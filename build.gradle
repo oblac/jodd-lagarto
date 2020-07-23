@@ -19,6 +19,9 @@ targetCompatibility = 1.8
 
 rootProject.description = 'Java HTML parsers suite'
 
+ext {
+}
+
 java {
     withSourcesJar()
     withJavadocJar()
@@ -98,6 +101,8 @@ task release() {
 //
 // UTILS
 //
+
+apply from: "${rootProject.projectDir}/gradle/license.gradle"
 
 tasks.named('wrapper') {
     distributionType = Wrapper.DistributionType.ALL
