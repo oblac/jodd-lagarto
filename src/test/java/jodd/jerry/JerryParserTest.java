@@ -38,13 +38,13 @@ class JerryParserTest {
 
 	@Test
 	void testJerryParserCreation() {
-		Jerry.JerryParser jerryParser = Jerry.jerry();
+		final Jerry.JerryParser jerryParser = Jerry.jerry();
 
 		((LagartoDOMBuilder) jerryParser.getDOMBuilder()).enableXmlMode();
 
-		Jerry doc = jerryParser.parse("<xml>   <book isbn='123'> <name>Foo<br></name>   </book></xml>");
+		final Jerry doc = jerryParser.parse("<xml>   <book isbn='123'> <name>Foo<br></name>   </book></xml>");
 
-		Jerry name = doc.s("book name");
+		final Jerry name = doc.s("book name");
 
 		assertEquals("Foo", name.text());
 
@@ -53,13 +53,13 @@ class JerryParserTest {
 
 	@Test
 	void testAppendContent() {
-		Jerry.JerryParser jerryParser = Jerry.jerry();
+		final Jerry.JerryParser jerryParser = Jerry.jerry();
 
 		((LagartoDOMBuilder) jerryParser.getDOMBuilder()).enableHtmlMode();
 
-		Jerry doc = jerryParser.parse("<xml><book isbn='123'><name>Foo</name></book></xml>");
+		final Jerry doc = jerryParser.parse("<xml><book isbn='123'><name>Foo</name></book></xml>");
 
-		Jerry book = doc.s("book");
+		final Jerry book = doc.s("book");
 
 		book.append("<br>");
 
@@ -68,13 +68,13 @@ class JerryParserTest {
 
 	@Test
 	void testAppendContent2() {
-		Jerry.JerryParser jerryParser = Jerry.jerry();
+		final Jerry.JerryParser jerryParser = Jerry.jerry();
 
 		((LagartoDOMBuilder) jerryParser.getDOMBuilder()).enableXmlMode();
 
-		Jerry doc = jerryParser.parse("<xml><book isbn='123'><name>Foo</name></book></xml>");
+		final Jerry doc = jerryParser.parse("<xml><book isbn='123'><name>Foo</name></book></xml>");
 
-		Jerry book = doc.s("book");
+		final Jerry book = doc.s("book");
 
 		book.append("<br>");
 
@@ -83,13 +83,13 @@ class JerryParserTest {
 
 	@Test
 	void testAppendContent3() {
-		Jerry.JerryParser jerryParser = Jerry.jerry();
+		final Jerry.JerryParser jerryParser = Jerry.jerry();
 
 		((LagartoDOMBuilder) jerryParser.getDOMBuilder()).enableXhtmlMode();
 
-		Jerry doc = jerryParser.parse("<xml><book isbn='123'><name>Foo</name></book></xml>");
+		final Jerry doc = jerryParser.parse("<xml><book isbn='123'><name>Foo</name></book></xml>");
 
-		Jerry book = doc.s("book");
+		final Jerry book = doc.s("book");
 
 		book.append("<br>");
 
@@ -98,9 +98,9 @@ class JerryParserTest {
 
 	@Test
 	void testAttributeCaseSensitive() {
-		String str = "<dIV id='one' myAttr='aaa'>xxx</dIV>";
+		final String str = "<dIV id='one' myAttr='aaa'>xxx</dIV>";
 
-		Jerry.JerryParser jerryParser = Jerry.jerry();
+		final Jerry.JerryParser jerryParser = Jerry.jerry();
 		((LagartoDOMBuilder) jerryParser.getDOMBuilder()).enableHtmlMode();
 
 		// default, case not sensitive
@@ -119,7 +119,7 @@ class JerryParserTest {
 
 		// case sensitive
 
-		((LagartoDOMBuilder) jerryParser.getDOMBuilder()).getConfig().setCaseSensitive(true);
+		((LagartoDOMBuilder) jerryParser.getDOMBuilder()).getParserConfig().setCaseSensitive(true);
 
 		doc = jerryParser.parse(str);
 		document = (Document) doc.get(0);

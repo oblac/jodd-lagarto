@@ -273,7 +273,8 @@ class DomTreeTest {
 		html = StringUtil.replace(html, "&#32;", " ");
 		final LagartoDOMBuilder builder = new LagartoDOMBuilder();
 		builder.getConfig().setSelfCloseVoidTags(true);                        // use self-closing tags!
-		builder.getConfig().setEnableConditionalComments(true).setCondCommentIEVersion(6);
+		builder.getParserConfig().setEnableConditionalComments(true);
+		builder.getConfig().setCondCommentIEVersion(6);
 		document = builder.parse(html);
 		innerHtml = document.getHtml();
 		innerHtml = StringUtil.replace(innerHtml, "»", "&raquo;");

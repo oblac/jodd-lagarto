@@ -30,7 +30,7 @@ import jodd.lagarto.LagartoParserConfig;
  * Additional configuration for {@link jodd.lagarto.dom.LagartoDOMBuilder}
  * based on {@link jodd.lagarto.LagartoParserConfig}.
  */
-public class LagartoDomBuilderConfig extends LagartoParserConfig<LagartoDomBuilderConfig> {
+public class LagartoDomBuilderConfig {
 
 	protected boolean ignoreWhitespacesBetweenTags;
 	protected boolean ignoreComments;
@@ -44,6 +44,7 @@ public class LagartoDomBuilderConfig extends LagartoParserConfig<LagartoDomBuild
 	protected boolean unclosedTagAsOrphanCheck;
 
 	protected LagartoHtmlRenderer lagartoHtmlRenderer = new LagartoHtmlRenderer();
+	protected LagartoParserConfig parserConfig = new LagartoParserConfig();
 
 	// ---------------------------------------------------------------- access
 
@@ -159,5 +160,13 @@ public class LagartoDomBuilderConfig extends LagartoParserConfig<LagartoDomBuild
 
 	public void setLagartoHtmlRenderer(final LagartoHtmlRenderer lagartoHtmlRenderer) {
 		this.lagartoHtmlRenderer = lagartoHtmlRenderer;
+	}
+
+	public LagartoParserConfig getParserConfig() {
+		return parserConfig;
+	}
+
+	public void setParserConfig(final LagartoParserConfig parserConfig) {
+		this.parserConfig = parserConfig;
 	}
 }

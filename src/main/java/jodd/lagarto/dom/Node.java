@@ -77,7 +77,7 @@ public abstract class Node implements Cloneable {
 		this.ownerDocument = document;
 		this.nodeRawName = nodeName;
 		if (nodeName != null) {
-			this.nodeName = ownerDocument.config.isCaseSensitive() ? nodeName : nodeName.toLowerCase();
+			this.nodeName = ownerDocument.config.parserConfig.isCaseSensitive() ? nodeName : nodeName.toLowerCase();
 		} else {
 			this.nodeName = null;
 		}
@@ -97,7 +97,7 @@ public abstract class Node implements Cloneable {
 		if (attributes != null) {
 			dest.attributes = new ArrayList<>(attributes.size());
 			for (int i = 0, attributesSize = attributes.size(); i < attributesSize; i++) {
-				Attribute attr = attributes.get(i);
+				final Attribute attr = attributes.get(i);
 				dest.attributes.add(attr.clone());
 			}
 		}
@@ -105,8 +105,8 @@ public abstract class Node implements Cloneable {
 		if (childNodes != null) {
 			dest.childNodes = new ArrayList<>(childNodes.size());
 			for (int i = 0, childNodesSize = childNodes.size(); i < childNodesSize; i++) {
-				Node child = childNodes.get(i);
-				Node childClone = child.clone();
+				final Node child = childNodes.get(i);
+				final Node childClone = child.clone();
 
 				childClone.parentNode = dest;    // fix parent!
 				dest.childNodes.add(childClone);
@@ -199,7 +199,7 @@ public abstract class Node implements Cloneable {
 		if (nodes.length == 0) {
 			return;	// nothing to add
 		}
-		for (Node node : nodes) {
+		for (final Node node : nodes) {
 			node.detachFromParent();
 			node.parentNode = this;
 			initChildNodes(node);
@@ -217,7 +217,7 @@ public abstract class Node implements Cloneable {
 		try {
 			initChildNodes(node);
 			childNodes.add(index, node);
-		} catch (IndexOutOfBoundsException ignore) {
+		} catch (final IndexOutOfBoundsException ignore) {
 			throw new LagartoDOMException("Invalid node index: " + index);
 		}
 		reindexChildren();
@@ -228,14 +228,14 @@ public abstract class Node implements Cloneable {
 	 * after all children are added.
 	 */
 	public void insertChild(final Node[] nodes, int index) {
-		for (Node node : nodes) {
+		for (final Node node : nodes) {
 			node.detachFromParent();
 			node.parentNode = this;
 			try {
 				initChildNodes(node);
 				childNodes.add(index, node);
 				index++;
-			} catch (IndexOutOfBoundsException ignore) {
+			} catch (final IndexOutOfBoundsException ignore) {
 				throw new LagartoDOMException("Invalid node index: " + index);
 			}
 		}
@@ -246,7 +246,7 @@ public abstract class Node implements Cloneable {
 	 * Inserts node before provided node.
 	 */
 	public void insertBefore(final Node newChild, final Node refChild) {
-		int siblingIndex = refChild.getSiblingIndex();
+		final int siblingIndex = refChild.getSiblingIndex();
 		refChild.parentNode.insertChild(newChild, siblingIndex);
 	}
 
@@ -257,7 +257,7 @@ public abstract class Node implements Cloneable {
 		if (newChilds.length == 0) {
 			return;
 		}
-		int siblingIndex = refChild.getSiblingIndex();
+		final int siblingIndex = refChild.getSiblingIndex();
 		refChild.parentNode.insertChild(newChilds, siblingIndex);
 	}
 
@@ -265,7 +265,7 @@ public abstract class Node implements Cloneable {
 	 * Inserts node after provided node.
 	 */
 	public void insertAfter(final Node newChild, final Node refChild) {
-		int siblingIndex = refChild.getSiblingIndex() + 1;
+		final int siblingIndex = refChild.getSiblingIndex() + 1;
 		if (siblingIndex == refChild.parentNode.getChildNodesCount()) {
 			refChild.parentNode.addChild(newChild);
 		} else {
@@ -281,7 +281,7 @@ public abstract class Node implements Cloneable {
 			return;
 		}
 
-		int siblingIndex = refChild.getSiblingIndex() + 1;
+		final int siblingIndex = refChild.getSiblingIndex() + 1;
 		if (siblingIndex == refChild.parentNode.getChildNodesCount()) {
 			refChild.parentNode.addChild(newChilds);
 		} else {
@@ -297,10 +297,10 @@ public abstract class Node implements Cloneable {
 		if (childNodes == null) {
 			return null;
 		}
-		Node node;
+		final Node node;
 		try {
 			node = childNodes.get(index);
-		} catch (IndexOutOfBoundsException ignore) {
+		} catch (final IndexOutOfBoundsException ignore) {
 			return null;
 		}
 		node.detachFromParent();
@@ -322,14 +322,14 @@ public abstract class Node implements Cloneable {
 	 * Removes all child nodes. Each child node will be detached from this parent.
 	 */
 	public void removeAllChilds() {
-		List<Node> removedNodes = childNodes;
+		final List<Node> removedNodes = childNodes;
 		childNodes = null;
 		childElementNodes = null;
 		childElementNodesCount = 0;
 
 		if (removedNodes != null) {
 			for (int i = 0, removedNodesSize = removedNodes.size(); i < removedNodesSize; i++) {
-				Node removedNode = removedNodes.get(i);
+				final Node removedNode = removedNodes.get(i);
 				removedNode.detachFromParent();
 			}
 		}
@@ -384,11 +384,11 @@ public abstract class Node implements Cloneable {
 		if (attributes == null) {
 			return false;
 		}
-		if (!ownerDocument.config.isCaseSensitive()) {
+		if (!ownerDocument.config.parserConfig.isCaseSensitive()) {
 			name = name.toLowerCase();
 		}
 		for (int i = 0, attributesSize = attributes.size(); i < attributesSize; i++) {
-			Attribute attr = attributes.get(i);
+			final Attribute attr = attributes.get(i);
 			if (attr.getName().equals(name)) {
 				return true;
 			}
@@ -402,7 +402,7 @@ public abstract class Node implements Cloneable {
 	 * specify a value.
 	 */
 	public String getAttribute(final String name) {
-		Attribute attribute = getAttributeInstance(name);
+		final Attribute attribute = getAttributeInstance(name);
 		if (attribute == null) {
 			return null;
 		}
@@ -414,12 +414,12 @@ public abstract class Node implements Cloneable {
 			return null;
 		}
 
-		if (!ownerDocument.config.isCaseSensitive()) {
+		if (!ownerDocument.config.parserConfig.isCaseSensitive()) {
 			name = name.toLowerCase();
 		}
 
 		for (int i = 0, attributesSize = attributes.size(); i < attributesSize; i++) {
-			Attribute attr = attributes.get(i);
+			final Attribute attr = attributes.get(i);
 			if (attr.getName().equals(name)) {
 				return attr;
 			}
@@ -432,12 +432,12 @@ public abstract class Node implements Cloneable {
 			return -1;
 		}
 
-		if (!ownerDocument.config.isCaseSensitive()) {
+		if (!ownerDocument.config.parserConfig.isCaseSensitive()) {
 			name = name.toLowerCase();
 		}
 
 		for (int i = 0, attributesSize = attributes.size(); i < attributesSize; i++) {
-			Attribute attr = attributes.get(i);
+			final Attribute attr = attributes.get(i);
 			if (attr.getName().equals(name)) {
 				return i;
 			}
@@ -446,7 +446,7 @@ public abstract class Node implements Cloneable {
 	}
 
 	public boolean removeAttribute(final String name) {
-		int index = indexOfAttributeInstance(name);
+		final int index = indexOfAttributeInstance(name);
 		if (index == -1) {
 			return false;
 		}
@@ -460,14 +460,14 @@ public abstract class Node implements Cloneable {
 	public void setAttribute(String name, final String value) {
 		initAttributes();
 
-		String rawAttributeName = name;
-		if (!ownerDocument.config.isCaseSensitive()) {
+		final String rawAttributeName = name;
+		if (!ownerDocument.config.parserConfig.isCaseSensitive()) {
 			name = name.toLowerCase();
 		}
 
 		// search if attribute with the same name exist
 		for (int i = 0, attributesSize = attributes.size(); i < attributesSize; i++) {
-			Attribute attr = attributes.get(i);
+			final Attribute attr = attributes.get(i);
 			if (attr.getName().equals(name)) {
 				attr.setValue(value);
 				return;
@@ -487,7 +487,7 @@ public abstract class Node implements Cloneable {
 	 * Returns <code>true</code> if attribute containing some word.
 	 */
 	public boolean isAttributeContaining(final String name, final String word) {
-		Attribute attr = getAttributeInstance(name);
+		final Attribute attr = getAttributeInstance(name);
 		if (attr == null) {
 			return false;
 		}
@@ -527,7 +527,7 @@ public abstract class Node implements Cloneable {
 	 * Returns number of child <b>elements</b> with given name.
 	 */
 	public int getChildElementsCount(final String elementName) {
-		Node lastChild = getLastChildElement(elementName);
+		final Node lastChild = getLastChildElement(elementName);
 		return lastChild.siblingNameIndex + 1;
 	}
 
@@ -599,7 +599,7 @@ public abstract class Node implements Cloneable {
 	 */
 	public Node getChild(final int... indexes) {
 		Node node = this;
-		for (int index : indexes) {
+		for (final int index : indexes) {
 			node = node.getChild(index);
 		}
 		return node;
@@ -653,7 +653,7 @@ public abstract class Node implements Cloneable {
 			return null;
 		}
 		for (int i = 0, childNodesSize = childNodes.size(); i < childNodesSize; i++) {
-			Node child = childNodes.get(i);
+			final Node child = childNodes.get(i);
 			if (child.getNodeType() == NodeType.ELEMENT && elementName.equals(child.getNodeName())) {
 				child.initSiblingNames();
 				return (Element) child;
@@ -697,9 +697,9 @@ public abstract class Node implements Cloneable {
 		if (childNodes == null) {
 			return null;
 		}
-		int from = childNodes.size() - 1;
+		final int from = childNodes.size() - 1;
 		for (int i = from; i >= 0; i--) {
-			Node child = childNodes.get(i);
+			final Node child = childNodes.get(i);
 			if (child.getNodeType() == NodeType.ELEMENT && elementName.equals(child.getNodeName())) {
 				child.initSiblingNames();
 				return (Element) child;
@@ -724,7 +724,7 @@ public abstract class Node implements Cloneable {
 		// children
 		int siblingElementIndex = 0;
 		for (int i = 0, childNodesSize = childNodes.size(); i < childNodesSize; i++) {
-			Node childNode = childNodes.get(i);
+			final Node childNode = childNodes.get(i);
 
 			if (childNode.siblingIndex != i) {
 				return false;
@@ -748,9 +748,9 @@ public abstract class Node implements Cloneable {
 				return false;
 			}
 
-			int childCount = getChildNodesCount();
+			final int childCount = getChildNodesCount();
 			for (int i = 0; i < childCount; i++) {
-				Node child = getChild(i);
+				final Node child = getChild(i);
 				if (child.siblingElementIndex >= 0) {
 					if (childElementNodes[child.siblingElementIndex] != child) {
 						return false;
@@ -761,10 +761,10 @@ public abstract class Node implements Cloneable {
 
 		// sibling names
 		if (siblingNameIndex != -1) {
-			List<Node> siblings = parentNode.childNodes;
+			final List<Node> siblings = parentNode.childNodes;
 			int index = 0;
 			for (int i = 0, siblingsSize = siblings.size(); i < siblingsSize; i++) {
-				Node sibling = siblings.get(i);
+				final Node sibling = siblings.get(i);
 				if (sibling.siblingNameIndex == -1
 						&& nodeType == NodeType.ELEMENT
 						&& nodeName.equals(sibling.getNodeName())) {
@@ -776,7 +776,7 @@ public abstract class Node implements Cloneable {
 		}
 
 		// process children
-		for (Node childNode : childNodes) {
+		for (final Node childNode : childNodes) {
 			if (!childNode.check()) {
 				return false;
 			}
@@ -796,7 +796,7 @@ public abstract class Node implements Cloneable {
 	protected void reindexChildren() {
 		int siblingElementIndex = 0;
 		for (int i = 0, childNodesSize = childNodes.size(); i < childNodesSize; i++) {
-			Node childNode = childNodes.get(i);
+			final Node childNode = childNodes.get(i);
 
 			childNode.siblingIndex = i;
 			childNode.siblingNameIndex = -1;	// reset sibling name info
@@ -815,12 +815,12 @@ public abstract class Node implements Cloneable {
 	 * Only added children are optimized.
 	 */
 	protected void reindexChildrenOnAdd(final int addedCount) {
-		int childNodesSize = childNodes.size();
-		int previousSize = childNodes.size() - addedCount;
+		final int childNodesSize = childNodes.size();
+		final int previousSize = childNodes.size() - addedCount;
 
 		int siblingElementIndex = childElementNodesCount;
 		for (int i = previousSize; i < childNodesSize; i++) {
-			Node childNode = childNodes.get(i);
+			final Node childNode = childNodes.get(i);
 
 			childNode.siblingIndex = i;
 			childNode.siblingNameIndex = -1;	// reset sibling name info
@@ -841,9 +841,9 @@ public abstract class Node implements Cloneable {
 		if (childElementNodes == null) {
 			childElementNodes = new Element[childElementNodesCount];
 
-			int childCount = getChildNodesCount();
+			final int childCount = getChildNodesCount();
 			for (int i = 0; i < childCount; i++) {
-				Node child = getChild(i);
+				final Node child = getChild(i);
 				if (child.siblingElementIndex >= 0) {
 					childElementNodes[child.siblingElementIndex] = (Element) child;
 				}
@@ -856,10 +856,10 @@ public abstract class Node implements Cloneable {
 	 */
 	protected void initSiblingNames() {
 		if (siblingNameIndex == -1) {
-			List<Node> siblings = parentNode.childNodes;
+			final List<Node> siblings = parentNode.childNodes;
 			int index = 0;
 			for (int i = 0, siblingsSize = siblings.size(); i < siblingsSize; i++) {
-				Node sibling = siblings.get(i);
+				final Node sibling = siblings.get(i);
 				if (sibling.siblingNameIndex == -1
 						&& nodeType == NodeType.ELEMENT
 						&& nodeName.equals(sibling.getNodeName())) {
@@ -899,9 +899,9 @@ public abstract class Node implements Cloneable {
 	protected void changeOwnerDocument(final Node node, final Document ownerDocument) {
 		node.ownerDocument = ownerDocument;
 
-		int childCount = node.getChildNodesCount();
+		final int childCount = node.getChildNodesCount();
 		for (int i = 0; i < childCount; i++) {
-			Node child = node.getChild(i);
+			final Node child = node.getChild(i);
 			changeOwnerDocument(child, ownerDocument);
 		}
 	}
@@ -933,8 +933,8 @@ public abstract class Node implements Cloneable {
 	 * <code>null</code> if this is the last sibling.
 	 */
 	public Node getNextSibling() {
-		List<Node> siblings = parentNode.childNodes;
-		int index = siblingIndex + 1;
+		final List<Node> siblings = parentNode.childNodes;
+		final int index = siblingIndex + 1;
 		if (index >= siblings.size()) {
 			return null;
 		}
@@ -947,16 +947,16 @@ public abstract class Node implements Cloneable {
 	public Node getNextSiblingElement() {
 		parentNode.initChildElementNodes();
 		if (siblingElementIndex == -1) {
-			int max = parentNode.getChildNodesCount();
+			final int max = parentNode.getChildNodesCount();
 			for (int i = siblingIndex; i < max; i++) {
-				Node sibling = parentNode.childNodes.get(i);
+				final Node sibling = parentNode.childNodes.get(i);
 				if (sibling.getNodeType() == NodeType.ELEMENT) {
 					return sibling;
 				}
 			}
 			return null;
 		}
-		int index = siblingElementIndex + 1;
+		final int index = siblingElementIndex + 1;
 		if (index >= parentNode.childElementNodesCount) {
 			return null;
 		}
@@ -971,10 +971,10 @@ public abstract class Node implements Cloneable {
 			return null;
 		}
 		initSiblingNames();
-		int index = siblingNameIndex + 1;
-		int max = parentNode.getChildNodesCount();
+		final int index = siblingNameIndex + 1;
+		final int max = parentNode.getChildNodesCount();
 		for (int i = siblingIndex + 1; i < max; i++) {
-			Node sibling = parentNode.childNodes.get(i);
+			final Node sibling = parentNode.childNodes.get(i);
 			if ((index == sibling.siblingNameIndex) && nodeName.equals(sibling.getNodeName())) {
 				return sibling;
 			}
@@ -990,8 +990,8 @@ public abstract class Node implements Cloneable {
 	 * or <code>null</code> if this is the first sibling.
 	 */
 	public Node getPreviousSibling() {
-		List<Node> siblings = parentNode.childNodes;
-		int index = siblingIndex - 1;
+		final List<Node> siblings = parentNode.childNodes;
+		final int index = siblingIndex - 1;
 		if (index < 0) {
 			return null;
 		}
@@ -1007,14 +1007,14 @@ public abstract class Node implements Cloneable {
 		parentNode.initChildElementNodes();
 		if (siblingElementIndex == -1) {
 			for (int i = siblingIndex - 1; i >= 0; i--) {
-				Node sibling = parentNode.childNodes.get(i);
+				final Node sibling = parentNode.childNodes.get(i);
 				if (sibling.getNodeType() == NodeType.ELEMENT) {
 					return sibling;
 				}
 			}
 			return null;
 		}
-		int index = siblingElementIndex - 1;
+		final int index = siblingElementIndex - 1;
 		if (index < 0) {
 			return null;
 		}
@@ -1029,9 +1029,9 @@ public abstract class Node implements Cloneable {
 			return null;
 		}
 		initSiblingNames();
-		int index = siblingNameIndex -1;
+		final int index = siblingNameIndex -1;
 		for (int i = siblingIndex; i >= 0; i--) {
-			Node sibling = parentNode.childNodes.get(i);
+			final Node sibling = parentNode.childNodes.get(i);
 			if ((index == sibling.siblingNameIndex) && nodeName.equals(sibling.getNodeName())) {
 				return sibling;
 			}
@@ -1046,7 +1046,7 @@ public abstract class Node implements Cloneable {
 	 * @see #appendTextContent(Appendable)
 	 */
 	public String getTextContent() {
-		StringBuilder sb = new StringBuilder(getChildNodesCount() + 1);
+		final StringBuilder sb = new StringBuilder(getChildNodesCount() + 1);
 		appendTextContent(sb);
 		return sb.toString();
 	}
@@ -1062,14 +1062,14 @@ public abstract class Node implements Cloneable {
 			if ((nodeType == NodeType.TEXT) || (nodeType == NodeType.CDATA)) {
 				try {
 					appendable.append(nodeValue);
-				} catch (IOException ioex) {
+				} catch (final IOException ioex) {
 					throw new LagartoDOMException(ioex);
 				}
 			}
 		}
 		if (childNodes != null) {
 			for (int i = 0, childNodesSize = childNodes.size(); i < childNodesSize; i++) {
-				Node childNode = childNodes.get(i);
+				final Node childNode = childNodes.get(i);
 				childNode.appendTextContent(appendable);
 			}
 		}
@@ -1081,14 +1081,14 @@ public abstract class Node implements Cloneable {
 	 * Generates HTML.
 	 */
 	public String getHtml() {
-		LagartoDomBuilderConfig lagartoDomBuilderConfig;
+		final LagartoDomBuilderConfig lagartoDomBuilderConfig;
 		if (ownerDocument == null) {
 			lagartoDomBuilderConfig = ((Document) this).getConfig();
 		} else {
 			lagartoDomBuilderConfig = ownerDocument.getConfig();
 		}
 
-		LagartoHtmlRenderer lagartoHtmlRenderer =
+		final LagartoHtmlRenderer lagartoHtmlRenderer =
 				lagartoDomBuilderConfig.getLagartoHtmlRenderer();
 
 		return lagartoHtmlRenderer.toHtml(this, new StringBuilder());
@@ -1098,14 +1098,14 @@ public abstract class Node implements Cloneable {
 	 * Generates inner HTML.
 	 */
 	public String getInnerHtml() {
-		LagartoDomBuilderConfig lagartoDomBuilderConfig;
+		final LagartoDomBuilderConfig lagartoDomBuilderConfig;
 		if (ownerDocument == null) {
 			lagartoDomBuilderConfig = ((Document) this).getConfig();
 		} else {
 			lagartoDomBuilderConfig = ownerDocument.getConfig();
 		}
 
-		LagartoHtmlRenderer lagartoHtmlRenderer =
+		final LagartoHtmlRenderer lagartoHtmlRenderer =
 				lagartoDomBuilderConfig.getLagartoHtmlRenderer();
 
 		return lagartoHtmlRenderer.toInnerHtml(this, new StringBuilder());
@@ -1124,7 +1124,7 @@ public abstract class Node implements Cloneable {
 	protected void visitChildren(final NodeVisitor nodeVisitor) {
 		if (childNodes != null) {
 			for (int i = 0, childNodesSize = childNodes.size(); i < childNodesSize; i++) {
-				Node childNode = childNodes.get(i);
+				final Node childNode = childNodes.get(i);
 				childNode.visit(nodeVisitor);
 			}
 		}
@@ -1142,15 +1142,15 @@ public abstract class Node implements Cloneable {
 	 * Returns CSS path to this node from document root.
 	 */
 	public String getCssPath() {
-		StringBuilder path = new StringBuilder();
+		final StringBuilder path = new StringBuilder();
 
 		Node node = this;
 		while (node != null) {
-			String nodeName = node.getNodeName();
+			final String nodeName = node.getNodeName();
 			if (nodeName != null) {
-				StringBuilder sb = new StringBuilder();
+				final StringBuilder sb = new StringBuilder();
 				sb.append(' ').append(nodeName);
-				String id = node.getAttribute("id");
+				final String id = node.getAttribute("id");
 				if (id != null) {
 					sb.append('#').append(id);
 				}

@@ -84,7 +84,7 @@ class DomXmlTest {
 	}
 
 	@Test
-	void testWhitespaces() throws IOException {
+	void testWhitespaces() {
 		final String xmlContent = "<foo>   <!--c-->  <bar>   </bar> <x/> </foo>";
 
 		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
@@ -147,7 +147,7 @@ class DomXmlTest {
 		lagartoDOMBuilder.enableXmlMode();
 		lagartoDOMBuilder.getConfig().setIgnoreComments(true);
 		lagartoDOMBuilder.getConfig().setCollectErrors(true);
-		lagartoDOMBuilder.getConfig().setCalculatePosition(true);
+		lagartoDOMBuilder.getParserConfig().setCalculatePosition(true);
 
 		final Document doc = lagartoDOMBuilder.parse(xmlContent);
 		final List<String> errors = doc.getErrors();

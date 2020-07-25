@@ -42,8 +42,8 @@ class LagartoHtmlRendererTest {
 	
 	@Test
 	void testSimple() {
-		String html = "<html><boDY><div id=\"z\" fooBar=\"aAa\">some Text</div></boDY></html>";
-		LagartoDOMBuilder domBuilder = new LagartoDOMBuilder();
+		final String html = "<html><boDY><div id=\"z\" fooBar=\"aAa\">some Text</div></boDY></html>";
+		final LagartoDOMBuilder domBuilder = new LagartoDOMBuilder();
 
 		// case insensitive -> lowercase
 		Document document = domBuilder.parse(html);
@@ -51,7 +51,7 @@ class LagartoHtmlRendererTest {
 		assertEquals("<html><body><div id=\"z\" foobar=\"aAa\">some Text</div></body></html>", htmlOut);
 
 		// case sensitive -> raw
-		domBuilder.getConfig().setCaseSensitive(true);
+		domBuilder.getParserConfig().setCaseSensitive(true);
 		document = domBuilder.parse(html);
 		htmlOut = document.getHtml();
 		assertEquals(html, htmlOut);
@@ -59,19 +59,19 @@ class LagartoHtmlRendererTest {
 
 	@Test
 	void testCases() {
-		String html = "<html><boDY><div id=\"z\" fooBar=\"aAa\">some Text</div></boDY></html>";
-		LagartoDOMBuilder domBuilder = new LagartoDOMBuilder();
+		final String html = "<html><boDY><div id=\"z\" fooBar=\"aAa\">some Text</div></boDY></html>";
+		final LagartoDOMBuilder domBuilder = new LagartoDOMBuilder();
 
 		// case insensitive -> lowercase
-		Document document = domBuilder.parse(html);
+		final Document document = domBuilder.parse(html);
 
 		// raw, default
 
 		document.getConfig().setLagartoHtmlRenderer(
 			new LagartoHtmlRenderer() {
 				@Override
-				protected NodeVisitor createRenderer(Appendable appendable) {
-					LagartoHtmlRendererNodeVisitor renderer =
+				protected NodeVisitor createRenderer(final Appendable appendable) {
+					final LagartoHtmlRendererNodeVisitor renderer =
 							(LagartoHtmlRendererNodeVisitor) super.createRenderer(appendable);
 
 					renderer.setTagCase(RAW);
@@ -88,8 +88,8 @@ class LagartoHtmlRendererTest {
 		document.getConfig().setLagartoHtmlRenderer(
 			new LagartoHtmlRenderer() {
 				@Override
-				protected NodeVisitor createRenderer(Appendable appendable) {
-					LagartoHtmlRendererNodeVisitor renderer =
+				protected NodeVisitor createRenderer(final Appendable appendable) {
+					final LagartoHtmlRendererNodeVisitor renderer =
 							(LagartoHtmlRendererNodeVisitor) super.createRenderer(appendable);
 
 					renderer.setTagCase(RAW);
@@ -107,8 +107,8 @@ class LagartoHtmlRendererTest {
 		document.getConfig().setLagartoHtmlRenderer(
 			new LagartoHtmlRenderer() {
 				@Override
-				protected NodeVisitor createRenderer(Appendable appendable) {
-					LagartoHtmlRendererNodeVisitor renderer =
+				protected NodeVisitor createRenderer(final Appendable appendable) {
+					final LagartoHtmlRendererNodeVisitor renderer =
 							(LagartoHtmlRendererNodeVisitor) super.createRenderer(appendable);
 
 					renderer.setTagCase(DEFAULT);
@@ -125,8 +125,8 @@ class LagartoHtmlRendererTest {
 		document.getConfig().setLagartoHtmlRenderer(
 			new LagartoHtmlRenderer() {
 				@Override
-				protected NodeVisitor createRenderer(Appendable appendable) {
-					LagartoHtmlRendererNodeVisitor renderer =
+				protected NodeVisitor createRenderer(final Appendable appendable) {
+					final LagartoHtmlRendererNodeVisitor renderer =
 							(LagartoHtmlRendererNodeVisitor) super.createRenderer(appendable);
 
 					renderer.setTagCase(DEFAULT);
@@ -143,8 +143,8 @@ class LagartoHtmlRendererTest {
 		document.getConfig().setLagartoHtmlRenderer(
 			new LagartoHtmlRenderer() {
 				@Override
-				protected NodeVisitor createRenderer(Appendable appendable) {
-					LagartoHtmlRendererNodeVisitor renderer =
+				protected NodeVisitor createRenderer(final Appendable appendable) {
+					final LagartoHtmlRendererNodeVisitor renderer =
 							(LagartoHtmlRendererNodeVisitor) super.createRenderer(appendable);
 
 					renderer.setTagCase(LOWERCASE);
@@ -162,8 +162,8 @@ class LagartoHtmlRendererTest {
 		document.getConfig().setLagartoHtmlRenderer(
 				new LagartoHtmlRenderer() {
 					@Override
-					protected NodeVisitor createRenderer(Appendable appendable) {
-						LagartoHtmlRendererNodeVisitor renderer =
+					protected NodeVisitor createRenderer(final Appendable appendable) {
+						final LagartoHtmlRendererNodeVisitor renderer =
 								(LagartoHtmlRendererNodeVisitor) super.createRenderer(appendable);
 
 						renderer.setTagCase(UPPERCASE);
@@ -191,12 +191,12 @@ class LagartoHtmlRendererTest {
 	 */
 	public static class CustomRenderer extends LagartoHtmlRenderer {
 		@Override
-		protected NodeVisitor createRenderer(Appendable appendable) {
+		protected NodeVisitor createRenderer(final Appendable appendable) {
 
 			return new LagartoHtmlRendererNodeVisitor(appendable) {
 
 				@Override
-				public void document(Document document) {
+				public void document(final Document document) {
 					configHtml();
 					super.document(document);
 				}
@@ -211,8 +211,8 @@ class LagartoHtmlRendererTest {
 				}
 
 				@Override
-				protected String resolveAttributeName(Node node, Attribute attribute) {
-					String attributeName = attribute.getRawName();
+				protected String resolveAttributeName(final Node node, final Attribute attribute) {
+					final String attributeName = attribute.getRawName();
 					if (attributeName.contains("_") || attributeName.contains("-")) {
 						return attributeName;
 					}
@@ -220,8 +220,8 @@ class LagartoHtmlRendererTest {
 				}
 
 				@Override
-				protected void elementBody(Element element) throws IOException {
-					boolean hasXML = element.hasAttribute("xml-attrib");
+				protected void elementBody(final Element element) throws IOException {
+					final boolean hasXML = element.hasAttribute("xml-attrib");
 
 					// detects XML content
 					if (hasXML) {
@@ -242,18 +242,18 @@ class LagartoHtmlRendererTest {
 
 	@Test
 	void testVKSethi() throws IOException {
-		String html = FileUtil.readString(new File(testDataRoot, "vksethi.html"));
-		String htmlExpected = FileUtil.readString(new File(testDataRoot, "vksethi-out.html"));
+		final String html = FileUtil.readString(new File(testDataRoot, "vksethi.html"));
+		final String htmlExpected = FileUtil.readString(new File(testDataRoot, "vksethi-out.html"));
 
-		LagartoDOMBuilder domBuilder = new LagartoDOMBuilder();
+		final LagartoDOMBuilder domBuilder = new LagartoDOMBuilder();
 		for (int i = 0; i < 2; i++) {
 			// this does not change anything with html output
-			domBuilder.getConfig().setCaseSensitive(i == 1);
+			domBuilder.getParserConfig().setCaseSensitive(i == 1);
 			domBuilder.getConfig().setLagartoHtmlRenderer(new CustomRenderer());
 
-			Document document = domBuilder.parse(html);
+			final Document document = domBuilder.parse(html);
 
-			String htmlOut = document.getHtml();
+			final String htmlOut = document.getHtml();
 			assertEquals(htmlExpected, htmlOut);
 		}
 	}

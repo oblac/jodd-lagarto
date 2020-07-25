@@ -293,16 +293,16 @@ public class LagartoDOMBuilderTagVisitor implements TagVisitor {
 	 */
 	protected Node findMatchingParentOpenTag(String tagName) {
 		Node parent = parentNode;
-		
-		if (!rootNode.config.isCaseSensitive()) {
+
+		if (!rootNode.config.parserConfig.isCaseSensitive()) {
 			tagName = tagName.toLowerCase();
 		}
-		
+
 		while (parent != null) {
 			String parentNodeName = parent.getNodeName();
 
 			if (parentNodeName != null) {
-				if (!rootNode.config.isCaseSensitive()) {
+				if (!rootNode.config.parserConfig.isCaseSensitive()) {
 					parentNodeName = parentNodeName.toLowerCase();
 				}
 			}

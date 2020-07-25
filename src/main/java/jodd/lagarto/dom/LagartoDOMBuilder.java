@@ -25,6 +25,9 @@
 package jodd.lagarto.dom;
 
 import jodd.lagarto.LagartoParser;
+import jodd.lagarto.LagartoParserConfig;
+
+import java.util.function.Consumer;
 
 /**
  * Lagarto DOM builder creates DOM tree from HTML, XHTML or XML content.
@@ -32,19 +35,29 @@ import jodd.lagarto.LagartoParser;
 public class LagartoDOMBuilder implements DOMBuilder {
 
 	public LagartoDOMBuilder() {
+		this(new LagartoDomBuilderConfig());
+	}
+
+	public LagartoDOMBuilder(final LagartoDomBuilderConfig config) {
+		this.config = config;
 		enableHtmlMode();
 	}
 
 	// ---------------------------------------------------------------- config
 
-	protected LagartoDomBuilderConfig config = new LagartoDomBuilderConfig();
+	protected final LagartoDomBuilderConfig config;
 
 	public LagartoDomBuilderConfig getConfig() {
 		return config;
 	}
 
-	public void setConfig(final LagartoDomBuilderConfig config) {
-		this.config = config;
+	public LagartoParserConfig getParserConfig() {
+		return config.parserConfig;
+	}
+
+	public LagartoDOMBuilder configure(final Consumer<LagartoDomBuilderConfig> configConsumer) {
+		configConsumer.accept(this.config);
+		return this;
 	}
 
 	// ---------------------------------------------------------------- quick settings
@@ -54,7 +67,7 @@ public class LagartoDOMBuilder implements DOMBuilder {
 	 */
 	public LagartoDOMBuilder enableDebug() {
 		config.collectErrors = true;
-		config.setCalculatePosition(true);
+		config.parserConfig.setCalculatePosition(true);
 		return this;
 	}
 
@@ -63,7 +76,7 @@ public class LagartoDOMBuilder implements DOMBuilder {
 	 */
 	public LagartoDOMBuilder disableDebug() {
 		config.collectErrors = false;
-		config.setCalculatePosition(false);
+		config.parserConfig.setCalculatePosition(false);
 		return this;
 	}
 
@@ -83,14 +96,14 @@ public class LagartoDOMBuilder implements DOMBuilder {
 	 * Enables HTML5 parsing mode.
 	 */
 	public LagartoDOMBuilder enableHtmlMode() {
-		config.ignoreWhitespacesBetweenTags = false;			// collect all whitespaces
-		config.setCaseSensitive(false);							// HTML is case insensitive
-		config.setEnableRawTextModes(true);						// script and style tags are parsed as CDATA
-		config.enabledVoidTags = true;							// list of void tags
-		config.selfCloseVoidTags = false;						// don't self close void tags
-		config.impliedEndTags = true;							// some tags end is implied
-		config.setEnableConditionalComments(false);				// don't enable IE conditional comments
-		config.setParseXmlTags(false);							// enable XML mode in parsing
+		config.ignoreWhitespacesBetweenTags = false;               // collect all whitespaces
+		config.parserConfig.setCaseSensitive(false);               // HTML is case insensitive
+		config.parserConfig.setEnableRawTextModes(true);           // script and style tags are parsed as CDATA
+		config.enabledVoidTags = true;                             // list of void tags
+		config.selfCloseVoidTags = false;                          // don't self close void tags
+		config.impliedEndTags = true;                              // some tags end is implied
+		config.parserConfig.setEnableConditionalComments(false);   // don't enable IE conditional comments
+		config.parserConfig.setParseXmlTags(false);                // enable XML mode in parsing
 		return this;
 	}
 
@@ -98,14 +111,14 @@ public class LagartoDOMBuilder implements DOMBuilder {
 	 * Enables XHTML mode.
 	 */
 	public LagartoDOMBuilder enableXhtmlMode() {
-		config.ignoreWhitespacesBetweenTags = false;			// collect all whitespaces
-		config.setCaseSensitive(true);							// XHTML is case sensitive
-		config.setEnableRawTextModes(false);					// all tags are parsed in the same way
-		config.enabledVoidTags = true;							// list of void tags
-		config.selfCloseVoidTags = true;						// self close void tags
-		config.impliedEndTags = false;							// no implied tag ends
-		config.setEnableConditionalComments(false);				// don't enable IE conditional comments
-		config.setParseXmlTags(false);							// enable XML mode in parsing
+		config.ignoreWhitespacesBetweenTags = false;               // collect all whitespaces
+		config.parserConfig.setCaseSensitive(true);                // XHTML is case sensitive
+		config.parserConfig.setEnableRawTextModes(false);          // all tags are parsed in the same way
+		config.enabledVoidTags = true;                             // list of void tags
+		config.selfCloseVoidTags = true;                           // self close void tags
+		config.impliedEndTags = false;                             // no implied tag ends
+		config.parserConfig.setEnableConditionalComments(false);   // don't enable IE conditional comments
+		config.parserConfig.setParseXmlTags(false);                // enable XML mode in parsing
 		return this;
 	}
 
@@ -113,14 +126,14 @@ public class LagartoDOMBuilder implements DOMBuilder {
 	 * Enables XML parsing mode.
 	 */
 	public LagartoDOMBuilder enableXmlMode() {
-		config.ignoreWhitespacesBetweenTags = true;				// ignore whitespaces that are non content
-		config.setCaseSensitive(true);							// XML is case sensitive
-		config.setEnableRawTextModes(false);					// all tags are parsed in the same way
-		config.enabledVoidTags = false;							// there are no void tags
-		config.selfCloseVoidTags = false;						// don't self close empty tags (can be changed!)
-		config.impliedEndTags = false;							// no implied tag ends
-		config.setEnableConditionalComments(false);				// disable IE conditional comments
-		config.setParseXmlTags(true);							// enable XML mode in parsing
+		config.ignoreWhitespacesBetweenTags = true;                // ignore whitespaces that are non content
+		config.parserConfig.setCaseSensitive(true);                // XML is case sensitive
+		config.parserConfig.setEnableRawTextModes(false);          // all tags are parsed in the same way
+		config.enabledVoidTags = false;                            // there are no void tags
+		config.selfCloseVoidTags = false;                          // don't self close empty tags (can be changed!)
+		config.impliedEndTags = false;                             // no implied tag ends
+		config.parserConfig.setEnableConditionalComments(false);   // disable IE conditional comments
+		config.parserConfig.setParseXmlTags(true);                 // enable XML mode in parsing
 		return this;
 	}
 
@@ -131,8 +144,8 @@ public class LagartoDOMBuilder implements DOMBuilder {
 	 */
 	@Override
 	public Document parse(final char[] content) {
-		LagartoParser lagartoParser = new LagartoParser(content);
-		return doParse(lagartoParser);
+		final LagartoParser lagartoParser = new LagartoParser(content);
+		return parseWithLagarto(lagartoParser);
 	}
 
 	/**
@@ -140,17 +153,17 @@ public class LagartoDOMBuilder implements DOMBuilder {
 	 */
 	@Override
 	public Document parse(final String content) {
-		LagartoParser lagartoParser = new LagartoParser(content);
-		return doParse(lagartoParser);
+		final LagartoParser lagartoParser = new LagartoParser(content);
+		return parseWithLagarto(lagartoParser);
 	}
 
 	/**
 	 * Parses the content using provided lagarto parser.
 	 */
-	protected Document doParse(final LagartoParser lagartoParser) {
-		lagartoParser.setConfig(config);
+	protected Document parseWithLagarto(final LagartoParser lagartoParser) {
+		lagartoParser.setConfig(config.parserConfig);
 
-		LagartoDOMBuilderTagVisitor domBuilderTagVisitor =
+		final LagartoDOMBuilderTagVisitor domBuilderTagVisitor =
 				new LagartoDOMBuilderTagVisitor(this);
 
 		lagartoParser.parse(domBuilderTagVisitor);

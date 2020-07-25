@@ -34,11 +34,14 @@ class JerryCustomTest {
 
 	@Test
 	void testConditionalTags() {
-		Jerry.JerryParser jerry = new Jerry.JerryParser();
+		final Jerry.JerryParser jerry = new Jerry.JerryParser();
 
-		((LagartoDOMBuilder) jerry.getDOMBuilder()).getConfig().setIgnoreComments(true);
+		((LagartoDOMBuilder) jerry.getDOMBuilder())
+				.configure(cfg -> {
+					cfg.setIgnoreComments(true);
+				});
 
-		Jerry doc = jerry.parse(
+		final Jerry doc = jerry.parse(
 				"<html>" +
 						"    <!--[if lt IE 7]>  <body class=\"ie ie6 ie_lte_9 ie_lte_8 ie_lte_7\"> <![endif]-->\n" +
 						"    <!--[if IE 7]>     <body class=\"ie ie7 ie_lte_9 ie_lte_8 ie_lte_7\"> <![endif]-->\n" +
@@ -56,13 +59,15 @@ class JerryCustomTest {
 
 	@Test
 	void testConditionalTags2() {
-		Jerry.JerryParser jerry = new Jerry.JerryParser();
+		final Jerry.JerryParser jerry = new Jerry.JerryParser();
 		((LagartoDOMBuilder) jerry.getDOMBuilder()).getConfig()
 				.setIgnoreComments(true)
-				.setEnableConditionalComments(true)
-				.setCondCommentIEVersion(8);
+				.setCondCommentIEVersion(8)
+				.getParserConfig()
+				.setEnableConditionalComments(true);
 
-		Jerry doc = jerry.parse(
+
+		final Jerry doc = jerry.parse(
 				"<html>" +
 						"    <!--[if lt IE 7]>  <body class=\"ie ie6 ie_lte_9 ie_lte_8 ie_lte_7\"> <![endif]-->\n" +
 						"    <!--[if IE 7]>     <body class=\"ie ie7 ie_lte_9 ie_lte_8 ie_lte_7\"> <![endif]-->\n" +
@@ -81,13 +86,14 @@ class JerryCustomTest {
 
 	@Test
 	void testConditionalTags3() {
-		Jerry.JerryParser jerry = new Jerry.JerryParser();
+		final Jerry.JerryParser jerry = new Jerry.JerryParser();
 		((LagartoDOMBuilder) jerry.getDOMBuilder()).getConfig()
 				.setIgnoreComments(true)
-				.setEnableConditionalComments(true)
-				.setCondCommentIEVersion(10);
+				.setCondCommentIEVersion(10)
+				.getParserConfig()
+				.setEnableConditionalComments(true);
 
-		Jerry doc = jerry.parse(
+		final Jerry doc = jerry.parse(
 				"<html>" +
 						"    <!--[if lt IE 7]>  <body class=\"ie ie6 ie_lte_9 ie_lte_8 ie_lte_7\"> <![endif]-->\n" +
 						"    <!--[if IE 7]>     <body class=\"ie ie7 ie_lte_9 ie_lte_8 ie_lte_7\"> <![endif]-->\n" +
