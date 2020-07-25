@@ -24,38 +24,41 @@
 
 package jodd.lagarto;
 
-import jodd.util.CharArraySequence;
 import jodd.util.CharUtil;
 
 /**
- * Utility scanner over a char buffer.
+ * Utility scanner over an input.
  */
-class Scanner {
+abstract class Scanner implements CharSequence {
 
-	protected char[] input;
-	protected int ndx = 0;
-	protected int total;
+	protected int ndx;
+	protected final int total;
 
-	Scanner() { }
-
-	/**
-	 * Initializes scanner.
-	 */
-	protected void initialize(final char[] input) {
-		this.input = input;
+	public Scanner(final int total) {
+		this.total = total;
 		this.ndx = -1;
-		this.total = input.length;
 	}
 
+	@Override
+	public int length() {
+		return total;
+	}
+
+	public abstract char charAtNdx();
+
 	// ---------------------------------------------------------------- find
+
+	public final int find(final char target) {
+		return find(target, ndx, total);
+	}
 
 	/**
 	 * Finds a character in some range and returns its index.
 	 * Returns <code>-1</code> if character is not found.
 	 */
-	protected final int find(final char target, int from, final int end) {
+	public final int find(final char target, int from, final int end) {
 		while (from < end) {
-			if (input[from] == target) {
+			if (charAt(from) == target) {
 				break;
 			}
 			from++;
@@ -64,11 +67,15 @@ class Scanner {
 		return (from == end) ? -1 : from;
 	}
 
+	public final int find(final char[] target, final int from) {
+		return find(target, from, total);
+	}
+
 	/**
 	 * Finds character buffer in some range and returns its index.
 	 * Returns <code>-1</code> if character is not found.
 	 */
-	protected final int find(final char[] target, int from, final int end) {
+	public final int find(final char[] target, int from, final int end) {
 		while (from < end) {
 			if (match(target, from)) {
 				break;
@@ -92,7 +99,7 @@ class Scanner {
 		int j = ndx;
 
 		for (int i = 0; i < target.length; i++, j++) {
-			if (input[j] != target[i]) {
+			if (charAt(j) != target[i]) {
 				return false;
 			}
 		}
@@ -119,7 +126,7 @@ class Scanner {
 		int j = ndx;
 
 		for (int i = 0; i < uppercaseTarget.length; i++, j++) {
-			final char c = CharUtil.toUpperAscii(input[j]);
+			final char c = CharUtil.toUpperAscii(charAt(j));
 
 			if (c != uppercaseTarget[i]) {
 				return false;
@@ -129,16 +136,10 @@ class Scanner {
 		return true;
 	}
 
-	// ---------------------------------------------------------------- char sequences
+	// ---------------------------------------------------------------- decode HTML name
 
-	/**
-	 * Creates char sub-sequence from the input.
-	 */
-	protected final CharSequence charSequence(final int from, final int to) {
-		if (from == to) {
-			return CharArraySequence.EMPTY;
-		}
-		return CharArraySequence.of(input, from, to - from);
+	public String decodeHtmlName() {
+		return HtmlDecoder.detectName(this, ndx);
 	}
 
 	// ---------------------------------------------------------------- position
@@ -157,12 +158,12 @@ class Scanner {
 	/**
 	 * Calculates {@link Position current position}: offset, line and column.
 	 */
-	protected Position position(final int position) {
+	protected Position positionOf(final int index) {
 		int line;
 		int offset;
 		int lastNewLineOffset;
 
-		if (position > lastOffset) {
+		if (index > lastOffset) {
 			line = 1;
 			offset = 0;
 			lastNewLineOffset = 0;
@@ -172,8 +173,8 @@ class Scanner {
 			lastNewLineOffset = lastLastNewLineOffset;
 		}
 
-		while (offset < position) {
-			final char c = input[offset];
+		while (offset < index) {
+			final char c = charAt(offset);
 
 			if (c == '\n') {
 				line++;
@@ -187,7 +188,7 @@ class Scanner {
 		lastLine = line;
 		lastLastNewLineOffset = lastNewLineOffset;
 
-		return new Position(position, line, position - lastNewLineOffset + 1);
+		return new Position(index, line, index - lastNewLineOffset + 1);
 	}
 
 	/**
@@ -203,12 +204,6 @@ class Scanner {
 			this.offset = offset;
 			this.line = line;
 			this.column = column;
-		}
-
-		public Position(final int offset) {
-			this.offset = offset;
-			this.line = -1;
-			this.column = -1;
 		}
 
 		@Override
