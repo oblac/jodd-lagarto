@@ -25,15 +25,17 @@
 package jodd.lagarto.dom;
 
 import jodd.io.FileUtil;
+import jodd.lagarto.dom.render.LagartoHtmlRenderer;
+import jodd.lagarto.dom.render.LagartoHtmlRendererNodeVisitor;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
 
-import static jodd.lagarto.dom.LagartoHtmlRendererNodeVisitor.Case.DEFAULT;
-import static jodd.lagarto.dom.LagartoHtmlRendererNodeVisitor.Case.LOWERCASE;
-import static jodd.lagarto.dom.LagartoHtmlRendererNodeVisitor.Case.RAW;
-import static jodd.lagarto.dom.LagartoHtmlRendererNodeVisitor.Case.UPPERCASE;
+import static jodd.lagarto.dom.render.LagartoHtmlRendererNodeVisitor.Case.DEFAULT;
+import static jodd.lagarto.dom.render.LagartoHtmlRendererNodeVisitor.Case.LOWERCASE;
+import static jodd.lagarto.dom.render.LagartoHtmlRendererNodeVisitor.Case.RAW;
+import static jodd.lagarto.dom.render.LagartoHtmlRendererNodeVisitor.Case.UPPERCASE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class LagartoHtmlRendererTest {
@@ -67,99 +69,99 @@ class LagartoHtmlRendererTest {
 
 		// raw, default
 
-		document.getConfig().setLagartoHtmlRenderer(
-			new LagartoHtmlRenderer() {
-				@Override
-				protected NodeVisitor createRenderer(final Appendable appendable) {
-					final LagartoHtmlRendererNodeVisitor renderer =
-							(LagartoHtmlRendererNodeVisitor) super.createRenderer(appendable);
+		document.getConfig().setHtmlRenderer(
+				new LagartoHtmlRenderer() {
+					@Override
+					protected NodeVisitor createRenderer(final Appendable appendable) {
+						final LagartoHtmlRendererNodeVisitor renderer =
+								(LagartoHtmlRendererNodeVisitor) super.createRenderer(appendable);
 
-					renderer.setTagCase(RAW);
-					renderer.setAttributeCase(DEFAULT);
+						renderer.setTagCase(RAW);
+						renderer.setAttributeCase(DEFAULT);
 
-					return renderer;
+						return renderer;
+					}
 				}
-			}
 		);
 
 		assertEquals("<html><boDY><div id=\"z\" foobar=\"aAa\">some Text</div></boDY></html>", document.getHtml());
 
 		// raw, raw
-		document.getConfig().setLagartoHtmlRenderer(
-			new LagartoHtmlRenderer() {
-				@Override
-				protected NodeVisitor createRenderer(final Appendable appendable) {
-					final LagartoHtmlRendererNodeVisitor renderer =
-							(LagartoHtmlRendererNodeVisitor) super.createRenderer(appendable);
+		document.getConfig().setHtmlRenderer(
+				new LagartoHtmlRenderer() {
+					@Override
+					protected NodeVisitor createRenderer(final Appendable appendable) {
+						final LagartoHtmlRendererNodeVisitor renderer =
+								(LagartoHtmlRendererNodeVisitor) super.createRenderer(appendable);
 
-					renderer.setTagCase(RAW);
-					renderer.setAttributeCase(RAW);
+						renderer.setTagCase(RAW);
+						renderer.setAttributeCase(RAW);
 
-					return renderer;
+						return renderer;
+					}
 				}
-			}
 		);
 
 		assertEquals(html, document.getHtml());
 
 		// default, raw
 
-		document.getConfig().setLagartoHtmlRenderer(
-			new LagartoHtmlRenderer() {
-				@Override
-				protected NodeVisitor createRenderer(final Appendable appendable) {
-					final LagartoHtmlRendererNodeVisitor renderer =
-							(LagartoHtmlRendererNodeVisitor) super.createRenderer(appendable);
+		document.getConfig().setHtmlRenderer(
+				new LagartoHtmlRenderer() {
+					@Override
+					protected NodeVisitor createRenderer(final Appendable appendable) {
+						final LagartoHtmlRendererNodeVisitor renderer =
+								(LagartoHtmlRendererNodeVisitor) super.createRenderer(appendable);
 
-					renderer.setTagCase(DEFAULT);
-					renderer.setAttributeCase(RAW);
+						renderer.setTagCase(DEFAULT);
+						renderer.setAttributeCase(RAW);
 
-					return renderer;
+						return renderer;
+					}
 				}
-			}
 		);
 
 		assertEquals("<html><body><div id=\"z\" fooBar=\"aAa\">some Text</div></body></html>", document.getHtml());
 
 		// default, default
-		document.getConfig().setLagartoHtmlRenderer(
-			new LagartoHtmlRenderer() {
-				@Override
-				protected NodeVisitor createRenderer(final Appendable appendable) {
-					final LagartoHtmlRendererNodeVisitor renderer =
-							(LagartoHtmlRendererNodeVisitor) super.createRenderer(appendable);
+		document.getConfig().setHtmlRenderer(
+				new LagartoHtmlRenderer() {
+					@Override
+					protected NodeVisitor createRenderer(final Appendable appendable) {
+						final LagartoHtmlRendererNodeVisitor renderer =
+								(LagartoHtmlRendererNodeVisitor) super.createRenderer(appendable);
 
-					renderer.setTagCase(DEFAULT);
-					renderer.setAttributeCase(DEFAULT);
+						renderer.setTagCase(DEFAULT);
+						renderer.setAttributeCase(DEFAULT);
 
-					return renderer;
+						return renderer;
+					}
 				}
-			}
 		);
 
 		assertEquals("<html><body><div id=\"z\" foobar=\"aAa\">some Text</div></body></html>", document.getHtml());
 
 		// lowercase, uppercase
-		document.getConfig().setLagartoHtmlRenderer(
-			new LagartoHtmlRenderer() {
-				@Override
-				protected NodeVisitor createRenderer(final Appendable appendable) {
-					final LagartoHtmlRendererNodeVisitor renderer =
-							(LagartoHtmlRendererNodeVisitor) super.createRenderer(appendable);
+		document.getConfig().setHtmlRenderer(
+				new LagartoHtmlRenderer() {
+					@Override
+					protected NodeVisitor createRenderer(final Appendable appendable) {
+						final LagartoHtmlRendererNodeVisitor renderer =
+								(LagartoHtmlRendererNodeVisitor) super.createRenderer(appendable);
 
-					renderer.setTagCase(LOWERCASE);
-					renderer.setAttributeCase(UPPERCASE);
+						renderer.setTagCase(LOWERCASE);
+						renderer.setAttributeCase(UPPERCASE);
 
-					return renderer;
+						return renderer;
+					}
 				}
-			}
 		);
 
 		assertEquals("<html><body><div ID=\"z\" FOOBAR=\"aAa\">some Text</div></body></html>", document.getHtml());
 
 		// uppercase, lowercase
 		// lowercase, uppercase
-		document.getConfig().setLagartoHtmlRenderer(
+		document.getConfig().setHtmlRenderer(
 				new LagartoHtmlRenderer() {
 					@Override
 					protected NodeVisitor createRenderer(final Appendable appendable) {
@@ -249,7 +251,7 @@ class LagartoHtmlRendererTest {
 		for (int i = 0; i < 2; i++) {
 			// this does not change anything with html output
 			domBuilder.getParserConfig().setCaseSensitive(i == 1);
-			domBuilder.getConfig().setLagartoHtmlRenderer(new CustomRenderer());
+			domBuilder.getConfig().setHtmlRenderer(new CustomRenderer());
 
 			final Document document = domBuilder.parse(html);
 

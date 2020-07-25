@@ -22,7 +22,10 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-package jodd.lagarto.dom;
+package jodd.lagarto.dom.render;
+
+import jodd.lagarto.dom.Node;
+import jodd.lagarto.dom.NodeVisitor;
 
 /**
  * Renderer is a factory for {@link jodd.lagarto.dom.NodeVisitor} that
@@ -34,7 +37,7 @@ public class LagartoHtmlRenderer {
 	 * Renders node to appendable.
 	 */
 	public String toHtml(final Node node, final Appendable appendable) {
-		NodeVisitor renderer = createRenderer(appendable);
+		final NodeVisitor renderer = createRenderer(appendable);
 
 		node.visit(renderer);
 
@@ -45,7 +48,7 @@ public class LagartoHtmlRenderer {
 	 * Renders node children to appendable.
 	 */
 	public String toInnerHtml(final Node node, final Appendable appendable) {
-		NodeVisitor renderer = createRenderer(appendable);
+		final NodeVisitor renderer = createRenderer(appendable);
 
 		node.visitChildren(renderer);
 

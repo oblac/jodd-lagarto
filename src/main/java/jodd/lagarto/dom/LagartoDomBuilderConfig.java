@@ -25,6 +25,7 @@
 package jodd.lagarto.dom;
 
 import jodd.lagarto.LagartoParserConfig;
+import jodd.lagarto.dom.render.LagartoHtmlRenderer;
 
 /**
  * Additional configuration for {@link jodd.lagarto.dom.LagartoDOMBuilder}
@@ -43,7 +44,7 @@ public class LagartoDomBuilderConfig {
 	protected boolean useFosterRules;
 	protected boolean unclosedTagAsOrphanCheck;
 
-	protected LagartoHtmlRenderer lagartoHtmlRenderer = new LagartoHtmlRenderer();
+	protected LagartoHtmlRenderer htmlRenderer = new LagartoHtmlRenderer();
 	protected LagartoParserConfig parserConfig = new LagartoParserConfig();
 
 	// ---------------------------------------------------------------- access
@@ -154,12 +155,12 @@ public class LagartoDomBuilderConfig {
 		return this;
 	}
 
-	public LagartoHtmlRenderer getLagartoHtmlRenderer() {
-		return lagartoHtmlRenderer;
+	public LagartoHtmlRenderer getHtmlRenderer() {
+		return htmlRenderer;
 	}
 
-	public void setLagartoHtmlRenderer(final LagartoHtmlRenderer lagartoHtmlRenderer) {
-		this.lagartoHtmlRenderer = lagartoHtmlRenderer;
+	public void setHtmlRenderer(final LagartoHtmlRenderer htmlRenderer) {
+		this.htmlRenderer = htmlRenderer;
 	}
 
 	public LagartoParserConfig getParserConfig() {

@@ -22,9 +22,20 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-package jodd.lagarto.dom;
+package jodd.lagarto.dom.render;
 
 import jodd.lagarto.TagWriterUtil;
+import jodd.lagarto.dom.Attribute;
+import jodd.lagarto.dom.CData;
+import jodd.lagarto.dom.Comment;
+import jodd.lagarto.dom.Document;
+import jodd.lagarto.dom.DocumentType;
+import jodd.lagarto.dom.Element;
+import jodd.lagarto.dom.LagartoDOMException;
+import jodd.lagarto.dom.Node;
+import jodd.lagarto.dom.NodeVisitor;
+import jodd.lagarto.dom.Text;
+import jodd.lagarto.dom.XmlDeclaration;
 import jodd.net.HtmlEncoder;
 
 import java.io.IOException;
@@ -42,21 +53,21 @@ public class LagartoHtmlRendererNodeVisitor implements NodeVisitor {
 
 	@Override
 	public void cdata(final CData cdata) {
-		String nodeValue = cdata.getNodeValue();
+		final String nodeValue = cdata.getNodeValue();
 		try {
 			TagWriterUtil.writeCData(appendable, nodeValue);
-		} catch (IOException ioex) {
+		} catch (final IOException ioex) {
 			throw new LagartoDOMException(ioex);
 		}
 	}
 
 	@Override
 	public void comment(final Comment comment) {
-		String nodeValue = comment.getNodeValue();
+		final String nodeValue = comment.getNodeValue();
 
 		try {
 			TagWriterUtil.writeComment(appendable, nodeValue);
-		} catch (IOException ioex) {
+		} catch (final IOException ioex) {
 			throw new LagartoDOMException(ioex);
 		}
 	}
@@ -70,21 +81,21 @@ public class LagartoHtmlRendererNodeVisitor implements NodeVisitor {
 	public void documentType(final DocumentType documentType) {
 		try {
 			TagWriterUtil.writeDoctype(appendable,
-					documentType.nodeValue,
-					documentType.publicId,
-					documentType.systemId);
-		} catch (IOException ioex) {
+					documentType.getNodeValue(),
+					documentType.getPublicIdentifier(),
+					documentType.getSystemIdentifier());
+		} catch (final IOException ioex) {
 			throw new LagartoDOMException(ioex);
 		}
 	}
 
 	@Override
 	public void text(final Text text) {
-		String nodeValue = text.getTextValue();
+		final String nodeValue = text.getTextValue();
 
 		try {
 			appendable.append(nodeValue);
-		} catch (IOException ioex) {
+		} catch (final IOException ioex) {
 			throw new LagartoDOMException(ioex);
 		}
 	}
@@ -94,7 +105,7 @@ public class LagartoHtmlRendererNodeVisitor implements NodeVisitor {
 		try {
 			TagWriterUtil.writeXml(appendable,
 					xmlDeclaration.getVersion(), xmlDeclaration.getEncoding(), xmlDeclaration.getStandalone());
-		} catch (IOException ioex) {
+		} catch (final IOException ioex) {
 			throw new LagartoDOMException(ioex);
 		}
 	}
@@ -193,8 +204,8 @@ public class LagartoHtmlRendererNodeVisitor implements NodeVisitor {
 	 * Renders attribute.
 	 */
 	protected void renderAttribute(final Node node, final Attribute attribute, final Appendable appendable) throws IOException {
-		String name = resolveAttributeName(node, attribute);
-		String value = attribute.getValue();
+		final String name = resolveAttributeName(node, attribute);
+		final String value = attribute.getValue();
 
 		appendable.append(name);
 		if (value != null) {
@@ -209,37 +220,37 @@ public class LagartoHtmlRendererNodeVisitor implements NodeVisitor {
 	public void element(final Element element) {
 		try {
 			_element(element);
-		} catch (IOException ioex) {
+		} catch (final IOException ioex) {
 			throw new LagartoDOMException(ioex);
 		}
 	}
 
 	protected void _element(final Element element) throws IOException {
-		String nodeName = resolveNodeName(element);
+		final String nodeName = resolveNodeName(element);
 
 		appendable.append('<');
 		appendable.append(nodeName);
 
-		int attrCount = element.getAttributesCount();
+		final int attrCount = element.getAttributesCount();
 
 		if (attrCount != 0) {
 			for (int i = 0; i < attrCount; i++) {
-				Attribute attr = element.getAttribute(i);
+				final Attribute attr = element.getAttribute(i);
 				appendable.append(' ');
 				renderAttribute(element, attr, appendable);
 			}
 		}
 
-		int childCount = element.getChildNodesCount();
+		final int childCount = element.getChildNodesCount();
 
-		if (element.selfClosed && childCount == 0) {
+		if (element.isSelfClosed() && childCount == 0) {
 			appendable.append("/>");
 			return;
 		}
 
 		appendable.append('>');
 
-		if (element.voidElement) {
+		if (element.isVoidElement()) {
 			return;
 		}
 
@@ -253,11 +264,11 @@ public class LagartoHtmlRendererNodeVisitor implements NodeVisitor {
 	}
 
 	protected void elementBody(final Element element) throws IOException {
-		int childCount = element.getChildNodesCount();
+		final int childCount = element.getChildNodesCount();
 
 		if (element.isRawTag()) {
 			for (int i = 0; i < childCount; i++) {
-				Node childNode = element.getChild(i);
+				final Node childNode = element.getChild(i);
 
 				if (childNode.getNodeType() == Node.NodeType.TEXT) {
 					appendable.append(childNode.getNodeValue());

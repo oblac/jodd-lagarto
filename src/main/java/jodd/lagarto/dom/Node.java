@@ -24,6 +24,8 @@
 
 package jodd.lagarto.dom;
 
+import jodd.lagarto.dom.render.LagartoHtmlRenderer;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -1089,7 +1091,7 @@ public abstract class Node implements Cloneable {
 		}
 
 		final LagartoHtmlRenderer lagartoHtmlRenderer =
-				lagartoDomBuilderConfig.getLagartoHtmlRenderer();
+				lagartoDomBuilderConfig.getHtmlRenderer();
 
 		return lagartoHtmlRenderer.toHtml(this, new StringBuilder());
 	}
@@ -1106,7 +1108,7 @@ public abstract class Node implements Cloneable {
 		}
 
 		final LagartoHtmlRenderer lagartoHtmlRenderer =
-				lagartoDomBuilderConfig.getLagartoHtmlRenderer();
+				lagartoDomBuilderConfig.getHtmlRenderer();
 
 		return lagartoHtmlRenderer.toInnerHtml(this, new StringBuilder());
 	}
@@ -1121,7 +1123,7 @@ public abstract class Node implements Cloneable {
 	/**
 	 * Visits children nodes.
 	 */
-	protected void visitChildren(final NodeVisitor nodeVisitor) {
+	public void visitChildren(final NodeVisitor nodeVisitor) {
 		if (childNodes != null) {
 			for (int i = 0, childNodesSize = childNodes.size(); i < childNodesSize; i++) {
 				final Node childNode = childNodes.get(i);

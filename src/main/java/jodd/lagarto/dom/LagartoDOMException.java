@@ -27,7 +27,7 @@ package jodd.lagarto.dom;
 import jodd.lagarto.LagartoException;
 
 /**
- * Lagarto DOM exception
+ * Lagarto DOM exception.
  */
 public class LagartoDOMException extends LagartoException {
 
