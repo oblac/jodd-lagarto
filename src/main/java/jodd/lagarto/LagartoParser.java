@@ -30,6 +30,8 @@ import jodd.util.CharArraySequence;
 import jodd.util.CharUtil;
 import jodd.util.StringPool;
 
+import java.util.function.Consumer;
+
 import static jodd.util.CharUtil.equalsOne;
 import static jodd.util.CharUtil.isAlpha;
 import static jodd.util.CharUtil.isDigit;
@@ -67,21 +69,32 @@ public class LagartoParser {
 	protected ParsedDoctype doctype;
 	protected long parsingTime;
 	protected final Scanner s;
+	protected final LagartoParserConfig config;
 
 	/**
 	 * Creates parser on char array.
 	 */
-	public LagartoParser(final char[] charArray) {
-		s = new CharArrayScanner(charArray);
+	public LagartoParser(final LagartoParserConfig parserConfig, final char[] input) {
+		this.config = parserConfig;
+		s = new CharArrayScanner(input);
 		initialize();
+	}
+
+	public LagartoParser(final char[] input) {
+		this(new LagartoParserConfig(), input);
 	}
 
 	/**
 	 * Creates parser on a String.
 	 */
-	public LagartoParser(final String string) {
-		s = new StringScanner(string);
+	public LagartoParser(final LagartoParserConfig parserConfig, final String input) {
+		this.config = parserConfig;
+		s = new StringScanner(input);
 		initialize();
+	}
+
+	public LagartoParser(final String input) {
+		this(new LagartoParserConfig(), input);
 	}
 
 	/**
@@ -90,15 +103,12 @@ public class LagartoParser {
 	protected void initialize() {
 		this.tag = new ParsedTag();
 		this.doctype = new ParsedDoctype();
-		this.text = new char[1024]; // todo configuration
+		this.text = new char[config.getTextBufferSize()];
 		this.textLen = 0;
 		this.parsingTime = -1;
 	}
 
 	// ---------------------------------------------------------------- configuration
-
-	// todo make it final
-	protected LagartoParserConfig config = new LagartoParserConfig();
 
 	/**
 	 * Returns {@link jodd.lagarto.LagartoParserConfig configuration} for the parser.
@@ -107,12 +117,11 @@ public class LagartoParser {
 		return config;
 	}
 
-	/**
-	 * Sets parser configuration.
-	 */
-	public void setConfig(final LagartoParserConfig config) {
-		this.config = config;
+	public LagartoParser configure(final Consumer<LagartoParserConfig> configConsumer) {
+		configConsumer.accept(this.config);
+		return this;
 	}
+
 
 	// ---------------------------------------------------------------- parse
 

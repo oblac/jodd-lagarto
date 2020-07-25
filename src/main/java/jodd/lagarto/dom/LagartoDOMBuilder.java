@@ -144,7 +144,7 @@ public class LagartoDOMBuilder implements DOMBuilder {
 	 */
 	@Override
 	public Document parse(final char[] content) {
-		final LagartoParser lagartoParser = new LagartoParser(content);
+		final LagartoParser lagartoParser = new LagartoParser(config.parserConfig, content);
 		return parseWithLagarto(lagartoParser);
 	}
 
@@ -153,7 +153,7 @@ public class LagartoDOMBuilder implements DOMBuilder {
 	 */
 	@Override
 	public Document parse(final String content) {
-		final LagartoParser lagartoParser = new LagartoParser(content);
+		final LagartoParser lagartoParser = new LagartoParser(config.parserConfig, content);
 		return parseWithLagarto(lagartoParser);
 	}
 
@@ -161,8 +161,6 @@ public class LagartoDOMBuilder implements DOMBuilder {
 	 * Parses the content using provided lagarto parser.
 	 */
 	protected Document parseWithLagarto(final LagartoParser lagartoParser) {
-		lagartoParser.setConfig(config.parserConfig);
-
 		final LagartoDOMBuilderTagVisitor domBuilderTagVisitor =
 				new LagartoDOMBuilderTagVisitor(this);
 
