@@ -29,7 +29,6 @@ import jodd.lagarto.Tag;
 import jodd.lagarto.TagType;
 import jodd.lagarto.TagVisitor;
 import jodd.util.CharSequenceUtil;
-import jodd.util.StringPool;
 import jodd.util.Util;
 
 import java.util.function.Supplier;
@@ -342,7 +341,7 @@ public class LagartoDOMBuilderTagVisitor implements TagVisitor {
 
 						String positionString = tag.getPosition();
 						if (positionString == null) {
-							positionString = StringPool.EMPTY;
+							positionString = "";
 						}
 
 						error("Orphan closed tag ignored: </" + tag.getName() + "> " + positionString);

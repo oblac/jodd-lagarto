@@ -27,6 +27,7 @@ package jodd.lagarto.dom;
 /**
  * Node filter.
  */
+@FunctionalInterface
 public interface NodeFilter {
 
 	/**

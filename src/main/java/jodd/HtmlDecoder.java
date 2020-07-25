@@ -1,4 +1,4 @@
-package jodd.lagarto;
+package jodd;
 
 import jodd.util.BinarySearchBase;
 
@@ -22,7 +22,7 @@ public class HtmlDecoder {
 		try (final InputStream is = HtmlDecoder.class.getResourceAsStream(propertiesName)) {
 			entityReferences.load(is);
 		} catch (final Exception ex) {
-			throw new IllegalStateException("Can't load properties", ex);
+			throw new IllegalStateException(ex);
 		}
 
 		ENTITY_MAP = new HashMap<>(entityReferences.size());
@@ -61,69 +61,7 @@ public class HtmlDecoder {
 
 		Arrays.sort(ENTITY_NAMES, Comparator.comparing(String::new));
 	}
-
-	/**
-	 * Decodes HTML text. Assumes that all character references are properly closed with semi-colon.
-	 */
-	public static String decode(final String html) {
-
-		int ndx = html.indexOf('&');
-		if (ndx == -1) {
-			return html;
-		}
-
-		final StringBuilder result = new StringBuilder(html.length());
-
-		int lastIndex = 0;
-		final int len = html.length();
-		mainloop:
-		while (ndx != -1) {
-			result.append(html, lastIndex, ndx);
-
-			lastIndex = ndx;
-			while (html.charAt(lastIndex) != ';') {
-				lastIndex++;
-				if (lastIndex == len) {
-					lastIndex = ndx;
-					break mainloop;
-				}
-			}
-
-			if (html.charAt(ndx + 1) == '#') {
-				// decimal/hex
-				final char c = html.charAt(ndx + 2);
-				final int radix;
-				if ((c == 'x') || (c == 'X')) {
-					radix = 16;
-					ndx += 3;
-				} else {
-					radix = 10;
-					ndx += 2;
-				}
-
-				final String number = html.substring(ndx, lastIndex);
-				final int i = Integer.parseInt(number, radix);
-				result.append((char) i);
-				lastIndex++;
-			} else {
-				// token
-				final String encodeToken = html.substring(ndx + 1, lastIndex);
-
-				final char[] replacement = ENTITY_MAP.get(encodeToken);
-				if (replacement == null) {
-					result.append('&');
-					lastIndex = ndx + 1;
-				} else {
-					result.append(replacement);
-					lastIndex++;
-				}
-			}
-			ndx = html.indexOf('&', lastIndex);
-		}
-		result.append(html.substring(lastIndex));
-		return result.toString();
-	}
-
+	
 	private static final class Ptr {
 		public int offset;
 		public char c;
@@ -198,6 +136,5 @@ public class HtmlDecoder {
 	private static boolean isAlphaOrDigit(final char c) {
 		return (c >= '0' && c <= '9') || ((c >= 'a') && (c <= 'z')) || ((c >= 'A') && (c <= 'Z'));
 	}
-
 
 }

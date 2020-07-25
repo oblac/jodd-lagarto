@@ -27,11 +27,12 @@ package jodd.lagarto;
 /**
  * Parsing state.
  */
+@FunctionalInterface
 public interface State {
 
 	/**
 	 * Parses content.
 	 */
-	public void parse();
+	void parse();
 
 }

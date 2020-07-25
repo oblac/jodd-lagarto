@@ -25,7 +25,7 @@
 package jodd.lagarto;
 
 /**
- * Empty tag visitor.
+ * Empty {@link TagVisitor}.
  */
 public class EmptyTagVisitor implements TagVisitor {
 

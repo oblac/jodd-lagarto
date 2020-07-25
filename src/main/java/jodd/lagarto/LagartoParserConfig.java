@@ -30,12 +30,15 @@ package jodd.lagarto;
 public class LagartoParserConfig {
 
 	protected boolean parseXmlTags = false;
-	protected boolean enableConditionalComments = true;
+	protected boolean enableConditionalComments = true; // todo make false
 	protected boolean caseSensitive = false;
 	protected boolean calculatePosition = false;
 	protected boolean enableRawTextModes = true;
 	protected int textBufferSize = 1024;
 
+	/**
+	 * @see #setEnableConditionalComments(boolean)
+	 */
 	public boolean isEnableConditionalComments() {
 		return enableConditionalComments;
 	}
@@ -65,6 +68,9 @@ public class LagartoParserConfig {
 		return this;
 	}
 
+	/**
+	 * Returns {@code true} if case-sensitive flag is enabled.
+	 */
 	public boolean isCaseSensitive() {
 		return caseSensitive;
 	}
@@ -109,6 +115,9 @@ public class LagartoParserConfig {
 		return textBufferSize;
 	}
 
+	/**
+	 * Specifies initial text buffer size, used when emitting strings.
+	 */
 	public void setTextBufferSize(final int textBufferSize) {
 		this.textBufferSize = textBufferSize;
 	}

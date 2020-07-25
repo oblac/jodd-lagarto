@@ -25,7 +25,7 @@
 package jodd.lagarto;
 
 /**
- * Tag information.
+ * Tag definition.
  */
 public interface Tag {
 

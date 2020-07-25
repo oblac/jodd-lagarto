@@ -26,6 +26,7 @@ package jodd.lagarto;
 
 /**
  * Visitor over several target visitors at once.
+ * // todo make only 2 (this and that) not an array!
  */
 public class TagVisitorChain implements TagVisitor {
 
@@ -37,77 +38,77 @@ public class TagVisitorChain implements TagVisitor {
 
 	@Override
 	public void start() {
-		for (TagVisitor target : targets) {
+		for (final TagVisitor target : targets) {
 			target.start();
 		}
 	}
 
 	@Override
 	public void end() {
-		for (TagVisitor target : targets) {
+		for (final TagVisitor target : targets) {
 			target.end();
 		}
 	}
 
 	@Override
 	public void tag(final Tag tag) {
-		for (TagVisitor target : targets) {
+		for (final TagVisitor target : targets) {
 			target.tag(tag);
 		}
 	}
 
 	@Override
 	public void script(final Tag tag, final CharSequence body) {
-		for (TagVisitor target : targets) {
+		for (final TagVisitor target : targets) {
 			target.script(tag, body);
 		}
 	}
 
 	@Override
 	public void comment(final CharSequence comment) {
-		for (TagVisitor target : targets) {
+		for (final TagVisitor target : targets) {
 			target.comment(comment);
 		}
 	}
 
 	@Override
 	public void text(final CharSequence text) {
-		for (TagVisitor target : targets) {
+		for (final TagVisitor target : targets) {
 			target.text(text);
 		}
 	}
 
 	@Override
 	public void cdata(final CharSequence cdata) {
-		for (TagVisitor target : targets) {
+		for (final TagVisitor target : targets) {
 			target.cdata(cdata);
 		}
 	}
 
 	@Override
 	public void xml(final CharSequence version, final CharSequence encoding, final CharSequence standalone) {
-		for (TagVisitor target : targets) {
+		for (final TagVisitor target : targets) {
 			target.xml(version, encoding, standalone);
 		}
 	}
 
 	@Override
 	public void doctype(final Doctype doctype) {
-		for (TagVisitor target : targets) {
+		for (final TagVisitor target : targets) {
 			target.doctype(doctype);
 		}
 	}
 
 	@Override
 	public void condComment(final CharSequence expression, final boolean isStartingTag, final boolean isHidden, final boolean isHiddenEndTag) {
-		for (TagVisitor target : targets) {
+		for (final TagVisitor target : targets) {
 			target.condComment(expression, isStartingTag, isHidden, isHiddenEndTag);
 		}
 	}
 
 	@Override
 	public void error(final String message) {
-		for (TagVisitor target : targets) {
+		for (final TagVisitor target : targets) {
 			target.error(message);
 		}
 	}

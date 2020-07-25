@@ -36,5 +36,5 @@ public interface JerryFunction {
 	 * is because when Jerry is used in Nashorn, when javascript method
 	 * returns nothing it means it's not false.
 	 */
-	Boolean onNode(Jerry $this, int index);
+	Boolean onNode(Jerry node, int index);
 }

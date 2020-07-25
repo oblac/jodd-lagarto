@@ -24,13 +24,17 @@
 
 package jodd.lagarto;
 
+import jodd.HtmlDecoder;
 import jodd.util.CharUtil;
 
 /**
- * Utility scanner over an input.
+ * Scanner over an input.
  */
 abstract class Scanner implements CharSequence {
 
+	/**
+	 * Current position.
+	 */
 	protected int ndx;
 	protected final int total;
 
@@ -39,15 +43,24 @@ abstract class Scanner implements CharSequence {
 		this.ndx = -1;
 	}
 
+	/**
+	 * Returns the total size of the input.
+	 */
 	@Override
 	public int length() {
 		return total;
 	}
 
+	/**
+	 * Returns character at current position.
+	 */
 	public abstract char charAtNdx();
 
 	// ---------------------------------------------------------------- find
 
+	/**
+	 * Finds a character from current position until the end of the input.
+	 */
 	public final int find(final char target) {
 		return find(target, ndx, total);
 	}
@@ -67,6 +80,10 @@ abstract class Scanner implements CharSequence {
 		return (from == end) ? -1 : from;
 	}
 
+	/**
+	 * Finds the char array from given index to the end of the input.
+	 * Returns {@code -1} if not found.
+	 */
 	public final int find(final char[] target, final int from) {
 		return find(target, from, total);
 	}
@@ -138,6 +155,10 @@ abstract class Scanner implements CharSequence {
 
 	// ---------------------------------------------------------------- decode HTML name
 
+	/**
+	 * Decodes HTML name on current position.
+	 * Returns {@code null} if name not detected.
+	 */
 	public String decodeHtmlName() {
 		return HtmlDecoder.detectName(this, ndx);
 	}

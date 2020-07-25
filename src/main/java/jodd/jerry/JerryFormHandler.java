@@ -29,6 +29,7 @@ import java.util.Map;
 /**
  * Callback for Jerry <code>form()</code> method.
  */
+@FunctionalInterface
 public interface JerryFormHandler {
 
 	/**

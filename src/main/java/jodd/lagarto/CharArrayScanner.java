@@ -2,8 +2,11 @@ package jodd.lagarto;
 
 import java.nio.CharBuffer;
 
+/**
+ * Implementation of {@link Scanner} over a {@code char[]}.
+ */
 final class CharArrayScanner extends Scanner {
-	private static final CharSequence EMPTY_CHAR_SEQUENCE = CharBuffer.allocate(0);
+	public static final CharSequence EMPTY_CHAR_SEQUENCE = CharBuffer.allocate(0);
 
 	private final char[] input;
 
@@ -12,18 +15,24 @@ final class CharArrayScanner extends Scanner {
 		this.input = input;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public final char charAt(final int index) {
 		return input[index];
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public final char charAtNdx() {
 		return input[ndx];
 	}
 
 	/**
-	 * Creates char sub-sequence from the input.
+	 * {@inheritDoc}
 	 */
 	@Override
 	public final CharSequence subSequence(final int from, final int to) {

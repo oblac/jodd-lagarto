@@ -50,6 +50,7 @@ public class ParsedDoctype implements Doctype {
 		systemIdentifier = null;
 	}
 
+	// todo remove methods and access fields directly
 	public void setPublicIdentifier(final CharSequence publicIdentifier) {
 		this.publicIdentifier = publicIdentifier;
 	}

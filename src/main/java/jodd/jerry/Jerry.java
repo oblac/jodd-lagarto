@@ -99,7 +99,7 @@ public class Jerry implements Iterable<Jerry> {
 		protected final DOMBuilder domBuilder;
 
 		public JerryParser() {
-			this.domBuilder = new LagartoDOMBuilder();
+			this(new LagartoDOMBuilder());
 		}
 		public JerryParser(final DOMBuilder domBuilder) {
 			this.domBuilder = domBuilder;

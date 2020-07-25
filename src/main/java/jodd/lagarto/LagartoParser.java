@@ -26,9 +26,7 @@ package jodd.lagarto;
 
 import jodd.net.HtmlDecoder;
 import jodd.util.ArraysUtil;
-import jodd.util.CharArraySequence;
 import jodd.util.CharUtil;
-import jodd.util.StringPool;
 
 import java.util.function.Consumer;
 
@@ -53,13 +51,6 @@ import static jodd.util.CharUtil.isDigit;
  * <li>conditional comments added</li>
  * <li>xml states and callbacks added</li>
  * </ul>
- *
- * <p>
- * There are two ways how text is passed back to the visitor.
- * By default it is passed as <code>CharBuffer</code>, which
- * gives excellent performances. However, if you need more <code>Strings</code>
- * than enable it, and all text will be strings. This is faster
- * then first converting to char buffer and then to strings.
  */
 @SuppressWarnings("DuplicatedCode")
 public class LagartoParser {
@@ -67,7 +58,6 @@ public class LagartoParser {
 	protected TagVisitor visitor;
 	protected ParsedTag tag;
 	protected ParsedDoctype doctype;
-	protected long parsingTime;
 	protected final Scanner s;
 	protected final LagartoParserConfig config;
 
@@ -80,6 +70,9 @@ public class LagartoParser {
 		initialize();
 	}
 
+	/**
+	 * Creates parser on char array.
+	 */
 	public LagartoParser(final char[] input) {
 		this(new LagartoParserConfig(), input);
 	}
@@ -93,6 +86,9 @@ public class LagartoParser {
 		initialize();
 	}
 
+	/**
+	 * Creates parser on a String.
+	 */
 	public LagartoParser(final String input) {
 		this(new LagartoParserConfig(), input);
 	}
@@ -105,7 +101,6 @@ public class LagartoParser {
 		this.doctype = new ParsedDoctype();
 		this.text = new char[config.getTextBufferSize()];
 		this.textLen = 0;
-		this.parsingTime = -1;
 	}
 
 	// ---------------------------------------------------------------- configuration
@@ -117,6 +112,9 @@ public class LagartoParser {
 		return config;
 	}
 
+	/**
+	 * Configures the parser.
+	 */
 	public LagartoParser configure(final Consumer<LagartoParserConfig> configConsumer) {
 		configConsumer.accept(this.config);
 		return this;
@@ -128,12 +126,10 @@ public class LagartoParser {
 	protected boolean parsing;
 
 	/**
-	 * Parses content and callback provided {@link TagVisitor}.
+	 * Parses content and emits event to provided {@link TagVisitor}.
 	 */
 	public void parse(final TagVisitor visitor) {
 		tag.init(config.caseSensitive);
-
-		this.parsingTime = System.currentTimeMillis();
 
 		this.visitor = visitor;
 
@@ -148,15 +144,6 @@ public class LagartoParser {
 		emitText();
 
 		visitor.end();
-
-		this.parsingTime = System.currentTimeMillis() - parsingTime;
-	}
-
-	/**
-	 * Returns parsing time in milliseconds.
-	 */
-	public long getParsingTime() {
-		return parsingTime;
 	}
 
 	// ---------------------------------------------------------------- start & end
@@ -2901,7 +2888,7 @@ public class LagartoParser {
 
 	protected CharSequence textWrap() {
 		if (textLen == 0) {
-			return CharArraySequence.EMPTY;
+			return CharArrayScanner.EMPTY_CHAR_SEQUENCE;
 		}
 		return new String(text, 0, textLen);    // todo use charSequence pointer instead!
 	}
@@ -2993,7 +2980,7 @@ public class LagartoParser {
 	protected void emitComment(final int from, final int to) {
 		if (from == -1) {
 			// special case when `from` is `-1` in invalid comment
-			visitor.comment(CharArraySequence.EMPTY);
+			visitor.comment(CharArrayScanner.EMPTY_CHAR_SEQUENCE);
 			return;
 		}
 		if (config.enableConditionalComments) {
@@ -3101,13 +3088,13 @@ public class LagartoParser {
 		if (config.calculatePosition) {
 			final Scanner.Position currentPosition = s.positionOf(s.ndx);
 			message = message
-					.concat(StringPool.SPACE)
+					.concat(" ")
 					.concat(currentPosition.toString());
 		} else {
 			message = message
 					.concat(" [@")
 					.concat(Integer.toString(s.ndx))
-					.concat(StringPool.RIGHT_SQ_BRACKET);
+					.concat("]");
 		}
 
 		visitor.error(message);
@@ -3158,59 +3145,59 @@ public class LagartoParser {
 	// ---------------------------------------------------------------- state
 
 	protected State state = DATA_STATE;
-	
+
 	// ---------------------------------------------------------------- names
-	
-	private static final char[] TAG_WHITESPACES = new char[] {'\t', '\n', '\r', ' '};
-	private static final char[] TAG_WHITESPACES_OR_END = new char[] {'\t', '\n', '\r', ' ', '/', '>'};
-	private static final char[] CONTINUE_CHARS = new char[] {'\t', '\n', '\r', ' ', '<', '&'};
 
-	private static final char[] ATTR_INVALID_1 = new char[] {'\"', '\'', '<', '='};
-	private static final char[] ATTR_INVALID_2 = new char[] {'\"', '\'', '<'};
-	private static final char[] ATTR_INVALID_3 = new char[] {'<', '=', '`'};
-	private static final char[] ATTR_INVALID_4 = new char[] {'"', '\'', '<', '=', '`'};
+	private static final char[] TAG_WHITESPACES = new char[]{'\t', '\n', '\r', ' '};
+	private static final char[] TAG_WHITESPACES_OR_END = new char[]{'\t', '\n', '\r', ' ', '/', '>'};
+	private static final char[] CONTINUE_CHARS = new char[]{'\t', '\n', '\r', ' ', '<', '&'};
 
-	private static final char[] COMMENT_DASH = new char[] {'-', '-'};
+	private static final char[] ATTR_INVALID_1 = new char[]{'\"', '\'', '<', '='};
+	private static final char[] ATTR_INVALID_2 = new char[]{'\"', '\'', '<'};
+	private static final char[] ATTR_INVALID_3 = new char[]{'<', '=', '`'};
+	private static final char[] ATTR_INVALID_4 = new char[]{'"', '\'', '<', '=', '`'};
 
-	private static final char[] T_DOCTYPE = new char[] {'D', 'O', 'C', 'T', 'Y', 'P', 'E'};
-	private static final char[] T_SCRIPT = new char[] {'s', 'c', 'r', 'i', 'p', 't'};
-	private static final char[] T_XMP = new char[] {'x', 'm', 'p'};
-	private static final char[] T_STYLE = new char[] {'s', 't', 'y', 'l', 'e'};
-	private static final char[] T_IFRAME = new char[] {'i', 'f', 'r', 'a', 'm', 'e'};
-	private static final char[] T_NOFRAMES = new char[] {'n', 'o', 'f', 'r', 'a', 'm', 'e', 's'};
-	private static final char[] T_NOEMBED = new char[] {'n', 'o', 'e', 'm', 'b', 'e', 'd'};
-	private static final char[] T_NOSCRIPT = new char[] {'n', 'o', 's', 'c', 'r', 'i', 'p', 't'};
-	private static final char[] T_TEXTAREA = new char[] {'t', 'e', 'x', 't', 'a', 'r', 'e', 'a'};
-	private static final char[] T_TITLE = new char[] {'t', 'i', 't', 'l', 'e'};
+	private static final char[] COMMENT_DASH = new char[]{'-', '-'};
 
-	private static final char[] A_PUBLIC = new char[] {'P', 'U', 'B', 'L', 'I', 'C'};
-	private static final char[] A_SYSTEM = new char[] {'S', 'Y', 'S', 'T', 'E', 'M'};
+	private static final char[] T_DOCTYPE = new char[]{'D', 'O', 'C', 'T', 'Y', 'P', 'E'};
+	private static final char[] T_SCRIPT = new char[]{'s', 'c', 'r', 'i', 'p', 't'};
+	private static final char[] T_XMP = new char[]{'x', 'm', 'p'};
+	private static final char[] T_STYLE = new char[]{'s', 't', 'y', 'l', 'e'};
+	private static final char[] T_IFRAME = new char[]{'i', 'f', 'r', 'a', 'm', 'e'};
+	private static final char[] T_NOFRAMES = new char[]{'n', 'o', 'f', 'r', 'a', 'm', 'e', 's'};
+	private static final char[] T_NOEMBED = new char[]{'n', 'o', 'e', 'm', 'b', 'e', 'd'};
+	private static final char[] T_NOSCRIPT = new char[]{'n', 'o', 's', 'c', 'r', 'i', 'p', 't'};
+	private static final char[] T_TEXTAREA = new char[]{'t', 'e', 'x', 't', 'a', 'r', 'e', 'a'};
+	private static final char[] T_TITLE = new char[]{'t', 'i', 't', 'l', 'e'};
 
-	private static final char[] CDATA = new char[] {'[', 'C', 'D', 'A', 'T', 'A', '['};
-	private static final char[] CDATA_END = new char[] {']', ']', '>'};
+	private static final char[] A_PUBLIC = new char[]{'P', 'U', 'B', 'L', 'I', 'C'};
+	private static final char[] A_SYSTEM = new char[]{'S', 'Y', 'S', 'T', 'E', 'M'};
 
-	private static final char[] XML = new char[] {'?', 'x', 'm', 'l'};
-	private static final char[] XML_VERSION = new char[] {'v', 'e', 'r', 's', 'i', 'o', 'n'};
-	private static final char[] XML_ENCODING = new char[] {'e', 'n', 'c', 'o', 'd', 'i', 'n', 'g'};
-	private static final char[] XML_STANDALONE = new char[] {'s', 't', 'a', 'n', 'd', 'a', 'l', 'o', 'n', 'e'};
+	private static final char[] CDATA = new char[]{'[', 'C', 'D', 'A', 'T', 'A', '['};
+	private static final char[] CDATA_END = new char[]{']', ']', '>'};
 
-	private static final char[] CC_IF = new char[] {'[', 'i', 'f', ' '};
-	private static final char[] CC_ENDIF = new char[] {'[', 'e', 'n', 'd', 'i', 'f', ']'};
-	private static final char[] CC_ENDIF2 = new char[] {'<', '!', '[', 'e', 'n', 'd', 'i', 'f', ']'};
-	private static final char[] CC_END = new char[] {']', '>'};
+	private static final char[] XML = new char[]{'?', 'x', 'm', 'l'};
+	private static final char[] XML_VERSION = new char[]{'v', 'e', 'r', 's', 'i', 'o', 'n'};
+	private static final char[] XML_ENCODING = new char[]{'e', 'n', 'c', 'o', 'd', 'i', 'n', 'g'};
+	private static final char[] XML_STANDALONE = new char[]{'s', 't', 'a', 'n', 'd', 'a', 'l', 'o', 'n', 'e'};
+
+	private static final char[] CC_IF = new char[]{'[', 'i', 'f', ' '};
+	private static final char[] CC_ENDIF = new char[]{'[', 'e', 'n', 'd', 'i', 'f', ']'};
+	private static final char[] CC_ENDIF2 = new char[]{'<', '!', '[', 'e', 'n', 'd', 'i', 'f', ']'};
+	private static final char[] CC_END = new char[]{']', '>'};
 
 	// CDATA
-	private static final char[][] RAWTEXT_TAGS = new char[][] {
+	private static final char[][] RAWTEXT_TAGS = new char[][]{
 			T_XMP, T_STYLE, T_IFRAME, T_NOEMBED, T_NOFRAMES, T_NOSCRIPT, T_SCRIPT
 	};
 
-	private static final char[][] RCDATA_TAGS = new char[][] {
+	private static final char[][] RCDATA_TAGS = new char[][]{
 			T_TEXTAREA, T_TITLE
 	};
 
 	private static final char REPLACEMENT_CHAR = '\uFFFD';
 
-	private static final char[] INVALID_CHARS = new char[] {'\u000B', '\uFFFE', '\uFFFF'};
+	private static final char[] INVALID_CHARS = new char[]{'\u000B', '\uFFFE', '\uFFFF'};
 	//, '\u1FFFE', '\u1FFFF', '\u2FFFE', '\u2FFFF', '\u3FFFE', '\u3FFFF', '\u4FFFE,
 	//	'\u4FFFF', '\u5FFFE', '\u5FFFF', '\u6FFFE', '\u6FFFF', '\u7FFFE', '\u7FFFF', '\u8FFFE', '\u8FFFF', '\u9FFFE,
 	//	'\u9FFFF', '\uAFFFE', '\uAFFFF', '\uBFFFE', '\uBFFFF', '\uCFFFE', '\uCFFFF', '\uDFFFE', '\uDFFFF', '\uEFFFE,

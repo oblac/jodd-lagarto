@@ -26,6 +26,7 @@ package jodd.lagarto.dom;
 
 import java.util.List;
 
+@FunctionalInterface
 public interface NodeListFilter {
 
 	boolean accept(List<Node> currentResults, Node node, int index);
