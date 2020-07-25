@@ -24,12 +24,10 @@
 
 package jodd.lagarto;
 
-import jodd.exception.UncheckedException;
-
 /**
  * Lagarto exception.
  */
-public class LagartoException extends UncheckedException {
+public class LagartoException extends RuntimeException {
 
 	public LagartoException(final Throwable t) {
 		super("Parsing error.", t);
