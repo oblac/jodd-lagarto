@@ -31,12 +31,10 @@ import jodd.lagarto.dom.Element;
 import jodd.lagarto.dom.LagartoDOMBuilder;
 import jodd.mutable.MutableInteger;
 import jodd.util.StringUtil;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -44,16 +42,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 class ParsingProblemsTest {
 
-	protected String testDataRoot;
-
-	@BeforeEach
-	void setUp() {
-		if (testDataRoot != null) {
-			return;
-		}
-		final URL data = LagartoParserTest.class.getResource("data");
-		testDataRoot = data.getFile();
-	}
+	protected final String testDataRoot = this.getClass().getResource("misc").getFile();
 
 	@Test
 	void testInvalidTag() {

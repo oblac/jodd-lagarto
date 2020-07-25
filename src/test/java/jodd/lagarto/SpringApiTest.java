@@ -26,37 +26,26 @@ package jodd.lagarto;
 
 import jodd.io.FileUtil;
 import jodd.jerry.Jerry;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SpringApiTest {
 
-	protected String testDataRoot;
-
-	@BeforeEach
-	void setUp() throws Exception {
-		if (testDataRoot != null) {
-			return;
-		}
-		URL data = LagartoParserTest.class.getResource("data");
-		testDataRoot = data.getFile();
-	}
+	protected final String testDataRoot = this.getClass().getResource("misc").getFile();
 
 	@Test
 	void testPortletUtils() throws IOException {
-		File file = new File(testDataRoot, "PortletUtils.html");
-		String content = FileUtil.readString(file);
+		final File file = new File(testDataRoot, "PortletUtils.html");
+		final String content = FileUtil.readString(file);
 
-		Jerry.JerryParser jerryParser = new Jerry.JerryParser();
+		final Jerry.JerryParser jerryParser = new Jerry.JerryParser();
 		//jerryParser.getDOMBuilder().setCalculatePosition(true);
 
-		Jerry doc = jerryParser.parse(content);
+		final Jerry doc = jerryParser.parse(content);
 
 		// parse
 		doc.s("a").each(($this, index) -> {
@@ -67,13 +56,13 @@ class SpringApiTest {
 
 	@Test
 	void testAbstractFormController() throws IOException {
-		File file = new File(testDataRoot, "AbstractFormController.html");
-		String content = FileUtil.readString(file);
+		final File file = new File(testDataRoot, "AbstractFormController.html");
+		final String content = FileUtil.readString(file);
 
-		Jerry.JerryParser jerryParser = new Jerry.JerryParser();
+		final Jerry.JerryParser jerryParser = new Jerry.JerryParser();
 		//jerryParser.getDOMBuilder().setCalculatePosition(true);
 
-		Jerry doc = jerryParser.parse(content);
+		final Jerry doc = jerryParser.parse(content);
 
 		// parse
 		doc.s("a").each(($this, index) -> {

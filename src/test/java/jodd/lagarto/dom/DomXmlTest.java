@@ -26,50 +26,39 @@ package jodd.lagarto.dom;
 
 import jodd.io.FileUtil;
 import jodd.util.StringUtil;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DomXmlTest {
-	protected String testDataRoot;
-
-	@BeforeEach
-	void setUp() throws Exception {
-		if (testDataRoot != null) {
-			return;
-		}
-		URL data = NodeSelectorTest.class.getResource("test");
-		testDataRoot = data.getFile();
-	}
+	protected final String testDataRoot = this.getClass().getResource("data").getFile();
 
 	@Test
 	void testPeopleXml() throws IOException {
-		File file = new File(testDataRoot, "people.xml");
+		final File file = new File(testDataRoot, "people.xml");
 		String xmlContent = FileUtil.readString(file);
 
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
 		lagartoDOMBuilder.enableXmlMode();
-		Document doc = lagartoDOMBuilder.parse(xmlContent);
+		final Document doc = lagartoDOMBuilder.parse(xmlContent);
 
 		assertEquals(2, doc.getChildNodesCount());    // not 3!
 
-		XmlDeclaration xml = (XmlDeclaration) doc.getFirstChild();
+		final XmlDeclaration xml = (XmlDeclaration) doc.getFirstChild();
 		assertEquals(0, xml.getAttributesCount());
 
-		Element peopleList = (Element) doc.getChild(1);
+		final Element peopleList = (Element) doc.getChild(1);
 		assertEquals(1, peopleList.getChildNodesCount());
 
-		Element person = peopleList.getFirstChildElement();
+		final Element person = peopleList.getFirstChildElement();
 		assertEquals(3, person.getChildNodesCount());
 
-		Element name = (Element) person.getChild(0);
+		final Element name = (Element) person.getChild(0);
 		assertEquals("Fred Bloggs", name.getTextContent());
 		assertEquals("Male", person.getChild(2).getTextContent());
 
@@ -81,12 +70,12 @@ class DomXmlTest {
 
 	@Test
 	void testUpheaWebXml() throws IOException {
-		File file = new File(testDataRoot, "uphea-web.xml");
+		final File file = new File(testDataRoot, "uphea-web.xml");
 		String xmlContent = FileUtil.readString(file);
 
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
 		lagartoDOMBuilder.enableXmlMode();
-		Document doc = lagartoDOMBuilder.parse(xmlContent);
+		final Document doc = lagartoDOMBuilder.parse(xmlContent);
 
 		xmlContent = StringUtil.removeChars(xmlContent, "\n\r\t");
 		assertEquals(xmlContent, doc.getHtml());
@@ -96,21 +85,21 @@ class DomXmlTest {
 
 	@Test
 	void testWhitespaces() throws IOException {
-		String xmlContent = "<foo>   <!--c-->  <bar>   </bar> <x/> </foo>";
+		final String xmlContent = "<foo>   <!--c-->  <bar>   </bar> <x/> </foo>";
 
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
 		lagartoDOMBuilder.enableXmlMode();
 		lagartoDOMBuilder.getConfig().setSelfCloseVoidTags(true);
 
-		Document doc = lagartoDOMBuilder.parse(xmlContent);
+		final Document doc = lagartoDOMBuilder.parse(xmlContent);
 
 		assertEquals(1, doc.getChildNodesCount());
 
-		Element foo = (Element) doc.getChild(0);
+		final Element foo = (Element) doc.getChild(0);
 		assertEquals("foo", foo.getNodeName());
 
 		assertEquals(3, foo.getChildNodesCount());
-		Element bar = (Element) foo.getChild(1);
+		final Element bar = (Element) foo.getChild(1);
 		assertEquals("bar", bar.getNodeName());
 
 		assertEquals(1, bar.getChildNodesCount());    // must be 1 as whitespaces are between open/closed tag
@@ -122,13 +111,13 @@ class DomXmlTest {
 
 	@Test
 	void testIgnoreComments() throws IOException {
-		String xmlContent = "<foo>   <!--c-->  <bar>   </bar> <!--c--> <x/> <!--c--> </foo>";
+		final String xmlContent = "<foo>   <!--c-->  <bar>   </bar> <!--c--> <x/> <!--c--> </foo>";
 
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
 		lagartoDOMBuilder.enableXmlMode();
 		lagartoDOMBuilder.getConfig().setIgnoreComments(true);
 
-		Document doc = lagartoDOMBuilder.parse(xmlContent);
+		final Document doc = lagartoDOMBuilder.parse(xmlContent);
 
 		assertEquals("<foo><bar>   </bar><x></x></foo>", doc.getHtml());
 
@@ -137,13 +126,13 @@ class DomXmlTest {
 
 	@Test
 	void testConditionalComments() throws IOException {
-		String xmlContent = "<foo><!--[if !IE]>--><bar>Jodd</bar><!--<![endif]--></foo>";
+		final String xmlContent = "<foo><!--[if !IE]>--><bar>Jodd</bar><!--<![endif]--></foo>";
 
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
 		lagartoDOMBuilder.enableXmlMode();
 		lagartoDOMBuilder.getConfig().setIgnoreComments(true);
 
-		Document doc = lagartoDOMBuilder.parse(xmlContent);
+		final Document doc = lagartoDOMBuilder.parse(xmlContent);
 
 		assertEquals("<foo><bar>Jodd</bar></foo>", doc.getHtml());
 
@@ -152,16 +141,16 @@ class DomXmlTest {
 
 	@Test
 	void testConditionalComments2() throws IOException {
-		String xmlContent = "<foo><![if !IE]><bar>Jodd</bar></foo>";
+		final String xmlContent = "<foo><![if !IE]><bar>Jodd</bar></foo>";
 
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
 		lagartoDOMBuilder.enableXmlMode();
 		lagartoDOMBuilder.getConfig().setIgnoreComments(true);
 		lagartoDOMBuilder.getConfig().setCollectErrors(true);
 		lagartoDOMBuilder.getConfig().setCalculatePosition(true);
 
-		Document doc = lagartoDOMBuilder.parse(xmlContent);
-		List<String> errors = doc.getErrors();
+		final Document doc = lagartoDOMBuilder.parse(xmlContent);
+		final List<String> errors = doc.getErrors();
 
 		assertEquals(1, errors.size());
 		assertEquals("<foo><bar>Jodd</bar></foo>", doc.getHtml());
@@ -171,26 +160,26 @@ class DomXmlTest {
 
 	@Test
 	void testAddDeleteModifyNode() throws IOException {
-		File file = new File(testDataRoot, "people.xml");
+		final File file = new File(testDataRoot, "people.xml");
 		String xmlContent = FileUtil.readString(file);
 
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
 		lagartoDOMBuilder.enableXmlMode();
-		Document xml = lagartoDOMBuilder.parse(xmlContent);
+		final Document xml = lagartoDOMBuilder.parse(xmlContent);
 
 		// find all persons
-		NodeSelector nodeSelector = new NodeSelector(xml);
-		List<Node> persons = nodeSelector.select("person");
+		final NodeSelector nodeSelector = new NodeSelector(xml);
+		final List<Node> persons = nodeSelector.select("person");
 
 		assertEquals(1, persons.size());
-		Node man = persons.get(0);
+		final Node man = persons.get(0);
 		assertEquals("Fred Bloggs", man.getChild(0).getTextContent());
 
 		// update
 		man.getChild(0).getChild(0).setNodeValue("Just Joe");
 
 		// append
-		Element newPerson = new Element(xml, "person", false, false, false);
+		final Element newPerson = new Element(xml, "person", false, false, false);
 		newPerson.addChild(new Element(xml, "name", false, false, false));
 		newPerson.getChild(0).addChild(new Text(xml, "Just Maria"));
 
@@ -214,15 +203,15 @@ class DomXmlTest {
 
 	@Test
 	void testXmlAndSingleQuotes() throws IOException {
-		File file = new File(testDataRoot, "people2.xml");
-		String xmlContent = FileUtil.readString(file);
+		final File file = new File(testDataRoot, "people2.xml");
+		final String xmlContent = FileUtil.readString(file);
 
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
 		lagartoDOMBuilder.enableXmlMode();
 
-		Document xml = lagartoDOMBuilder.parse(xmlContent);
+		final Document xml = lagartoDOMBuilder.parse(xmlContent);
 
-		XmlDeclaration xmlDeclaration = (XmlDeclaration) xml.getChild(0);
+		final XmlDeclaration xmlDeclaration = (XmlDeclaration) xml.getChild(0);
 
 		assertEquals("1.0", xmlDeclaration.getVersion());
 		assertEquals("UTF-8", xmlDeclaration.getEncoding());

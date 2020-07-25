@@ -22,42 +22,33 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-package jodd.lagarto;
+package jodd.lagarto.adapter;
 
 import jodd.io.FileUtil;
-import jodd.lagarto.adapter.StripHtmlTagAdapter;
-import org.junit.jupiter.api.BeforeEach;
+import jodd.lagarto.LagartoParser;
+import jodd.lagarto.Tag;
+import jodd.lagarto.TagAdapter;
+import jodd.lagarto.TagWriter;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TagAdapterTest {
 
-	protected String testAdapterRoot;
-
-	@BeforeEach
-	void setUp() throws Exception {
-		if (testAdapterRoot != null) {
-			return;
-		}
-
-		URL data = LagartoParserTest.class.getResource("adaptert");
-		testAdapterRoot = data.getFile();
-	}
+	protected final String testAdapterRoot = this.getClass().getResource("data").getFile();
 
 	@Test
 	void testCleanHtml() throws IOException {
 		File ff = new File(testAdapterRoot, "clean.html");
 
-		LagartoParser lagartoParser = new LagartoParser(FileUtil.readString(ff));
+		final LagartoParser lagartoParser = new LagartoParser(FileUtil.readString(ff));
 
-		StringBuilder out = new StringBuilder();
-		TagWriter tagWriter = new TagWriter(out);
-		StripHtmlTagAdapter stripHtmlTagAdapter = new StripHtmlTagAdapter(tagWriter);
+		final StringBuilder out = new StringBuilder();
+		final TagWriter tagWriter = new TagWriter(out);
+		final StripHtmlTagAdapter stripHtmlTagAdapter = new StripHtmlTagAdapter(tagWriter);
 		lagartoParser.parse(stripHtmlTagAdapter);
 
 		ff = new File(testAdapterRoot, "clean-out.html");
@@ -69,17 +60,17 @@ class TagAdapterTest {
 	void testTwoAdapters() throws IOException {
 		File ff = new File(testAdapterRoot, "two.html");
 
-		LagartoParser lagartoParser = new LagartoParser(FileUtil.readString(ff));
-		StringBuilder out = new StringBuilder();
-		TagWriter tagWriter = new TagWriter(out);
+		final LagartoParser lagartoParser = new LagartoParser(FileUtil.readString(ff));
+		final StringBuilder out = new StringBuilder();
+		final TagWriter tagWriter = new TagWriter(out);
 
-		TagAdapter tagAdapter1 = new TagAdapter(tagWriter) {
+		final TagAdapter tagAdapter1 = new TagAdapter(tagWriter) {
 			@Override
-			public void tag(Tag tag) {
+			public void tag(final Tag tag) {
 				if (tag.getType().isStartingTag()) {
-					String tagname = tag.getName().toString();
+					final String tagname = tag.getName().toString();
 					if (tagname.equals("title")) {
-						String id = tag.getAttributeValue("id").toString();
+						final String id = tag.getAttributeValue("id").toString();
 						tag.setAttribute("id", String.valueOf(Integer.parseInt(id) + 1));
 					}
 				}
@@ -88,11 +79,11 @@ class TagAdapterTest {
 		};
 
 
-		TagAdapter tagAdapter2 = new TagAdapter(tagAdapter1) {
+		final TagAdapter tagAdapter2 = new TagAdapter(tagAdapter1) {
 			@Override
-			public void tag(Tag tag) {
+			public void tag(final Tag tag) {
 				if (tag.getType().isStartingTag()) {
-					String tagname = tag.getName().toString();
+					final String tagname = tag.getName().toString();
 					if (tagname.equals("title")) {
 						tag.addAttribute("id", "172");
 					}

@@ -26,12 +26,10 @@ package jodd.lagarto.dom;
 
 import jodd.io.FileUtil;
 import jodd.util.StringUtil;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -40,22 +38,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DomTreeTest {
 
-	protected String testDataRoot;
-
-	@BeforeEach
-	void setUp() throws Exception {
-		if (testDataRoot != null) {
-			return;
-		}
-		URL data = NodeSelectorTest.class.getResource("test");
-		testDataRoot = data.getFile();
-	}
+	protected final String testDataRoot = this.getClass().getResource("data").getFile();
+	;
 
 	@Test
 	void testSpecialCases() {
-		Document document = new Document();
+		final Document document = new Document();
 
-		Element html = new Element(document, "html");
+		final Element html = new Element(document, "html");
 		document.addChild(html);
 
 		assertEquals(0, html.getChildNodesCount());
@@ -80,13 +70,13 @@ class DomTreeTest {
 
 	@Test
 	void testDetach() {
-		Document document = new Document();
+		final Document document = new Document();
 
-		Element html = new Element(document, "html");
+		final Element html = new Element(document, "html");
 		document.addChild(html);
-		Element div1 = new Element(document, "div");
+		final Element div1 = new Element(document, "div");
 		html.addChild(div1);
-		Element div2 = new Element(document, "div");
+		final Element div2 = new Element(document, "div");
 		div1.addChild(div2);
 
 		div1.detachFromParent();
@@ -99,16 +89,16 @@ class DomTreeTest {
 
 	@Test
 	void testInsertRemoveDeepLevel() {
-		Document document = new Document();
+		final Document document = new Document();
 
-		Element html = new Element(document, "html");
+		final Element html = new Element(document, "html");
 		document.addChild(html);
 
-		Element div1 = new Element(document, "div");
+		final Element div1 = new Element(document, "div");
 		html.addChild(div1);
-		Element div2 = new Element(document, "div");
+		final Element div2 = new Element(document, "div");
 		html.addChild(div2);
-		Element div3 = new Element(document, "div");
+		final Element div3 = new Element(document, "div");
 		html.addChild(div3);
 
 		assertEquals(3, html.getChildNodesCount());
@@ -167,9 +157,9 @@ class DomTreeTest {
 
 	@Test
 	void testAttributes() {
-		Document document = new Document();
+		final Document document = new Document();
 
-		Element node = new Element(document, "div");
+		final Element node = new Element(document, "div");
 
 		assertFalse(node.hasAttributes());
 		assertFalse(node.hasAttribute("id"));
@@ -195,28 +185,28 @@ class DomTreeTest {
 
 	@Test
 	void testChildren() {
-		Document document = new Document();
+		final Document document = new Document();
 
-		Element node = new Element(document, "div");
+		final Element node = new Element(document, "div");
 
-		Text textHello = new Text(document, "hello");
+		final Text textHello = new Text(document, "hello");
 		node.addChild(textHello);
 
-		Element em = new Element(document, "em");
+		final Element em = new Element(document, "em");
 		node.addChild(em);
-		Text textJodd = new Text(document, "jodd");
+		final Text textJodd = new Text(document, "jodd");
 		em.addChild(textJodd);
 
-		Text textHey = new Text(document, "!");
+		final Text textHey = new Text(document, "!");
 		node.addChild(textHey);
 
 		assertEquals(3, node.getChildNodesCount());
 		assertEquals(1, node.getChildElementsCount());
 		assertEquals(1, node.getChildElementsCount("em"));
 
-		Element b = new Element(document, "b");
+		final Element b = new Element(document, "b");
 		node.addChild(b);
-		Text textJodd2 = new Text(document, "fwk");
+		final Text textJodd2 = new Text(document, "fwk");
 		b.addChild(textJodd2);
 
 		assertEquals(4, node.getChildNodesCount());
@@ -239,14 +229,14 @@ class DomTreeTest {
 
 	@Test
 	void testCssPath() {
-		Document document = new Document();
+		final Document document = new Document();
 
-		Element html = new Element(document, "html");
+		final Element html = new Element(document, "html");
 		document.addChild(html);
-		Element div1 = new Element(document, "div");
+		final Element div1 = new Element(document, "div");
 		div1.setAttribute("id", "one");
 		html.addChild(div1);
-		Element div2 = new Element(document, "div");
+		final Element div2 = new Element(document, "div");
 		div1.addChild(div2);
 
 		assertEquals("html div#one div", div2.getCssPath());
@@ -281,7 +271,7 @@ class DomTreeTest {
 		html = StringUtil.replace(html, "\" >", "\">");
 		html = StringUtil.replace(html, "'", "");
 		html = StringUtil.replace(html, "&#32;", " ");
-		LagartoDOMBuilder builder = new LagartoDOMBuilder();
+		final LagartoDOMBuilder builder = new LagartoDOMBuilder();
 		builder.getConfig().setSelfCloseVoidTags(true);                        // use self-closing tags!
 		builder.getConfig().setEnableConditionalComments(true).setCondCommentIEVersion(6);
 		document = builder.parse(html);
@@ -305,9 +295,9 @@ class DomTreeTest {
 		html = StringUtil.replace(html, "'", "");
 		document = new LagartoDOMBuilder().parse(html);
 
-		NodeSelector nodeSelector = new NodeSelector(document);
-		Element div = (Element) nodeSelector.selectFirst("div.ysites-col");
-		Element h2 = (Element) div.getFirstChild();
+		final NodeSelector nodeSelector = new NodeSelector(document);
+		final Element div = (Element) nodeSelector.selectFirst("div.ysites-col");
+		final Element h2 = (Element) div.getFirstChild();
 
 		assertEquals(2, h2.getAttributesCount());
 		assertEquals("y-ftr-txt-hdr  ", h2.getAttribute("class"));
@@ -332,25 +322,25 @@ class DomTreeTest {
 
 	@Test
 	void testReindexOne() {
-		Document document = new Document();
+		final Document document = new Document();
 
-		Element one = new Element(document, "one");
+		final Element one = new Element(document, "one");
 		document.addChild(one);
 
 		assertEquals(1, document.childElementNodesCount);
 		assertEquals(0, one.siblingElementIndex);
 
-		Element two = new Element(document, "two");
+		final Element two = new Element(document, "two");
 		document.addChild(two);
 
 		assertEquals(2, document.childElementNodesCount);
 		assertEquals(0, one.siblingElementIndex);
 		assertEquals(1, two.siblingElementIndex);
 
-		Text three = new Text(document, "xxx");
+		final Text three = new Text(document, "xxx");
 		document.addChild(three);
 
-		Element four = new Element(document, "four");
+		final Element four = new Element(document, "four");
 		document.addChild(four);
 
 		assertEquals(3, document.childElementNodesCount);
@@ -361,9 +351,9 @@ class DomTreeTest {
 
 	@Test
 	void testHasVsGet333() {
-		Document document = new Document();
+		final Document document = new Document();
 
-		Element one = new Element(document, "one");
+		final Element one = new Element(document, "one");
 		document.addChild(one);
 		one.setAttribute("a1", "v1");
 

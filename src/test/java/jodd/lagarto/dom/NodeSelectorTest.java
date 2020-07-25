@@ -27,12 +27,10 @@ package jodd.lagarto.dom;
 import jodd.csselly.CSSelly;
 import jodd.csselly.CssSelector;
 import jodd.io.FileUtil;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,17 +41,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class NodeSelectorTest {
 
-	protected String testDataRoot;
-
-	@BeforeEach
-	void setUp() throws Exception {
-		if (testDataRoot != null) {
-			return;
-		}
-		URL data = NodeSelectorTest.class.getResource("test");
-		testDataRoot = data.getFile();
-	}
-
+	protected final String testDataRoot = this.getClass().getResource("data").getFile();
+	
 	@Test
 	void testTags() throws IOException {
 		NodeSelector nodeSelector = createNodeFilter();

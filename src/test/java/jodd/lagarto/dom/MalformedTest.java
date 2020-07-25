@@ -26,12 +26,10 @@ package jodd.lagarto.dom;
 
 import jodd.io.FileUtil;
 import jodd.util.StringUtil;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -40,83 +38,74 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MalformedTest {
 
-	protected String testDataRoot;
-
-	@BeforeEach
-	void setUp() throws Exception {
-		if (testDataRoot != null) {
-			return;
-		}
-		URL data = NodeSelectorTest.class.getResource("test");
-		testDataRoot = data.getFile();
-	}
+	protected final String testDataRoot = this.getClass().getResource("data").getFile();
 
 	@Test
 	void testOneNode() {
-		String content = "<body><div>test<span>sss</span></body>";
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
-		Document doc = lagartoDOMBuilder.parse(content);
+		final String content = "<body><div>test<span>sss</span></body>";
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final Document doc = lagartoDOMBuilder.parse(content);
 		assertEquals("<body><div>test<span>sss</span></div></body>", doc.getHtml());
 		assertTrue(doc.check());
 	}
 
 	@Test
 	void testOneNodeWithBlanks() {
-		String content = "<body><div>   <span>sss</span></body>";
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
-		Document doc = lagartoDOMBuilder.parse(content);
+		final String content = "<body><div>   <span>sss</span></body>";
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final Document doc = lagartoDOMBuilder.parse(content);
 		assertEquals("<body><div>   <span>sss</span></div></body>", doc.getHtml());
 		assertTrue(doc.check());
 	}
 
 	@Test
 	void testTwoNodes() {
-		String content = "<body><div>test<span><form>xxx</form></body>";
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
-		Document doc = lagartoDOMBuilder.parse(content);
+		final String content = "<body><div>test<span><form>xxx</form></body>";
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final Document doc = lagartoDOMBuilder.parse(content);
 		assertEquals("<body><div>test<span><form>xxx</form></span></div></body>", doc.getHtml());
 		assertTrue(doc.check());
 	}
 
 	@Test
 	void testTwoNodes2() {
-		String content = "<body><div>test<span><form>xxx</body>";
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
-		Document doc = lagartoDOMBuilder.parse(content);
+		final String content = "<body><div>test<span><form>xxx</body>";
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final Document doc = lagartoDOMBuilder.parse(content);
 		assertEquals("<body><div>test<span><form>xxx</form></span></div></body>", doc.getHtml());
 		assertTrue(doc.check());
 	}
 
 	@Test
 	void testPeterSimple1() {
-		String content = "<div><h1>FORELE</h1><p>dicuss<div>xxx</div></div>";
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
-		Document doc = lagartoDOMBuilder.parse(content);
+		final String content = "<div><h1>FORELE</h1><p>dicuss<div>xxx</div></div>";
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final Document doc = lagartoDOMBuilder.parse(content);
 		assertEquals("<div><h1>FORELE</h1><p>dicuss</p><div>xxx</div></div>", doc.getHtml());
 		assertTrue(doc.check());
 	}
 
 	@Test
 	void testPeterSimple2() {
-		String content = "<div><h1>FORELE</h1><p>dicuss<div><h2>HAB</h2><p>AMONG</div></div>";
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
-		Document doc = lagartoDOMBuilder.parse(content);
+		final String content = "<div><h1>FORELE</h1><p>dicuss<div><h2>HAB</h2><p>AMONG</div></div>";
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final Document doc = lagartoDOMBuilder.parse(content);
 		assertEquals("<div><h1>FORELE</h1><p>dicuss</p><div><h2>HAB</h2><p>AMONG</p></div></div>", doc.getHtml());
 		assertTrue(doc.check());
 	}
 
 	@Test
 	void testPeterSimple3WithSpaces() {
-		String content = "<div> <h1>FORELE</h1> <p>dicuss <div> <h2>HAB</h2> <p>AMONG </div> </div>".toUpperCase();
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
-		Document doc = lagartoDOMBuilder.parse(content);
+		final String content = "<div> <h1>FORELE</h1> <p>dicuss <div> <h2>HAB</h2> <p>AMONG </div> </div>".toUpperCase();
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final Document doc = lagartoDOMBuilder.parse(content);
 		assertEquals("<div> <h1>FORELE</h1> <p>DICUSS </p><div> <h2>HAB</h2> <p>AMONG </p></div> </div>", doc.getHtml());
 		assertTrue(doc.check());
 	}
 
 	@Test
 	void testPeterFull() {
-		String content = "<DIV class=\"section\" id=\"forest-elephants\" >\n" +
+		final String content = "<DIV class=\"section\" id=\"forest-elephants\" >\n" +
 				"<H1>Forest elephants</H1>\n" +
 				"<P>In this section, we discuss the lesser known forest elephants.\n" +
 				"...this section continues...\n" +
@@ -126,10 +115,10 @@ class MalformedTest {
 				"...this subsection continues...\n" +
 				"</DIV>\n" +
 				"</DIV>";
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
-		Document doc = lagartoDOMBuilder.parse(content);
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final Document doc = lagartoDOMBuilder.parse(content);
 
-		String expected = "<div class=\"section\" id=\"forest-elephants\">\n" +
+		final String expected = "<div class=\"section\" id=\"forest-elephants\">\n" +
 				"<h1>Forest elephants</h1>\n" +
 				"<p>In this section, we discuss the lesser known forest elephants.\n" +
 				"...this section continues...\n</p>" +
@@ -146,48 +135,48 @@ class MalformedTest {
 
 	@Test
 	void testEof() {
-		String content = "<body><div>test";
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
-		Document doc = lagartoDOMBuilder.parse(content);
+		final String content = "<body><div>test";
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final Document doc = lagartoDOMBuilder.parse(content);
 		assertEquals("<body><div>test</div></body>", doc.getHtml());
 		assertTrue(doc.check());
 	}
 
 	@Test
 	void testEof2() {
-		String content = "<body><div>";
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
-		Document doc = lagartoDOMBuilder.parse(content);
+		final String content = "<body><div>";
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final Document doc = lagartoDOMBuilder.parse(content);
 		assertEquals("<body><div></div></body>", doc.getHtml());
 		assertTrue(doc.check());
 	}
 
 	@Test
 	void testSpanDivOverTable() {
-		String content = "<span><div><table><tr><td>text</span>";
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
-		Document doc = lagartoDOMBuilder.parse(content);
+		final String content = "<span><div><table><tr><td>text</span>";
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final Document doc = lagartoDOMBuilder.parse(content);
 		assertEquals("<span><div><table><tr><td>text</td></tr></table></div></span>", doc.getHtml());
 		assertTrue(doc.check());
 	}
 
 	@Test
 	void testDivSpanOverTable() {
-		String content = "<div><span><table><tr><td>text</div>";
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
-		Document doc = lagartoDOMBuilder.parse(content);
+		final String content = "<div><span><table><tr><td>text</div>";
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final Document doc = lagartoDOMBuilder.parse(content);
 		assertEquals("<div><span><table><tr><td>text</td></tr></table></span></div>", doc.getHtml());
 		assertTrue(doc.check());
 	}
 
 	@Test
 	void testTableInTableInTable() throws IOException {
-		String html = read("tableInTable.html", false);
+		final String html = read("tableInTable.html", false);
 
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
-		Document doc = lagartoDOMBuilder.parse(html);
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final Document doc = lagartoDOMBuilder.parse(html);
 
-		String out = read("tableInTable-out.html", true);
+		final String out = read("tableInTable-out.html", true);
 
 		assertEquals(out, html(doc));
 		assertTrue(doc.check());
@@ -197,7 +186,7 @@ class MalformedTest {
 	void testFormClosesAll() throws IOException {
 		String html = read("formClosesAll.html", false);
 
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
 		lagartoDOMBuilder.enableDebug();
 		Document doc = lagartoDOMBuilder.parse(html);
 		html = html(doc);
@@ -217,9 +206,9 @@ class MalformedTest {
 	@Test
 	void testFoster1() {
 		String html = "A<table>B<tr>C</tr>D</table>";
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
 		lagartoDOMBuilder.getConfig().setUseFosterRules(true);
-		Document doc = lagartoDOMBuilder.parse(html);
+		final Document doc = lagartoDOMBuilder.parse(html);
 		html = html1(doc);
 
 		assertEquals("ABCD<table><tr></tr></table>", html);
@@ -228,9 +217,9 @@ class MalformedTest {
 	@Test
 	void testFoster2() {
 		String html = "A<table><tr> B</tr> C</table>";
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
 		lagartoDOMBuilder.getConfig().setUseFosterRules(true);
-		Document doc = lagartoDOMBuilder.parse(html);
+		final Document doc = lagartoDOMBuilder.parse(html);
 		html = html1(doc);
 
 		assertEquals("ABC<table><tr></tr></table>", html);
@@ -239,9 +228,9 @@ class MalformedTest {
 	@Test
 	void testBodyEnd() {
 		String html = "<body><p>111</body>";
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
 		lagartoDOMBuilder.enableDebug();
-		Document doc = lagartoDOMBuilder.parse(html);
+		final Document doc = lagartoDOMBuilder.parse(html);
 		html = html1(doc);
 
 		assertEquals("<body><p>111</p></body>", html);
@@ -251,9 +240,9 @@ class MalformedTest {
 	@Test
 	void testBodyEndWithError() {
 		String html = "<body><p>111<h1>222</body>";
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
 		lagartoDOMBuilder.enableDebug();
-		Document doc = lagartoDOMBuilder.parse(html);
+		final Document doc = lagartoDOMBuilder.parse(html);
 		html = html1(doc);
 
 		assertEquals("<body><p>111</p><h1>222</h1></body>", html);
@@ -264,9 +253,9 @@ class MalformedTest {
 	@Test
 	void testEOF() {
 		String html = "<body><p>111";
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
 		lagartoDOMBuilder.enableDebug();
-		Document doc = lagartoDOMBuilder.parse(html);
+		final Document doc = lagartoDOMBuilder.parse(html);
 		html = html1(doc);
 
 		assertEquals("<body><p>111</p></body>", html);
@@ -276,9 +265,9 @@ class MalformedTest {
 	@Test
 	void testEOFWithError() {
 		String html = "<body><p>111<h1>222";
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
 		lagartoDOMBuilder.enableDebug();
-		Document doc = lagartoDOMBuilder.parse(html);
+		final Document doc = lagartoDOMBuilder.parse(html);
 		html = html1(doc);
 
 		assertEquals("<body><p>111</p><h1>222</h1></body>", html);
@@ -289,14 +278,14 @@ class MalformedTest {
 	@Test
 	void testCrazySpan() throws IOException {
 		String html = read("spancrazy.html", false);
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
 		lagartoDOMBuilder.enableHtmlPlusMode();
 		lagartoDOMBuilder.enableDebug();
 
-		Document doc = lagartoDOMBuilder.parse(html);
+		final Document doc = lagartoDOMBuilder.parse(html);
 		html = html(doc);
 
-		String out = read("spancrazy-out.html", true);
+		final String out = read("spancrazy-out.html", true);
 		assertEquals(out, html);
 		assertEquals(3, doc.getErrors().size());
 	}
@@ -304,14 +293,14 @@ class MalformedTest {
 	@Test
 	void testFosterForm() throws IOException {
 		String html = read("fosterForm.html", false);
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
 		lagartoDOMBuilder.enableHtmlPlusMode();
 		lagartoDOMBuilder.enableDebug();
 
-		Document doc = lagartoDOMBuilder.parse(html);
+		final Document doc = lagartoDOMBuilder.parse(html);
 		html = html(doc);
 
-		String out = read("fosterForm-out.html", true);
+		final String out = read("fosterForm-out.html", true);
 		assertEquals(out, html);
 		assertNull(doc.getErrors());
 	}
@@ -319,14 +308,14 @@ class MalformedTest {
 	@Test
 	void testListCrazy() throws IOException {
 		String html = read("listcrazy.html", false);
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
 		lagartoDOMBuilder.enableHtmlPlusMode();
 		lagartoDOMBuilder.enableDebug();
 
-		Document doc = lagartoDOMBuilder.parse(html);
+		final Document doc = lagartoDOMBuilder.parse(html);
 		html = html(doc);
 
-		String out = read("listcrazy-out.html", true);
+		final String out = read("listcrazy-out.html", true);
 		assertEquals(out, html);
 		assertEquals(1, doc.getErrors().size());
 	}
@@ -334,39 +323,39 @@ class MalformedTest {
 	@Test
 	void testTable1() throws IOException {
 		String html = read("table1.html", false);
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
 		lagartoDOMBuilder.enableHtmlPlusMode();
 		lagartoDOMBuilder.enableDebug();
 
-		Document doc = lagartoDOMBuilder.parse(html);
+		final Document doc = lagartoDOMBuilder.parse(html);
 		html = html(doc);
 
-		String out = read("table1-out.html", true);
+		final String out = read("table1-out.html", true);
 		assertEquals(out, html);
 	}
 
 	@Test
 	void testTable2() throws IOException {
 		String html = read("table2.html", false);
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
 		lagartoDOMBuilder.enableHtmlPlusMode();
 		lagartoDOMBuilder.enableDebug();
 
-		Document doc = lagartoDOMBuilder.parse(html);
+		final Document doc = lagartoDOMBuilder.parse(html);
 		html = html(doc);
 
-		String out = read("table2-out.html", true);
+		final String out = read("table2-out.html", true);
 		assertEquals(out, html);
 	}
 
 	@Test
 	public void smtest() throws IOException {
 		String html = read("smtest.html", false);
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
 		lagartoDOMBuilder.enableHtmlPlusMode();
 		lagartoDOMBuilder.enableDebug();
 
-		Document doc = lagartoDOMBuilder.parse(html);
+		final Document doc = lagartoDOMBuilder.parse(html);
 		html = html(doc);
 
 		String out = read("smtest-out.html", true);
@@ -389,19 +378,19 @@ class MalformedTest {
 		Document doc = lagartoDOMBuilder.parse(html);
 
 		Element td1 = (Element) doc.getChild(0, 1, 1, 1, 1);
-		String td1attr = td1.getAttribute("onclick");
+		final String td1attr = td1.getAttribute("onclick");
 
 		Element td2 = (Element) doc.getChild(0, 1, 1, 3, 1);
-		String td2attr = td2.getAttribute("onclick");
+		final String td2attr = td2.getAttribute("onclick");
 
 		html = html(doc);
-		String out = read("decode-out.html", true);
+		final String out = read("decode-out.html", true);
 
 		assertEquals(out, html);
 
 		// now re-parse the generated html
 
-		String newHtml = doc.getHtml();
+		final String newHtml = doc.getHtml();
 
 		lagartoDOMBuilder = new LagartoDOMBuilder();
 		doc = lagartoDOMBuilder.parse(newHtml);
@@ -417,12 +406,12 @@ class MalformedTest {
 	@Test
 	void testQuotes() throws IOException {
 		String html = read("quotes.html", false);
-		LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
+		final LagartoDOMBuilder lagartoDOMBuilder = new LagartoDOMBuilder();
 
-		Document doc = lagartoDOMBuilder.parse(html);
+		final Document doc = lagartoDOMBuilder.parse(html);
 
 		html = html(doc);
-		String out = read("quotes-out.html", true);
+		final String out = read("quotes-out.html", true);
 
 		assertEquals(out, html);
 	}
@@ -432,7 +421,7 @@ class MalformedTest {
 	/**
 	 * Reads test file and returns its content optionally stripped.
 	 */
-	protected String read(String filename, boolean strip) throws IOException {
+	protected String read(final String filename, final boolean strip) throws IOException {
 		String data = FileUtil.readString(new File(testDataRoot, filename));
 		if (strip) {
 			data = strip(data);
@@ -449,12 +438,12 @@ class MalformedTest {
 	/**
 	 * Parses HTML and returns the stripped html.
 	 */
-	protected String html(Document document) {
+	protected String html(final Document document) {
 		String html = document.getHtml();
 		html = strip(html);
 		return html;
 	}
-	protected String html1(Document document) {
+	protected String html1(final Document document) {
 		String html = document.getHtml();
 		html = StringUtil.removeChars(html, " \r\n\t");
 		return html;

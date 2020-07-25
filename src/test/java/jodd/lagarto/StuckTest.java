@@ -26,7 +26,6 @@ package jodd.lagarto;
 
 import jodd.io.StreamUtil;
 import jodd.jerry.Jerry;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -34,7 +33,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.zip.GZIPInputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,29 +40,20 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 class StuckTest {
 
-	protected String testDataRoot;
-
-	@BeforeEach
-	void setUp() throws Exception {
-		if (testDataRoot != null) {
-			return;
-		}
-		URL data = LagartoParserTest.class.getResource("data");
-		testDataRoot = data.getFile();
-	}
+	protected final String testDataRoot = this.getClass().getResource("misc").getFile();
 
 	@Test
 	void testStuck() throws IOException {
-		File file = new File(testDataRoot, "stuck.html.gz");
-		InputStream in = new GZIPInputStream(new FileInputStream(file));
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		final File file = new File(testDataRoot, "stuck.html.gz");
+		final InputStream in = new GZIPInputStream(new FileInputStream(file));
+		final ByteArrayOutputStream out = new ByteArrayOutputStream();
 		StreamUtil.copy(in, out);
 		in.close();
 
-		Jerry.JerryParser jerryParser = new Jerry.JerryParser();
+		final Jerry.JerryParser jerryParser = new Jerry.JerryParser();
 //		LagartoDOMBuilder lagartoDOMBuilder = (LagartoDOMBuilder) jerryParser.getDOMBuilder();
 //		lagartoDOMBuilder.setParsingErrorLogLevelName("ERROR");
-		Jerry doc = jerryParser.parse(out.toString("UTF-8"));
+		final Jerry doc = jerryParser.parse(out.toString("UTF-8"));
 
 		// parse
 		try {
@@ -72,7 +61,7 @@ class StuckTest {
 				assertEquals("Go to Database Directory", $this.html().trim());
 				return false;
 			});
-		} catch (StackOverflowError stackOverflowError) {
+		} catch (final StackOverflowError stackOverflowError) {
 			fail("stack overflow!");
 		}
 	}
