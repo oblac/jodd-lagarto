@@ -82,7 +82,7 @@ public class LagartoParser {
 	 */
 	public LagartoParser(final LagartoParserConfig parserConfig, final CharSequence input) {
 		this.config = parserConfig;
-		s = new StringScanner(input);
+		s = new CharSequenceScanner(input);
 		initialize();
 	}
 
