@@ -112,8 +112,7 @@ class ParsedTag implements Tag {
 	public boolean isRawTag() {
 		return rawTag;
 	}
-
-	// todo use directly
+	
 	public void setRawTag(final boolean isRawTag) {
 		this.rawTag = isRawTag;
 	}

@@ -208,7 +208,7 @@ class LagartoParserTest {
 
 		final TagWriter tagWriter = new TagWriter(out);
 
-		lagartoParser.parse(new TagVisitorChain(visitor, tagWriter));
+		lagartoParser.parse(new TagVisitors(visitor, tagWriter));
 
 		return new String[]{result.toString(), out.toString()};
 	}

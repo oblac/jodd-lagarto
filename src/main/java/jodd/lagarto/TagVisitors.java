@@ -26,13 +26,12 @@ package jodd.lagarto;
 
 /**
  * Visitor over several target visitors at once.
- * // todo make only 2 (this and that) not an array!
  */
-public class TagVisitorChain implements TagVisitor {
+public class TagVisitors implements TagVisitor {
 
 	protected final TagVisitor[] targets;
 
-	public TagVisitorChain(final TagVisitor... targets) {
+	public TagVisitors(final TagVisitor... targets) {
 		this.targets = targets;
 	}
 
