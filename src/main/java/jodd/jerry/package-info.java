@@ -23,6 +23,6 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
- * Jerry - Java JQuery!
+ * Jerry - Java jQuery!
  */
 package jodd.jerry;

@@ -24,12 +24,10 @@
 
 package jodd.csselly;
 
-import jodd.lagarto.LagartoException;
-
 /**
  * CSSelly exception.
  */
-public class CSSellyException extends LagartoException {
+public class CSSellyException extends RuntimeException {
 
 	public CSSellyException(final Throwable t) {
 		super(t);
