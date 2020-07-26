@@ -2,6 +2,7 @@ package jodd.lagarto;
 
 import jodd.io.StreamUtil;
 import jodd.util.NaturalOrderComparator;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -22,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class BigTest {
 
 	@Test
+	@Disabled
 	void shouldParseAllHtmlPages() throws IOException {
 
 		final List<Path> zipFiles;

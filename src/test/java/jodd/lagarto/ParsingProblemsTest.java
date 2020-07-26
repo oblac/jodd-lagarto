@@ -320,15 +320,17 @@ class ParsingProblemsTest {
 	void testCnnConditionals() {
 		final String html =
 				"<html><head>\n" +
-				"<!--[if lte IE 9]><meta http-equiv=\"refresh\" content=\"1;url=/2.218.0/static/unsupp.html\" /><![endif]-->\n" +
-				"<!--[if gt IE 9><!--><script>alert(\"Hello!\");</script><!--<![endif]-->\n" +
-				"</head>\n" +
-				"</html>";
+						"<!--[if lte IE 9]><meta http-equiv=\"refresh\" content=\"1;url=/2.218.0/static/unsupp.html\" /><![endif]-->\n" +
+						"<!--[if gt IE 9><!--><script>alert(\"Hello!\");</script><!--<![endif]-->\n" +
+						"</head>\n" +
+						"</html>";
 
 		final StringBuilder sb = new StringBuilder();
 		final MutableInteger errorCount = MutableInteger.of(0);
 
-		new LagartoParser(html).parse(new EmptyTagVisitor() {
+		new LagartoParser(html).configure(cfg -> {
+			cfg.setEnableConditionalComments(true);
+		}).parse(new EmptyTagVisitor() {
 			@Override
 			public void condComment(final CharSequence expression, final boolean isStartingTag, final boolean isHidden, final boolean isHiddenEndTag) {
 				sb.append("C:").append(expression).append('-').append(isStartingTag).append('\n');

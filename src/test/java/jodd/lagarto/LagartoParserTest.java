@@ -41,7 +41,7 @@ class LagartoParserTest {
 
 	protected final String testDataRoot = this.getClass().getResource("data").getFile();
 	protected final String testTagRoot = this.getClass().getResource("tags").getFile();
-	
+
 	@Test
 	void testDataHtml() throws IOException {
 		_testHtmls(testDataRoot);
@@ -200,6 +200,7 @@ class LagartoParserTest {
 
 		final LagartoParser lagartoParser = new LagartoParser(content);
 		lagartoParser.getConfig().setCalculatePosition(true);
+		lagartoParser.getConfig().setEnableConditionalComments(true);
 
 		if (isXml) {
 			lagartoParser.getConfig().setParseXmlTags(true);
