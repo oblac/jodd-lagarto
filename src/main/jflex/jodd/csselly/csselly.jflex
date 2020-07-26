@@ -22,7 +22,7 @@ import java.nio.CharBuffer;
 // additional methods
 %{
 	// position methods
-	public int position() { return yychar; }
+	public long position() { return yychar; }
 	public int length()   { return yylength(); }
 	public int line()     { return -1; /*yyline;*/ }   	// for debugging
 	public int column()   { return -1; /*yycolumn;*/ } 	// for debugging

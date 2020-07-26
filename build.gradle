@@ -1,9 +1,10 @@
 plugins {
-    id 'java-library'
-    id 'maven-publish'
-    id 'jacoco'
-    id 'signing'
-    id 'io.codearte.nexus-staging' version '0.21.2'
+	id 'java-library'
+	id 'maven-publish'
+	id 'jacoco'
+	id 'signing'
+	id 'io.codearte.nexus-staging' version '0.21.2'
+	id 'org.xbib.gradle.plugin.jflex' version '1.4.0'
 }
 
 repositories {
@@ -23,34 +24,44 @@ ext {
 }
 
 java {
-    withSourcesJar()
-    withJavadocJar()
+	withSourcesJar()
+	withJavadocJar()
 }
 
 dependencies {
-    implementation 'org.jodd:jodd-core:5.1.+'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.2'
+	implementation 'org.jodd:jodd-core:5.1.+'
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.2'
+	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.2'
+}
+
+jflex {
+	verbose true
+	statistics true
+	skel file('src/main/jflex/jodd/csselly/skeleton-1.8.2.jodd')
+}
+
+tasks.withType(Javadoc) {
+	options.addStringOption('Xdoclint:none', '-quiet')
 }
 
 test {
-    useJUnitPlatform()
-    testLogging {
-        events "standardOut", "passed", "skipped", "failed"
-        showExceptions true
-        exceptionFormat "full"
-        showCauses true
-        showStackTraces true
+	useJUnitPlatform()
+	testLogging {
+		events "standardOut", "passed", "skipped", "failed"
+		showExceptions true
+		exceptionFormat "full"
+		showCauses true
+		showStackTraces true
 
-        afterSuite { desc, result ->
-            if (!desc.parent) { // will match the outermost suite
-                def output = "Results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} successes, ${result.failedTestCount} failures, ${result.skippedTestCount} skipped)"
-                def startItem = '|  ', endItem = '  |'
-                def repeatLength = startItem.length() + output.length() + endItem.length()
-                println('\n' + ('-' * repeatLength) + '\n' + startItem + output + endItem + '\n' + ('-' * repeatLength))
-            }
-        }
-    }
+		afterSuite { desc, result ->
+			if (!desc.parent) { // will match the outermost suite
+				def output = "Results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} successes, ${result.failedTestCount} failures, ${result.skippedTestCount} skipped)"
+				def startItem = '|  ', endItem = '  |'
+				def repeatLength = startItem.length() + output.length() + endItem.length()
+				println('\n' + ('-' * repeatLength) + '\n' + startItem + output + endItem + '\n' + ('-' * repeatLength))
+			}
+		}
+	}
 }
 
 jacocoTestReport {
