@@ -28,7 +28,6 @@ import jodd.io.FileUtil;
 import jodd.io.findfile.FindFile;
 import jodd.io.findfile.WildcardFindFile;
 import jodd.util.StringUtil;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -37,14 +36,12 @@ import java.io.IOException;
 import static jodd.util.StringPool.NEWLINE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 class LagartoParserTest {
 
 	protected final String testDataRoot = this.getClass().getResource("data").getFile();
 	protected final String testTagRoot = this.getClass().getResource("tags").getFile();
-	protected final String testLiveRoot = null;//this.getClass().getResource("live").getFile();
-
+	
 	@Test
 	void testDataHtml() throws IOException {
 		_testHtmls(testDataRoot);
@@ -101,45 +98,6 @@ class LagartoParserTest {
 		}
 		assertTrue(processed);
 
-	}
-
-	/**
-	 * 13s
-	 */
-	@Test
-	@Disabled
-	void testLiveHtmls() throws IOException {
-		final FindFile ff = new WildcardFindFile().include("**/*.html");
-		ff.searchPath(testLiveRoot);
-		File file;
-		boolean processed = false;
-		while ((file = ff.nextFile()) != null) {
-			processed = true;
-			final String name = file.getName();
-			System.out.println('+' + name);
-			final String content = FileUtil.readString(file);
-			try {
-				_parseEmpty(content);
-			} catch (final Exception ex) {
-				ex.printStackTrace();
-				fail(ex.toString());
-			}
-		}
-		assertTrue(processed);
-	}
-
-	private String _parseEmpty(final String content) {
-		final LagartoParser lagartoParser = new LagartoParser(content);
-		lagartoParser.getConfig().setCalculatePosition(true);
-		final StringBuilder errors = new StringBuilder();
-		lagartoParser.parse(new EmptyTagVisitor() {
-			@Override
-			public void error(final String message) {
-				errors.append(message);
-				errors.append('\n');
-			}
-		});
-		return errors.toString();
 	}
 
 	private String[] _parse(final String content, final boolean isXml) {

@@ -5,9 +5,9 @@ package jodd.lagarto;
  */
 final class StringScanner extends Scanner {
 
-	private final String input;
+	private final CharSequence input;
 
-	StringScanner(final String input) {
+	StringScanner(final CharSequence input) {
 		super(input.length());
 		this.input = input;
 	}

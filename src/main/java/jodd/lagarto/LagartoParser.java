@@ -78,18 +78,18 @@ public class LagartoParser {
 	}
 
 	/**
-	 * Creates parser on a String.
+	 * Creates parser on a char sequence.
 	 */
-	public LagartoParser(final LagartoParserConfig parserConfig, final String input) {
+	public LagartoParser(final LagartoParserConfig parserConfig, final CharSequence input) {
 		this.config = parserConfig;
 		s = new StringScanner(input);
 		initialize();
 	}
 
 	/**
-	 * Creates parser on a String.
+	 * Creates parser on a char sequence.
 	 */
-	public LagartoParser(final String input) {
+	public LagartoParser(final CharSequence input) {
 		this(new LagartoParserConfig(), input);
 	}
 
