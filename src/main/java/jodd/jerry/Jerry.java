@@ -29,6 +29,7 @@ import jodd.lagarto.dom.Document;
 import jodd.lagarto.dom.LagartoDOMBuilder;
 import jodd.lagarto.dom.Node;
 import jodd.lagarto.dom.NodeSelector;
+import jodd.lagarto.dom.NodeUtil;
 import jodd.lagarto.dom.Text;
 import jodd.util.ArraysUtil;
 import jodd.util.Format;
@@ -177,7 +178,7 @@ public class Jerry implements Iterable<Jerry> {
 	 */
 	protected Jerry(final Jerry parent, final Node[] nodes1, final Node[] nodes2) {
 		this.parent = parent;
-		this.nodes = ArraysUtil.join(nodes1, nodes2);
+		this.nodes = NodeUtil.join(nodes1, nodes2);
 		this.builder = parent.builder;
 	}
 
