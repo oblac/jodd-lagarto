@@ -31,8 +31,8 @@ package jodd.jerry;
 public interface JerryFunction {
 
 	/**
-	 * Invoked on node. Returns <code>true</code> or <code>null</code>
-	 * to continue looping. The reason why it returns a <code>Boolean</code>
+	 * Invoked on node. Returns {@code true} or {@code null}
+	 * to continue looping. The reason why it returns a {@code Boolean}
 	 * is because when Jerry is used in Nashorn, when javascript method
 	 * returns nothing it means it's not false.
 	 */

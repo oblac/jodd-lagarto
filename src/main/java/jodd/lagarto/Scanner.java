@@ -28,7 +28,7 @@ import jodd.HtmlDecoder;
 import jodd.util.CharUtil;
 
 /**
- * Scanner over an input.
+ * Scanner over an input that consist of characters.
  */
 abstract class Scanner implements CharSequence {
 
@@ -67,7 +67,7 @@ abstract class Scanner implements CharSequence {
 
 	/**
 	 * Finds a character in some range and returns its index.
-	 * Returns <code>-1</code> if character is not found.
+	 * Returns {@code -1} if character is not found.
 	 */
 	public final int find(final char target, int from, final int end) {
 		while (from < end) {
@@ -90,7 +90,7 @@ abstract class Scanner implements CharSequence {
 
 	/**
 	 * Finds character buffer in some range and returns its index.
-	 * Returns <code>-1</code> if character is not found.
+	 * Returns {@code -1} if character is not found.
 	 */
 	public final int find(final char[] target, int from, final int end) {
 		while (from < end) {
@@ -170,7 +170,7 @@ abstract class Scanner implements CharSequence {
 	private int lastLastNewLineOffset;
 
 	/**
-	 * Returns <code>true</code> if EOF.
+	 * Returns {@code true} if EOF.
 	 */
 	protected final boolean isEOF() {
 		return ndx >= total;

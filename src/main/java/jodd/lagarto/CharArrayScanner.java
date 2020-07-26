@@ -3,7 +3,7 @@ package jodd.lagarto;
 import java.nio.CharBuffer;
 
 /**
- * Implementation of {@link Scanner} over a {@code char[]}.
+ * Implementation of the {@link Scanner} over a {@code char[]}.
  */
 final class CharArrayScanner extends Scanner {
 	public static final CharSequence EMPTY_CHAR_SEQUENCE = CharBuffer.allocate(0);

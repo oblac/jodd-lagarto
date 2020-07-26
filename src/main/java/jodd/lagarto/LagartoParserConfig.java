@@ -54,7 +54,7 @@ public class LagartoParserConfig {
 	}
 
 	/**
-	 * Returns <code>true</code> if parsing of XML tags is enabled.
+	 * Returns {@code true} if parsing of XML tags is enabled.
 	 */
 	public boolean isParseXmlTags() {
 		return parseXmlTags;
@@ -83,6 +83,9 @@ public class LagartoParserConfig {
 		return this;
 	}
 
+	/**
+	 * @see #setCalculatePosition(boolean)
+	 */
 	public boolean isCalculatePosition() {
 		return calculatePosition;
 	}
@@ -99,6 +102,9 @@ public class LagartoParserConfig {
 		return this;
 	}
 
+	/**
+	 * @see #setEnableRawTextModes(boolean)
+	 */
 	public boolean isEnableRawTextModes() {
 		return enableRawTextModes;
 	}
@@ -111,6 +117,9 @@ public class LagartoParserConfig {
 		return this;
 	}
 
+	/**
+	 * @see #setTextBufferSize(int)
+	 */
 	public int getTextBufferSize() {
 		return textBufferSize;
 	}

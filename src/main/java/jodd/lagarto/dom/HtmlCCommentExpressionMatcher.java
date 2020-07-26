@@ -33,19 +33,19 @@ public class HtmlCCommentExpressionMatcher {
 
 	/**
 	 * Matches conditional comment expression with current mode.
-	 * Returns <code>true</code> it conditional comment expression is positive,
-	 * otherwise returns <code>false</code>.
+	 * Returns {@code true} it conditional comment expression is positive,
+	 * otherwise returns {@code false}.
 	 */
 	public boolean match(final float ieVersion, String expression) {
 		expression = StringUtil.removeChars(expression, "()");
 		expression = expression.substring(3);
 
-		String[] andChunks = StringUtil.splitc(expression, '&');
+		final String[] andChunks = StringUtil.splitc(expression, '&');
 
 		boolean valid = true;
 
-		for (String andChunk : andChunks) {
-			String[] orChunks = StringUtil.splitc(andChunk, '|');
+		for (final String andChunk : andChunks) {
+			final String[] orChunks = StringUtil.splitc(andChunk, '|');
 
 			boolean innerValid = false;
 
@@ -53,8 +53,8 @@ public class HtmlCCommentExpressionMatcher {
 				orChunk = orChunk.trim();
 
 				if (orChunk.startsWith("IE ")) {
-					String value = orChunk.substring(3);
-					float number = Float.parseFloat(value);
+					final String value = orChunk.substring(3);
+					final float number = Float.parseFloat(value);
 
 					if (versionToCompare(ieVersion, number) == number) {
 						innerValid = true;
@@ -63,8 +63,8 @@ public class HtmlCCommentExpressionMatcher {
 					continue;
 				}
 				if (orChunk.startsWith("!IE ")) {
-					String value = orChunk.substring(4);
-					float number = Float.parseFloat(value);
+					final String value = orChunk.substring(4);
+					final float number = Float.parseFloat(value);
 
 					if (versionToCompare(ieVersion, number) != number) {
 						innerValid = true;
@@ -73,8 +73,8 @@ public class HtmlCCommentExpressionMatcher {
 					continue;
 				}
 				if (orChunk.startsWith("lt IE ")) {
-					String value = orChunk.substring(6);
-					float number = Float.parseFloat(value);
+					final String value = orChunk.substring(6);
+					final float number = Float.parseFloat(value);
 
 					if (ieVersion < number) {
 						innerValid = true;
@@ -83,8 +83,8 @@ public class HtmlCCommentExpressionMatcher {
 					continue;
 				}
 				if (orChunk.startsWith("lte IE ")) {
-					String value = orChunk.substring(7);
-					float number = Float.parseFloat(value);
+					final String value = orChunk.substring(7);
+					final float number = Float.parseFloat(value);
 
 					if (versionToCompare(ieVersion, number) <= number) {
 						innerValid = true;
@@ -93,8 +93,8 @@ public class HtmlCCommentExpressionMatcher {
 					continue;
 				}
 				if (orChunk.startsWith("gt IE ")) {
-					String value = orChunk.substring(6);
-					float number = Float.parseFloat(value);
+					final String value = orChunk.substring(6);
+					final float number = Float.parseFloat(value);
 
 					if (versionToCompare(ieVersion, number) > number) {
 						innerValid = true;
@@ -103,8 +103,8 @@ public class HtmlCCommentExpressionMatcher {
 					continue;
 				}
 				if (orChunk.startsWith("gte IE ")) {
-					String value = orChunk.substring(7);
-					float number = Float.parseFloat(value);
+					final String value = orChunk.substring(7);
+					final float number = Float.parseFloat(value);
 
 					if (ieVersion >= number) {
 						innerValid = true;

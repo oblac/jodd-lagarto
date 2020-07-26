@@ -52,7 +52,7 @@ public class Document extends Node {
 
 	@Override
 	public Document clone() {
-		Document document = cloneTo(new Document(config));
+		final Document document = cloneTo(new Document(config));
 		document.elapsedTime = this.elapsedTime;
 		return document;
 	}
@@ -86,7 +86,7 @@ public class Document extends Node {
 
 	/**
 	 * Returns list of warnings and errors occurred during parsing.
-	 * Returns <code>null</code> if parsing was successful; or if
+	 * Returns {@code null} if parsing was successful; or if
 	 * errors are not collected.
 	 */
 	public List<String> getErrors() {

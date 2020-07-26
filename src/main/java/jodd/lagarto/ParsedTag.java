@@ -24,14 +24,15 @@
 
 package jodd.lagarto;
 
+import jodd.net.HtmlEncoder;
 import jodd.util.ArraysUtil;
 import jodd.util.CharSequenceUtil;
-import jodd.net.HtmlEncoder;
 
 import java.io.IOException;
 
 /**
  * Reusable, parsed {@link Tag tag} implementation.
+ * Only one instance created and it is reused.
  */
 class ParsedTag implements Tag {
 
@@ -85,7 +86,7 @@ class ParsedTag implements Tag {
 
 	/**
 	 * Defines tag end with index of last '>'.
-	 * Sets the modification flag to <code>false</code>.
+	 * Sets the modification flag to {@code false}.
 	 */
 	void end(final int endIndex) {
 		this.tagLength = endIndex - tagStartIndex;
@@ -112,6 +113,7 @@ class ParsedTag implements Tag {
 		return rawTag;
 	}
 
+	// todo use directly
 	public void setRawTag(final boolean isRawTag) {
 		this.rawTag = isRawTag;
 	}
@@ -353,7 +355,7 @@ class ParsedTag implements Tag {
 			}
 
 			out.append(type.getEndString());
-		} catch (IOException ioex) {
+		} catch (final IOException ioex) {
 			throw new LagartoException(ioex);
 		}
 	}

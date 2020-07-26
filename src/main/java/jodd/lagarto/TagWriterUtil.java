@@ -27,7 +27,7 @@ package jodd.lagarto;
 import java.io.IOException;
 
 /**
- * Some common tag writer util methods.
+ * Some common {@link TagWriter} util methods.
  */
 public class TagWriterUtil {
 

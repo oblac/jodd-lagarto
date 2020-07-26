@@ -67,14 +67,14 @@ public class CssSelector implements NodeFilter {
 	}
 
 	/**
-	 * Returns previous <code>CssSelector</code>.
+	 * Returns previous {@link CssSelector}.
 	 */
 	public CssSelector getPrevCssSelector() {
 		return prevCssSelector;
 	}
 
 	/**
-	 * Returns next <code>CssSelector</code>.
+	 * Returns next {@link CssSelector}.
 	 */
 	public CssSelector getNextCssSelector() {
 		return nextCssSelector;
@@ -90,7 +90,7 @@ public class CssSelector implements NodeFilter {
 	// ---------------------------------------------------------------- selector
 
 	/**
-	 * Returns selector element name. Returns <code>*</code> for
+	 * Returns selector element name. Returns {@code *} for
 	 * universal selectors.
 	 */
 	public String getElement() {
@@ -121,7 +121,7 @@ public class CssSelector implements NodeFilter {
 	}
 
 	/**
-	 * Returns combinator, may be <code>null</code>.
+	 * Returns combinator, may be {@code null}.
 	 */
 	public Combinator getCombinator() {
 		return combinator;
@@ -161,24 +161,24 @@ public class CssSelector implements NodeFilter {
 	 */
 	@Override
 	public String toString() {
-		StringBuilder out = new StringBuilder();
+		final StringBuilder out = new StringBuilder();
 		out.append(element);
 
-		for (Selector selector : selectors) {
+		for (final Selector selector : selectors) {
 			switch (selector.getType()) {
 				case ATTRIBUTE:
-					AttributeSelector attrSelector = (AttributeSelector) selector;
-					String attrName = attrSelector.getName();
+					final AttributeSelector attrSelector = (AttributeSelector) selector;
+					final String attrName = attrSelector.getName();
 					if (attrName.equals(ID)) {
 						out.append('#').append(attrSelector.getValue());
 					} else if (attrName.equals(CLASS)) {
 						out.append('.').append(attrSelector.getValue());
 					} else {
 						out.append('[').append(attrSelector.getName());
-						String value = attrSelector.getValue();
+						final String value = attrSelector.getValue();
 						if (value != null) {
 							out.append(attrSelector.getMatch().getSign());
-							char quote = attrSelector.getQuoteChar();
+							final char quote = attrSelector.getQuoteChar();
 							if (quote != 0) {
 								out.append(quote);
 							}
@@ -191,11 +191,11 @@ public class CssSelector implements NodeFilter {
 					}
 					break;
 				case PSEUDO_CLASS:
-					PseudoClassSelector psc = (PseudoClassSelector) selector;
+					final PseudoClassSelector psc = (PseudoClassSelector) selector;
 					out.append(':').append(psc.getPseudoClass().getPseudoClassName());
 					break;
 				case PSEUDO_FUNCTION:
-					PseudoFunctionSelector pfns = (PseudoFunctionSelector) selector;
+					final PseudoFunctionSelector pfns = (PseudoFunctionSelector) selector;
 					out.append(':').append(pfns.getPseudoFunction().getPseudoFunctionName()).append('(');
 					out.append(pfns.getExpression()).append(')');
 					break;
@@ -228,9 +228,9 @@ public class CssSelector implements NodeFilter {
 		}
 
 		// match attributes
-		int totalSelectors = selectorsCount();
+		final int totalSelectors = selectorsCount();
 		for (int i = 0; i < totalSelectors; i++) {
-			Selector selector = getSelector(i);
+			final Selector selector = getSelector(i);
 
 			// just attr name existence
 			switch (selector.getType()) {
@@ -261,8 +261,8 @@ public class CssSelector implements NodeFilter {
 		if (node.getNodeType() != Node.NodeType.ELEMENT) {
 			return false;
 		}
-		String element = getElement();
-		String nodeName = node.getNodeName();
+		final String element = getElement();
+		final String nodeName = node.getNodeName();
 		return element.equals(StringPool.STAR) || element.equals(nodeName);
 	}
 
@@ -274,9 +274,9 @@ public class CssSelector implements NodeFilter {
 	 */
 	public boolean accept(final List<Node> currentResults, final Node node, final int index) {
 		// match attributes
-		int totalSelectors = selectorsCount();
+		final int totalSelectors = selectorsCount();
 		for (int i = 0; i < totalSelectors; i++) {
-			Selector selector = getSelector(i);
+			final Selector selector = getSelector(i);
 
 			// just attr name existence
 			switch (selector.getType()) {

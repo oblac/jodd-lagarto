@@ -59,7 +59,7 @@ public class LagartoDomBuilderConfig {
 	}
 
 	/**
-	 * Returns <code>true</code> if {@link HtmlFosterRules foster rules}
+	 * Returns {@code true} if {@link HtmlFosterRules foster rules}
 	 * should be used.
 	 */
 	public boolean isUseFosterRules() {

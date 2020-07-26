@@ -288,7 +288,7 @@ public class LagartoDOMBuilderTagVisitor implements TagVisitor {
 	}
 
 	/**
-	 * Finds matching parent open tag or <code>null</code> if not found.
+	 * Finds matching parent open tag or {@code null} if not found.
 	 */
 	protected Node findMatchingParentOpenTag(String tagName) {
 		Node parent = parentNode;

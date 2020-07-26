@@ -33,7 +33,7 @@ import jodd.lagarto.dom.Node;
 public interface JerryNodeFunction {
 
 	/**
-	 * Invoked on node. Returns <code>true</code> to continue looping.
+	 * Invoked on node. Returns {@code true} to continue looping.
 	 */
 	boolean onNode(Node node, int index);
 }

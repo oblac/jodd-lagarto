@@ -94,7 +94,7 @@ final class CSSellyLexer {
     "\6\0\1\20\1\21\1\22\1\11\10\0\1\11\11\0";
 
   private static int [] zzUnpackAction() {
-    int [] result = new int[178];
+    final int [] result = new int[178];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -103,11 +103,13 @@ final class CSSellyLexer {
   private static int zzUnpackAction(final String packed, final int offset, final int [] result) {
     int i = 0;       /* index in packed string  */
     int j = offset;  /* index in unpacked array */
-    int l = packed.length();
+    final int l = packed.length();
     while (i < l) {
       int count = packed.charAt(i++);
-      int value = packed.charAt(i++);
-      do result[j++] = value; while (--count > 0);
+      final int value = packed.charAt(i++);
+      do {
+	      result[j++] = value;
+      } while (--count > 0);
     }
     return j;
   }
@@ -144,7 +146,7 @@ final class CSSellyLexer {
     "\0\u1008\0\u1023";
 
   private static int [] zzUnpackRowMap() {
-    int [] result = new int[178];
+    final int [] result = new int[178];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -153,9 +155,9 @@ final class CSSellyLexer {
   private static int zzUnpackRowMap(final String packed, final int offset, final int [] result) {
     int i = 0;  /* index in packed string  */
     int j = offset;  /* index in unpacked array */
-    int l = packed.length();
+    final int l = packed.length();
     while (i < l) {
-      int high = packed.charAt(i++) << 16;
+      final int high = packed.charAt(i++) << 16;
       result[j++] = high | packed.charAt(i++);
     }
     return j;
@@ -328,7 +330,7 @@ final class CSSellyLexer {
     "\4\146\1\66\1\65\16\146";
 
   private static int [] zzUnpackTrans() {
-    int [] result = new int[4158];
+    final int [] result = new int[4158];
     int offset = 0;
     offset = zzUnpackTrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -337,12 +339,14 @@ final class CSSellyLexer {
   private static int zzUnpackTrans(final String packed, final int offset, final int [] result) {
     int i = 0;       /* index in packed string  */
     int j = offset;  /* index in unpacked array */
-    int l = packed.length();
+    final int l = packed.length();
     while (i < l) {
       int count = packed.charAt(i++);
       int value = packed.charAt(i++);
       value--;
-      do result[j++] = value; while (--count > 0);
+      do {
+	      result[j++] = value;
+      } while (--count > 0);
     }
     return j;
   }
@@ -361,7 +365,7 @@ final class CSSellyLexer {
   };
 
   /**
-   * ZZ_ATTRIBUTE[aState] contains the attributes of state <code>aState</code>
+   * ZZ_ATTRIBUTE[aState] contains the attributes of state {@code aState}
    */
   private static final int [] ZZ_ATTRIBUTE = zzUnpackAttribute();
 
@@ -376,7 +380,7 @@ final class CSSellyLexer {
     "\5\1\2\0\1\1\6\0\4\1\10\0\1\1\11\0";
 
   private static int [] zzUnpackAttribute() {
-    int [] result = new int[178];
+    final int [] result = new int[178];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -385,17 +389,19 @@ final class CSSellyLexer {
   private static int zzUnpackAttribute(final String packed, final int offset, final int [] result) {
     int i = 0;       /* index in packed string  */
     int j = offset;  /* index in unpacked array */
-    int l = packed.length();
+    final int l = packed.length();
     while (i < l) {
       int count = packed.charAt(i++);
-      int value = packed.charAt(i++);
-      do result[j++] = value; while (--count > 0);
+      final int value = packed.charAt(i++);
+      do {
+	      result[j++] = value;
+      } while (--count > 0);
     }
     return j;
   }
 
   /** the input device */
-  private char[] zzChars;
+  private final char[] zzChars;
 
   /** the current state of the DFA */
   private int zzState;
@@ -435,7 +441,7 @@ final class CSSellyLexer {
   /**
    * zzAtBOL == true <=> the scanner is currently at the beginning of a line
    */
-  private boolean zzAtBOL = true;
+  private final boolean zzAtBOL = true;
 
   /** zzAtEOF == true <=> the scanner is at the EOF */
   private boolean zzAtEOF;
@@ -449,7 +455,7 @@ final class CSSellyLexer {
    * into the final zzBuffer position, this will have a value of 1;
    * otherwise, it will have a value of 0.
    */
-  private int zzFinalHighSurrogate = 0;
+  private final int zzFinalHighSurrogate = 0;
 
   /* user code: */
 	// position methods
@@ -490,13 +496,15 @@ final class CSSellyLexer {
    * @return         the unpacked character translation table
    */
   private static char [] zzUnpackCMap(final String packed) {
-    char [] map = new char[0x110000];
+    final char [] map = new char[0x110000];
     int i = 0;  /* index in packed string  */
     int j = 0;  /* index in unpacked array */
     while (i < 128) {
       int  count = packed.charAt(i++);
-      char value = packed.charAt(i++);
-      do map[j++] = value; while (--count > 0);
+      final char value = packed.charAt(i++);
+      do {
+	      map[j++] = value;
+      } while (--count > 0);
     }
     return map;
   }
@@ -509,11 +517,11 @@ final class CSSellyLexer {
   }
 
 
-  /**
-   * Refills the input buffer.
-   *
-   * @return      <code>false</code>, iff there was new input.
-   */
+	/**
+	 * Refills the input buffer.
+	 *
+	 * @return      {@code false}, iff there was new input.
+	 */
   private boolean zzRefill() {
     if (zzBuffer == null) {
       zzBuffer = zzChars;
@@ -602,7 +610,7 @@ final class CSSellyLexer {
     try {
       message = ZZ_ERROR_MSG[errorCode];
     }
-    catch (ArrayIndexOutOfBoundsException e) {
+    catch (final ArrayIndexOutOfBoundsException e) {
       message = ZZ_ERROR_MSG[ZZ_UNKNOWN_ERROR];
     }
 
@@ -619,8 +627,9 @@ final class CSSellyLexer {
    *                This number must not be greater than yylength()!
    */
   public void yypushback(final int number)  {
-    if ( number > yylength() )
-      zzScanError(ZZ_PUSHBACK_2BIG);
+    if ( number > yylength() ) {
+	    zzScanError(ZZ_PUSHBACK_2BIG);
+    }
 
     zzMarkedPos -= number;
   }
@@ -654,11 +663,11 @@ final class CSSellyLexer {
     int zzMarkedPosL;
     int zzEndReadL = zzEndRead;
     char [] zzBufferL = zzBuffer;
-    char [] zzCMapL = ZZ_CMAP;
+    final char [] zzCMapL = ZZ_CMAP;
 
-    int [] zzTransL = ZZ_TRANS;
-    int [] zzRowMapL = ZZ_ROWMAP;
-    int [] zzAttrL = ZZ_ATTRIBUTE;
+    final int [] zzTransL = ZZ_TRANS;
+    final int [] zzRowMapL = ZZ_ROWMAP;
+    final int [] zzAttrL = ZZ_ATTRIBUTE;
 
     while (true) {
       zzMarkedPosL = zzMarkedPos;
@@ -693,7 +702,7 @@ final class CSSellyLexer {
             // store back cached positions
             zzCurrentPos  = zzCurrentPosL;
             zzMarkedPos   = zzMarkedPosL;
-            boolean eof = zzRefill();
+            final boolean eof = zzRefill();
             // get translated positions and possibly new buffer
             zzCurrentPosL  = zzCurrentPos;
             zzMarkedPosL   = zzMarkedPos;
@@ -708,15 +717,19 @@ final class CSSellyLexer {
               zzCurrentPosL += Character.charCount(zzInput);
             }
           }
-          int zzNext = zzTransL[ zzRowMapL[zzState] + zzCMapL[zzInput] ];
-          if (zzNext == -1) break zzForAction;
+          final int zzNext = zzTransL[ zzRowMapL[zzState] + zzCMapL[zzInput] ];
+          if (zzNext == -1) {
+	          break zzForAction;
+          }
           zzState = zzNext;
 
           zzAttributes = zzAttrL[zzState];
           if ( (zzAttributes & 1) == 1 ) {
             zzAction = zzState;
             zzMarkedPosL = zzCurrentPosL;
-            if ( (zzAttributes & 8) == 8 ) break zzForAction;
+            if ( (zzAttributes & 8) == 8 ) {
+	            break zzForAction;
+            }
           }
 
         }

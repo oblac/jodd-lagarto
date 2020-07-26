@@ -37,7 +37,7 @@ public interface Tag {
 	boolean isCaseSensitive();
 
 	/**
-	 * Returns <code>true</code> if tag should parse inner text content as RAWTEXT.
+	 * Returns {@code true} if tag should parse inner text content as RAWTEXT.
 	 */
 	boolean isRawTag();
 
@@ -76,18 +76,18 @@ public interface Tag {
 	CharSequence getAttributeName(int index);
 
 	/**
-	 * Returns attribute value or <code>null</code> for an empty attribute,
+	 * Returns attribute value or {@code null} for an empty attribute,
 	 */
 	CharSequence getAttributeValue(int index);
 
 	/**
-	 * Returns attribute value or <code>null</code> for an empty attribute,
-	 * Returns <code>null</code> also if attribute name does not exist.
+	 * Returns attribute value or {@code null} for an empty attribute,
+	 * Returns {@code null} also if attribute name does not exist.
 	 */
 	CharSequence getAttributeValue(CharSequence name);
 
 	/**
-	 * Returns attribute index or <code>-1</code> if not found.
+	 * Returns attribute index or {@code -1} if not found.
 	 */
 	int getAttributeIndex(CharSequence name);
 
@@ -109,7 +109,7 @@ public interface Tag {
 	int getTagLength();
 
 	/**
-	 * Returns tag position string or <code>null</code> if position is not calculated.
+	 * Returns tag position string or {@code null} if position is not calculated.
 	 */
 	public String getPosition();
 
@@ -172,14 +172,14 @@ public interface Tag {
 	void removeAttributes();
 
 	/**
-	 * Returns <code>true</code> if tag is modified.
+	 * Returns {@code true} if tag is modified.
 	 */
 	boolean isModified();
 
 	// ---------------------------------------------------------------- match
 
 	/**
-	 * Returns <code>true</code> if name equals to given char sequence.
+	 * Returns {@code true} if name equals to given char sequence.
 	 */
 	boolean nameEquals(CharSequence charSequence);
 

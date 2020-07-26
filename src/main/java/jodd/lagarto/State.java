@@ -31,7 +31,7 @@ package jodd.lagarto;
 public interface State {
 
 	/**
-	 * Parses content.
+	 * Parses the content.
 	 */
 	void parse();
 

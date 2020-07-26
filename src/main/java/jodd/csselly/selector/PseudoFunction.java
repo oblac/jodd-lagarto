@@ -38,7 +38,7 @@ import java.util.List;
  */
 public abstract class PseudoFunction<E> {
 	/**
-	 * The <code>:nth-child(an+b)</code> pseudo-class notation represents an element that has an+b-1
+	 * The {@code :nth-child(an+b)} pseudo-class notation represents an element that has an+b-1
 	 * siblings before it in the document tree, for any positive integer or zero value of n,
 	 * and has a parent element. For values of a and b greater than zero, this effectively divides
 	 * the element's children into groups of a elements (the last group taking the remainder),
@@ -56,14 +56,14 @@ public abstract class PseudoFunction<E> {
 
 		@Override
 		public boolean match(final Node node, final PseudoFunctionExpression expression) {
-			int value = node.getSiblingElementIndex() + 1;
+			final int value = node.getSiblingElementIndex() + 1;
 
 			return expression.match(value);
 		}
 	}
 
 	/**
-	 * The <code>:nth-last-child(an+b)</code> pseudo-class notation represents an element that has
+	 * The {@code :nth-last-child(an+b)} pseudo-class notation represents an element that has
 	 * an+b-1 siblings after it in the document tree, for any positive integer or zero value
 	 * of n, and has a parent element.
 	 */
@@ -76,7 +76,7 @@ public abstract class PseudoFunction<E> {
 
 		@Override
 		public boolean match(final Node node, final PseudoFunctionExpression expression) {
-			int value = node.getParentNode().getChildElementsCount() - node.getSiblingElementIndex();
+			final int value = node.getParentNode().getChildElementsCount() - node.getSiblingElementIndex();
 
 			return expression.match(value);
 		}
@@ -84,7 +84,7 @@ public abstract class PseudoFunction<E> {
 	}
 
 	/**
-	 * The <code>:nth-of-type(an+b)</code> pseudo-class notation represents an element that
+	 * The {@code :nth-of-type(an+b)} pseudo-class notation represents an element that
 	 * has an+b-1 siblings with the same expanded element name before it in the document tree,
 	 * for any zero or positive integer value of n, and has a parent element.
 	 */
@@ -97,7 +97,7 @@ public abstract class PseudoFunction<E> {
 
 		@Override
 		public boolean match(final Node node, final PseudoFunctionExpression expression) {
-			int value = node.getSiblingNameIndex() + 1;
+			final int value = node.getSiblingNameIndex() + 1;
 
 			return expression.match(value);
 		}
@@ -105,7 +105,7 @@ public abstract class PseudoFunction<E> {
 	}
 
 	/**
-	 * The <code>:nth-last-of-type(an+b)</code> pseudo-class notation represents an element
+	 * The {@code :nth-last-of-type(an+b)} pseudo-class notation represents an element
 	 * that has an+b-1 siblings with the same expanded element name after it in the document tree,
 	 * for any zero or positive integer value of n, and has a parent element.
 	 */
@@ -118,8 +118,8 @@ public abstract class PseudoFunction<E> {
 
 		@Override
 		public boolean match(final Node node, final PseudoFunctionExpression expression) {
-			Node child = node.getParentNode().getLastChildElement(node.getNodeName());
-			int value = child.getSiblingNameIndex() + 1 - node.getSiblingNameIndex();
+			final Node child = node.getParentNode().getLastChildElement(node.getNodeName());
+			final int value = child.getSiblingNameIndex() + 1 - node.getSiblingNameIndex();
 
 			return expression.match(value);
 		}
@@ -144,7 +144,7 @@ public abstract class PseudoFunction<E> {
 
 		@Override
 		public boolean match(final List<Node> currentResults, final Node node, final int index, final Integer expression) {
-			int value = expression.intValue();
+			final int value = expression.intValue();
 			if (value >= 0) {
 				return index == value;
 			} else {
@@ -170,7 +170,7 @@ public abstract class PseudoFunction<E> {
 
 		@Override
 		public boolean match(final List<Node> currentResults, final Node node, final int index, final Integer expression) {
-			int value = expression.intValue();
+			final int value = expression.intValue();
 			return index > value;
 		}
 	}
@@ -192,7 +192,7 @@ public abstract class PseudoFunction<E> {
 
 		@Override
 		public boolean match(final List<Node> currentResults, final Node node, final int index, final Integer expression) {
-			int value = expression.intValue();
+			final int value = expression.intValue();
 			return index < value;
 		}
 	}
@@ -212,7 +212,7 @@ public abstract class PseudoFunction<E> {
 
 		@Override
 		public boolean match(final Node node, final String expression) {
-			String text = node.getTextContent();
+			final String text = node.getTextContent();
 			return text.contains(expression);
 		}
 	}
@@ -234,7 +234,7 @@ public abstract class PseudoFunction<E> {
 
 		@Override
 		public boolean match(final Node node, final List<List<CssSelector>> selectors) {
-			List<Node> matchedNodes = new NodeSelector(node).select(selectors);
+			final List<Node> matchedNodes = new NodeSelector(node).select(selectors);
 
 			return !matchedNodes.isEmpty();
 		}
@@ -270,9 +270,9 @@ public abstract class PseudoFunction<E> {
 	 * Matches node using provided parsed expression.
 	 */
 	public abstract boolean match(Node node, E expression);
-	
+
 	/**
-	 * Returns <code>true</code> if node matches the pseudoclass within current results.
+	 * Returns {@code true} if node matches the pseudoclass within current results.
 	 */
 	public boolean match(final List<Node> currentResults, final Node node, final int index, final E expression) {
 		return true;

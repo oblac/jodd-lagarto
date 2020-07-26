@@ -23,6 +23,6 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
- * Lagarto - fast markup language (xml/html) event-based parser.
+ * Jodd Lagarto - fast markup language (html/xml) event-based parser.
  */
 package jodd.lagarto;

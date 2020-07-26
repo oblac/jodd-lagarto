@@ -42,28 +42,28 @@ public class HtmlFosterRules {
 	};
 
 	/**
-	 * Returns <code>true</code> if provided element is one of the table-related elements.
+	 * Returns {@code true} if provided element is one of the table-related elements.
 	 */
 	protected boolean isOneOfTableElements(final Element element) {
-		String elementName = element.getNodeName().toLowerCase();
+		final String elementName = element.getNodeName().toLowerCase();
 
 		return StringUtil.equalsOne(elementName, TABLE_ELEMENTS) != -1;
 	}
 
 	/**
-	 * Returns <code>true</code> if given node is a table element.
+	 * Returns {@code true} if given node is a table element.
 	 */
 	protected boolean isTableElement(final Node node) {
 		if (node.getNodeType() != Node.NodeType.ELEMENT) {
 			return false;
 		}
-		String elementName = node.getNodeName().toLowerCase();
+		final String elementName = node.getNodeName().toLowerCase();
 
 		return elementName.equals("table");
 	}
 
 	/**
-	 * Returns <code>true</code> if parent node is one of the table elements.
+	 * Returns {@code true} if parent node is one of the table elements.
 	 */
 	protected boolean isParentNodeOneOfFosterTableElements(final Node parentNode) {
 		if (parentNode == null) {
@@ -72,7 +72,7 @@ public class HtmlFosterRules {
 		if (parentNode.getNodeName() == null) {
 			return false;
 		}
-		String nodeName = parentNode.getNodeName().toLowerCase();
+		final String nodeName = parentNode.getNodeName().toLowerCase();
 
 		return StringUtil.equalsOne(nodeName, FOSTER_TABLE_ELEMENTS) != -1;
 	}
@@ -85,7 +85,7 @@ public class HtmlFosterRules {
 
 		while (tableNode != null) {
 			if (tableNode.getNodeType() == Node.NodeType.ELEMENT) {
-				String tableNodeName = tableNode.getNodeName().toLowerCase();
+				final String tableNodeName = tableNode.getNodeName().toLowerCase();
 
 				if (tableNodeName.equals("table")) {
 					break;
@@ -113,8 +113,8 @@ public class HtmlFosterRules {
 	}
 
 	/**
-	 * Finds foster elements. Returns <code>true</code> if there was no change in
-	 * DOM tree of the parent element. Otherwise, returns <code>false</code>
+	 * Finds foster elements. Returns {@code true} if there was no change in
+	 * DOM tree of the parent element. Otherwise, returns {@code false}
 	 * meaning that parent will scan its childs again.
 	 */
 	protected boolean findFosterNodes(final Node node) {
@@ -123,7 +123,7 @@ public class HtmlFosterRules {
 		if (!lastTables.isEmpty()) {
 			// if inside table
 			if (node.getNodeType() == Node.NodeType.TEXT) {
-				String value = node.getNodeValue();
+				final String value = node.getNodeValue();
 				if (!StringUtil.isBlank(value)) {
 					if (isParentNodeOneOfFosterTableElements(node.getParentNode())) {
 						fosterTexts.add((Text) node);
@@ -133,7 +133,7 @@ public class HtmlFosterRules {
 		}
 
 		if (node.getNodeType() == Node.NodeType.ELEMENT) {
-			Element element = (Element) node;
+			final Element element = (Element) node;
 
 			isTable = isTableElement(node);
 
@@ -146,18 +146,18 @@ public class HtmlFosterRules {
 				// ...if inside the table
 				if (!lastTables.isEmpty()) {
 					// check this and parent
-					Node parentNode = node.getParentNode();
+					final Node parentNode = node.getParentNode();
 					if (
 							isParentNodeOneOfFosterTableElements(parentNode) &&
 							!isOneOfTableElements(element)
 							) {
 
-						String elementNodeName = element.getNodeName().toLowerCase();
+						final String elementNodeName = element.getNodeName().toLowerCase();
 						if (elementNodeName.equals("form")) {
 							if (element.getChildNodesCount() > 0) {
 								// if form element, take all its child nodes
 								// and add after the from element
-								Node[] formChildNodes = element.getChildNodes();
+								final Node[] formChildNodes = element.getChildNodes();
 								parentNode.insertAfter(formChildNodes, element);
 								return false;
 							} else {
@@ -167,7 +167,7 @@ public class HtmlFosterRules {
 						}
 
 						if (elementNodeName.equals("input")) {
-							String inputType = element.getAttribute("type");
+							final String inputType = element.getAttribute("type");
 
 							if (inputType.equals("hidden")) {
 								// input hidden elements remains as they are
@@ -187,11 +187,11 @@ public class HtmlFosterRules {
 
 		allchilds:
 		while (true) {
-			int childs = node.getChildNodesCount();
+			final int childs = node.getChildNodesCount();
 			for (int i = 0; i < childs; i++) {
-				Node childNode = node.getChild(i);
+				final Node childNode = node.getChild(i);
 
-				boolean done = findFosterNodes(childNode);
+				final boolean done = findFosterNodes(childNode);
 				if (!done) {
 					continue allchilds;
 				}
@@ -201,7 +201,7 @@ public class HtmlFosterRules {
 
 		if (isTable) {
 			// remove last element
-			int size = lastTables.size();
+			final int size = lastTables.size();
 			if (size > 0) {
 				lastTables.remove(size - 1);	// no array copy occurs when the last element is removed
 			}
@@ -213,14 +213,14 @@ public class HtmlFosterRules {
 	 * Performs the fix for elements.
 	 */
 	protected void fixElements() {
-		for (Element fosterElement : fosterElements) {
+		for (final Element fosterElement : fosterElements) {
 			// find parent table
-			Element lastTable = findLastTable(fosterElement);
-			Node fosterElementParent = fosterElement.getParentNode();
+			final Element lastTable = findLastTable(fosterElement);
+			final Node fosterElementParent = fosterElement.getParentNode();
 
 			// filter our foster element
-			Node[] fosterChilds = fosterElement.getChildNodes();
-			for (Node fosterChild : fosterChilds) {
+			final Node[] fosterChilds = fosterElement.getChildNodes();
+			for (final Node fosterChild : fosterChilds) {
 				if (fosterChild.getNodeType() == Node.NodeType.ELEMENT) {
 					if (isOneOfTableElements((Element) fosterChild)) {
 						// move all child table elements outside
@@ -238,19 +238,19 @@ public class HtmlFosterRules {
 	}
 
 	protected void fixText() {
-		for (Text fosterText : fosterTexts) {
+		for (final Text fosterText : fosterTexts) {
 			// find parent table
-			Element lastTable = findLastTable(fosterText);
+			final Element lastTable = findLastTable(fosterText);
 
 			// move foster element above the table
 			fosterText.detachFromParent();
 
-			Node tablesPreviousNode = lastTable.getPreviousSibling();
+			final Node tablesPreviousNode = lastTable.getPreviousSibling();
 			if (tablesPreviousNode.getNodeType() == Node.NodeType.TEXT) {
 				// append to previous text node
-				Text textNode = (Text) tablesPreviousNode;
+				final Text textNode = (Text) tablesPreviousNode;
 
-				String text = textNode.getNodeValue();
+				final String text = textNode.getNodeValue();
 
 				textNode.setNodeValue(text + fosterText.getNodeValue());
 			} else {

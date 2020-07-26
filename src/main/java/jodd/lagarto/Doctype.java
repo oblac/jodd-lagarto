@@ -30,23 +30,23 @@ package jodd.lagarto;
 public interface Doctype {
 
 	/**
-	 * Returns DOCTYPE name. Returns <code>null</code> if name was not specified (due to parsing error).
+	 * Returns DOCTYPE name. Returns {@code null} if name was not specified (due to parsing error).
 	 */
 	CharSequence getName();
 
 	/**
-	 * Returns <code>true</code> if quirks mode was forced.
+	 * Returns {@code true} if quirks mode was forced.
 	 */
 	boolean isQuirksMode();
 
 	/**
-	 * Returns public identifier, if specified. Returns <code>null</code>
+	 * Returns public identifier, if specified. Returns {@code null}
 	 * if not specified, DOCTYPE is SYSTEM or there was a parsing error.
 	 */
 	CharSequence getPublicIdentifier();
 
 	/**
-	 * Returns system identifier, if specified. Returns <code>null</code>
+	 * Returns system identifier, if specified. Returns {@code null}
 	 * if not specified or there was a parsing error.
 	 */
 	CharSequence getSystemIdentifier();

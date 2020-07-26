@@ -29,7 +29,7 @@ import jodd.util.StringPool;
 import jodd.util.StringUtil;
 
 /**
- * {@link PseudoFunction Pseudo function expression}, in form: <code>an + b</code>.
+ * {@link PseudoFunction Pseudo function expression}, in form: {@code an + b}.
  */
 public class PseudoFunctionExpression {
 
@@ -45,9 +45,9 @@ public class PseudoFunctionExpression {
 			a = 2;
 			b = 0;
 		} else {
-			int nndx = expression.indexOf('n');
+			final int nndx = expression.indexOf('n');
 			if (nndx != -1) {
-				String aVal = expression.substring(0, nndx).trim();
+				final String aVal = expression.substring(0, nndx).trim();
 				if (aVal.length() == 0) {
 					a = 1;
 				} else {
@@ -57,7 +57,7 @@ public class PseudoFunctionExpression {
 						a = parseInt(aVal);
 					}
 				}
-				String bVal = expression.substring(nndx + 1);
+				final String bVal = expression.substring(nndx + 1);
 				if (bVal.length() == 0) {
 					b = 0;
 				} else {
@@ -71,12 +71,12 @@ public class PseudoFunctionExpression {
 	}
 
 	/**
-	 * Parses int value or throws <code>CSSellyException</code> on failure.
+	 * Parses int value or throws {@code CSSellyException} on failure.
 	 */
 	protected int parseInt(final String value) {
 		try {
 			return Integer.parseInt(value);
-		} catch (NumberFormatException nfex) {
+		} catch (final NumberFormatException nfex) {
 			throw new CSSellyException(nfex);
 		}
 	}

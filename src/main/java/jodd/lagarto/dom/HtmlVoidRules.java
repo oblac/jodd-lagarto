@@ -41,10 +41,10 @@ public class HtmlVoidRules {
 			"track", "wbr"};
 
 	/**
-	 * Returns <code>true</code> if tag name is a void tag.
+	 * Returns {@code true} if tag name is a void tag.
 	 */
 	public boolean isVoidTag(final CharSequence tagName) {
-		for (String html5VoidTag : HTML5_VOID_TAGS) {
+		for (final String html5VoidTag : HTML5_VOID_TAGS) {
 			if (CharSequenceUtil.equalsToLowercase(tagName, html5VoidTag)) {
 				return true;
 			}

@@ -76,14 +76,14 @@ public class Jerry implements Iterable<Jerry> {
 	// ---------------------------------------------------------------- create
 
 	/**
-	 * Parses input sequence and creates new <code>Jerry</code>.
+	 * Parses input sequence and creates new {@code Jerry}.
 	 */
 	public static Jerry jerry(final char[] content) {
 		return jerry().parse(content);
 	}
 
 	/**
-	 * Parses input content and creates new <code>Jerry</code>.
+	 * Parses input content and creates new {@code Jerry}.
 	 */
 	public static Jerry jerry(final String content) {
 		return jerry().parse(content);
@@ -205,7 +205,7 @@ public class Jerry implements Iterable<Jerry> {
 	}
 
 	/**
-	 * Returns node at given index. Returns <code>null</code>
+	 * Returns node at given index. Returns {@code null}
 	 * if index is out of bounds.
 	 */
 	public Node get(final int index) {
@@ -224,7 +224,7 @@ public class Jerry implements Iterable<Jerry> {
 	}
 
 	/**
-	 * Searches for a given <code>Node</code> from among the matched elements.
+	 * Searches for a given {@code Node} from among the matched elements.
 	 */
 	public int index(final Node element) {
 		if (nodes.length == 0) {
@@ -575,7 +575,7 @@ public class Jerry implements Iterable<Jerry> {
 
 	/**
 	 * Checks the current matched set of elements against a selector and
-	 * return <code>true</code> if at least one of these elements matches
+	 * return {@code true} if at least one of these elements matches
 	 * the given arguments.
 	 */
 	public boolean is(final String cssSelectors) {
@@ -677,7 +677,7 @@ public class Jerry implements Iterable<Jerry> {
 
 	/**
 	 * Gets the value of an attribute for the first element in the set of matched elements.
-	 * Returns <code>null</code> if set is empty.
+	 * Returns {@code null} if set is empty.
 	 */
 	public String attr(final String name) {
 		if (nodes.length == 0) {
@@ -720,7 +720,7 @@ public class Jerry implements Iterable<Jerry> {
 
 	/**
 	 * Gets the value of a style property for the first element
-	 * in the set of matched elements. Returns <code>null</code>
+	 * in the set of matched elements. Returns {@code null}
 	 * if set is empty.
 	 */
 	public String css(String propertyName) {
@@ -939,7 +939,7 @@ public class Jerry implements Iterable<Jerry> {
 	 * Gets the combined HTML contents of each element in the set of
 	 * matched elements, including their descendants.
 	 * @see #html()
-	 * @param setIncluded if <code>true</code> than sets node are included in the output
+	 * @param setIncluded if {@code true} than sets node are included in the output
 	 */
 	public String htmlAll(final boolean setIncluded) {
 		if (nodes.length == 0) {

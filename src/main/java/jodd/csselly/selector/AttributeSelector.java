@@ -63,10 +63,10 @@ public class AttributeSelector extends Selector implements NodeFilter {
 			this.value = null;
 			return;
 		}
-		char first = attr.charAt(index - 1);
+		final char first = attr.charAt(index - 1);
 		this.match = Match.valueOfFirstChar(first);
 
-		int signLen = this.match.getSign().length();
+		final int signLen = this.match.getSign().length();
 		index -= (signLen - 1);
 		this.name = attr.substring(0, index).trim();
 		this.value = extractValue(attr.substring(index + signLen));
@@ -94,7 +94,7 @@ public class AttributeSelector extends Selector implements NodeFilter {
 	}
 
 	/**
-	 * Returns attribute value or <code>null</code> if doesn't exist.
+	 * Returns attribute value or {@code null} if doesn't exist.
 	 */
 	public String getValue() {
 		return value;
@@ -108,7 +108,7 @@ public class AttributeSelector extends Selector implements NodeFilter {
 	}
 
 	/**
-	 * Returns the quote char or <code>0</code> if quote is not used.
+	 * Returns the quote char or {@code 0} if quote is not used.
 	 */
 	public char getQuoteChar() {
 		return quoteChar;
@@ -116,21 +116,22 @@ public class AttributeSelector extends Selector implements NodeFilter {
 
 	// ---------------------------------------------------------------- match
 
+	@Override
 	public boolean accept(final Node node) {
 		if (!node.hasAttribute(name)) {
 			return false;
 		}
 
-		if (value == null) {		// just detect if attribute exist
+		if (value == null) {        // just detect if attribute exist
 			return true;
 		}
 
-		String nodeValue = node.getAttribute(name);
+		final String nodeValue = node.getAttribute(name);
 
 		if (nodeValue == null) {
 			return false;
 		}
-		
+
 		return match.compare(nodeValue, value);
 	}
 }

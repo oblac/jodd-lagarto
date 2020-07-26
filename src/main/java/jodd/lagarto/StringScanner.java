@@ -1,5 +1,8 @@
 package jodd.lagarto;
 
+/**
+ * Implementation of {@link Scanner} over the {@code String}.
+ */
 final class StringScanner extends Scanner {
 
 	private final String input;

@@ -53,7 +53,7 @@ public class CSSelly {
 
 	/**
 	 * Parses selector string.
-	 * Returns <code>null</code> if no selector can be parsed.
+	 * Returns {@code null} if no selector can be parsed.
 	 */
 	public List<CssSelector> parse() {
 		try {
@@ -63,14 +63,14 @@ public class CSSelly {
 			}
 
 			// fixes last combinator
-			CssSelector last = lexer.selectors.get(lexer.selectors.size() - 1);
+			final CssSelector last = lexer.selectors.get(lexer.selectors.size() - 1);
 			if (last.getCombinator() == Combinator.DESCENDANT) {
 				last.setCombinator(null);
 			}
 
 			// set previous css selector
 			CssSelector prevCssSelector = null;
-			for (CssSelector cssSelector : lexer.selectors) {
+			for (final CssSelector cssSelector : lexer.selectors) {
 				if (prevCssSelector != null) {
 					cssSelector.setPrevCssSelector(prevCssSelector);
 				}
@@ -78,7 +78,7 @@ public class CSSelly {
 			}
 
 			return lexer.selectors;
-		} catch (IOException ioex) {
+		} catch (final IOException ioex) {
 			throw new CSSellyException(ioex);
 		}
 	}
@@ -88,10 +88,10 @@ public class CSSelly {
 	 * list of {@link CssSelector} lists in the same order.
 	 */
 	public static List<List<CssSelector>> parse(final String query) {
-		String[] singleQueries = StringUtil.splitc(query, ',');
-		List<List<CssSelector>> selectors = new ArrayList<>(singleQueries.length);
+		final String[] singleQueries = StringUtil.splitc(query, ',');
+		final List<List<CssSelector>> selectors = new ArrayList<>(singleQueries.length);
 
-		for (String singleQuery: singleQueries) {
+		for (final String singleQuery: singleQueries) {
 			selectors.add(new CSSelly(singleQuery).parse());
 		}
 
@@ -104,8 +104,8 @@ public class CSSelly {
 	 * Returns string representation of given list of selectors.
 	 */
 	public static String toString(final List<CssSelector> selectors) {
-		StringBuilder out = new StringBuilder();
-		for (CssSelector s : selectors) {
+		final StringBuilder out = new StringBuilder();
+		for (final CssSelector s : selectors) {
 			out.append(s.toString());
 		}
 		return out.toString();

@@ -37,7 +37,7 @@ public class TagAdapter implements TagVisitor {
 
 	/**
 	 * Returns target tag visitor. It may be another
-	 * nested <code>TagAdapter</code> or <code>TagWriter</code>.
+	 * nested {@code TagAdapter} or {@code TagWriter}.
 	 */
 	public TagVisitor getTarget() {
 		return target;

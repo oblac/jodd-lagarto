@@ -26,9 +26,9 @@ package jodd.lagarto;
 
 /**
  * Implementation of {@link jodd.lagarto.Doctype} used during parsing.
- * Only one instance is created per parsing and it is going to be reused.
+ * Only one instance is created per parsing and it is reused.
  */
-public class ParsedDoctype implements Doctype {
+class ParsedDoctype implements Doctype {
 
 	protected CharSequence name;
 	protected CharSequence publicIdentifier;

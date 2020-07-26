@@ -131,7 +131,7 @@ public abstract class Node implements Cloneable {
 	}
 
 	/**
-	 * Returns nodes name or <code>null</code> if name is not available.
+	 * Returns nodes name or {@code null} if name is not available.
 	 */
 	public String getNodeName() {
 		return nodeName;
@@ -145,7 +145,7 @@ public abstract class Node implements Cloneable {
 	}
 
 	/**
-	 * Returns node value or <code>null</code> if value is not available.
+	 * Returns node value or {@code null} if value is not available.
 	 */
 	public String getNodeValue() {
 		return nodeValue;
@@ -293,7 +293,7 @@ public abstract class Node implements Cloneable {
 
 	/**
 	 * Removes child node at given index.
-	 * Returns removed node or <code>null</code> if index is invalid.
+	 * Returns removed node or {@code null} if index is invalid.
 	 */
 	public Node removeChild(final int index) {
 		if (childNodes == null) {
@@ -338,7 +338,7 @@ public abstract class Node implements Cloneable {
 	}
 
 	/**
-	 * Returns parent node or <code>null</code> if no parent exist.
+	 * Returns parent node or {@code null} if no parent exist.
 	 */
 	public Node getParentNode() {
 		return parentNode;
@@ -347,7 +347,7 @@ public abstract class Node implements Cloneable {
 	// ---------------------------------------------------------------- attributes
 
 	/**
-	 * Returns <code>true</code> if node has attributes.
+	 * Returns {@code true} if node has attributes.
 	 */
 	public boolean hasAttributes() {
 		if (attributes == null) {
@@ -367,7 +367,7 @@ public abstract class Node implements Cloneable {
 	}
 
 	/**
-	 * Returns attribute at given index or <code>null</code> if index not found.
+	 * Returns attribute at given index or {@code null} if index not found.
 	 */
 	public Attribute getAttribute(final int index) {
 		if (attributes == null) {
@@ -380,7 +380,7 @@ public abstract class Node implements Cloneable {
 	}
 
 	/**
-	 * Returns <code>true</code> if node contains an attribute.
+	 * Returns {@code true} if node contains an attribute.
 	 */
 	public boolean hasAttribute(String name) {
 		if (attributes == null) {
@@ -399,7 +399,7 @@ public abstract class Node implements Cloneable {
 	}
 
 	/**
-	 * Returns attribute value. Returns <code>null</code> when
+	 * Returns attribute value. Returns {@code null} when
 	 * attribute doesn't exist or when attribute exist but doesn't
 	 * specify a value.
 	 */
@@ -457,7 +457,7 @@ public abstract class Node implements Cloneable {
 	}
 
 	/**
-	 * Sets attribute value. Value may be <code>null</code>.
+	 * Sets attribute value. Value may be {@code null}.
 	 */
 	public void setAttribute(String name, final String value) {
 		initAttributes();
@@ -486,7 +486,7 @@ public abstract class Node implements Cloneable {
 	}
 
 	/**
-	 * Returns <code>true</code> if attribute containing some word.
+	 * Returns {@code true} if attribute containing some word.
 	 */
 	public boolean isAttributeContaining(final String name, final String word) {
 		final Attribute attr = getAttributeInstance(name);
@@ -499,7 +499,7 @@ public abstract class Node implements Cloneable {
 	// ---------------------------------------------------------------- children count
 
 	/**
-	 * Returns <code>true</code> if node has child nodes.
+	 * Returns {@code true} if node has child nodes.
 	 */
 	public boolean hasChildNodes() {
 		if (childNodes == null) {
@@ -582,7 +582,7 @@ public abstract class Node implements Cloneable {
 	}
 
 	/**
-	 * Returns a child node at given index or <code>null</code>
+	 * Returns a child node at given index or {@code null}
 	 * if child doesn't exist for that index.
 	 */
 	public Node getChild(final int index) {
@@ -609,7 +609,7 @@ public abstract class Node implements Cloneable {
 
 	/**
 	 * Returns a child element node at given index.
-	 * If index is out of bounds, <code>null</code> is returned.
+	 * If index is out of bounds, {@code null} is returned.
 	 */
 	public Element getChildElement(final int index) {
 		initChildElementNodes();
@@ -622,7 +622,7 @@ public abstract class Node implements Cloneable {
 	// ---------------------------------------------------------------- first child
 
 	/**
-	 * Returns first child or <code>null</code> if no children exist.
+	 * Returns first child or {@code null} if no children exist.
 	 */
 	public Node getFirstChild() {
 		if (childNodes == null) {
@@ -636,7 +636,7 @@ public abstract class Node implements Cloneable {
 
 	/**
 	 * Returns first child <b>element</b> node or
-	 * <code>null</code> if no element children exist.
+	 * {@code null} if no element children exist.
 	 */
 	public Element getFirstChildElement() {
 		initChildElementNodes();
@@ -648,7 +648,7 @@ public abstract class Node implements Cloneable {
 
 	/**
 	 * Returns first child <b>element</b> with given name or
-	 * <code>null</code> if no such children exist.
+	 * {@code null} if no such children exist.
 	 */
 	public Element getFirstChildElement(final String elementName) {
 		if (childNodes == null) {
@@ -667,7 +667,7 @@ public abstract class Node implements Cloneable {
 	// ---------------------------------------------------------------- last child
 
 	/**
-	 * Returns last child or <code>null</code> if no children exist.
+	 * Returns last child or {@code null} if no children exist.
 	 */
 	public Node getLastChild() {
 		if (childNodes == null) {
@@ -681,7 +681,7 @@ public abstract class Node implements Cloneable {
 
 	/**
 	 * Returns last child <b>element</b> node or
-	 * <code>null</code> if no such child node exist.
+	 * {@code null} if no such child node exist.
 	 */
 	public Element getLastChildElement() {
 		initChildElementNodes();
@@ -693,7 +693,7 @@ public abstract class Node implements Cloneable {
 
 	/**
 	 * Returns last child <b>element</b> with given name or
-	 * <code>null</code> if no such child node exist.
+	 * {@code null} if no such child node exist.
 	 */
 	public Element getLastChildElement(final String elementName) {
 		if (childNodes == null) {
@@ -932,7 +932,7 @@ public abstract class Node implements Cloneable {
 
 	/**
 	 * Returns this node's next sibling of <b>any</b> type or
-	 * <code>null</code> if this is the last sibling.
+	 * {@code null} if this is the last sibling.
 	 */
 	public Node getNextSibling() {
 		final List<Node> siblings = parentNode.childNodes;
@@ -989,7 +989,7 @@ public abstract class Node implements Cloneable {
 
 	/**
 	 * Returns this node's previous sibling of <b>any</b> type
-	 * or <code>null</code> if this is the first sibling.
+	 * or {@code null} if this is the first sibling.
 	 */
 	public Node getPreviousSibling() {
 		final List<Node> siblings = parentNode.childNodes;
@@ -1003,7 +1003,7 @@ public abstract class Node implements Cloneable {
 
 	/**
 	 * Returns this node's previous sibling of <b>element</b> type
-	 * or <code>null</code> if this is the first sibling.
+	 * or {@code null} if this is the first sibling.
 	 */
 	public Node getPreviousSiblingElement() {
 		parentNode.initChildElementNodes();
@@ -1054,9 +1054,9 @@ public abstract class Node implements Cloneable {
 	}
 
 	/**
-	 * Appends the text content to an <code>Appendable</code>
-	 * (<code>StringBuilder</code>, <code>CharBuffer</code>...).
-	 * This way we can reuse the <code>Appendable</code> instance
+	 * Appends the text content to an {@code Appendable}
+	 * ({@code StringBuilder}, {@code CharBuffer}...).
+	 * This way we can reuse the {@code Appendable} instance
 	 * during the creation of text content and have better performances.
 	 */
 	public void appendTextContent(final Appendable appendable) {

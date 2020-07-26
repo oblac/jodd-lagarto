@@ -24,9 +24,9 @@
 
 package jodd.lagarto.dom;
 
-import jodd.util.StringUtil;
 import jodd.net.HtmlDecoder;
 import jodd.net.HtmlEncoder;
+import jodd.util.StringUtil;
 
 /**
  * Text node. Text value is stored as node value in decoded, readable form.
@@ -51,7 +51,7 @@ public class Text extends Node {
 	protected Boolean blank;
 
 	/**
-	 * Returns <code>true</code> if text content is blank.
+	 * Returns {@code true} if text content is blank.
 	 */
 	public boolean isBlank() {
 		if (blank == null) {

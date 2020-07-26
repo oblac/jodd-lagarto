@@ -27,7 +27,7 @@ package jodd.jerry;
 import java.util.Map;
 
 /**
- * Callback for Jerry <code>form()</code> method.
+ * Callback for Jerry {@code form()} method.
  */
 @FunctionalInterface
 public interface JerryFormHandler {

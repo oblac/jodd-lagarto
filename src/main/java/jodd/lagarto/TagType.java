@@ -30,18 +30,18 @@ package jodd.lagarto;
 public enum TagType {
 
 	/**
-	 * Start tags: <code>&lt;foo&gt;</code>.
+	 * Start tags: {@code &lt;foo&gt;}.
 	 * Void tags are reported as start tags.
 	 */
 	START("<", ">"),
 
 	/**
-	 * End tags: <code>&lt;/foo&gt;</code>.
+	 * End tags: {@code &lt;/foo&gt;}.
 	 */
 	END("</", ">"),
 
 	/**
-	 * Self closing tag: <code>&lt;foo/&gt;</code>.
+	 * Self closing tag: {@code &lt;foo/&gt;}.
 	 */
 	SELF_CLOSING("<", "/>");
 
@@ -72,14 +72,14 @@ public enum TagType {
 	}
 
 	/**
-	 * Returns <code>true</code> if tag is {@link #START} or {@link #SELF_CLOSING}.
+	 * Returns {@code true} if tag is {@link #START} or {@link #SELF_CLOSING}.
 	 */
 	public boolean isStartingTag() {
 		return isStarting;
 	}
 
 	/**
-	 * Returns <code>true</code> if tag is {@link #END} or {@link #SELF_CLOSING}.
+	 * Returns {@code true} if tag is {@link #END} or {@link #SELF_CLOSING}.
 	 */
 	public boolean isEndingTag() {
 		return isEnding;

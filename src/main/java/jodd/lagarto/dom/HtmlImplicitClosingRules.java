@@ -85,7 +85,7 @@ public class HtmlImplicitClosingRules {
 			new String[] {"body"},
 	};
 	/**
-	 * Returns <code>true</code> if parent node tag can be closed implicitly.
+	 * Returns {@code true} if parent node tag can be closed implicitly.
 	 */
 	public boolean implicitlyCloseParentTagOnNewTag(String parentNodeName, String nodeName) {
 		if (parentNodeName == null) {
@@ -135,7 +135,7 @@ public class HtmlImplicitClosingRules {
 	};
 
 	/**
-	 * Returns <code>true</code> if current end tag (node name) closes the parent tag.
+	 * Returns {@code true} if current end tag (node name) closes the parent tag.
 	 */
 	public boolean implicitlyCloseParentTagOnTagEnd(String parentNodeName, String nodeName) {
 		if (parentNodeName == null) {
@@ -163,7 +163,7 @@ public class HtmlImplicitClosingRules {
 	};
 
 	/**
-	 * Returns <code>true</code> if tag should be closed on EOF.
+	 * Returns {@code true} if tag should be closed on EOF.
 	 */
 	public boolean implicitlyCloseTagOnEOF(String nodeName) {
 		if (nodeName == null) {

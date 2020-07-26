@@ -36,7 +36,7 @@ public abstract class PseudoClass {
 	// ---------------------------------------------------------------- STANDARD PSEUDO CLASSES
 
 	/**
-	 * Same as <code>:nth-child(1)</code>. Represents an element that is the first child of some other element.
+	 * Same as {@code :nth-child(1)}. Represents an element that is the first child of some other element.
 	 */
 	public static class FIRST_CHILD extends PseudoClass {
 		@Override
@@ -46,7 +46,7 @@ public abstract class PseudoClass {
 	}
 
 	/**
-	 * Same as <code>:nth-last-child(1)</code>. Represents an element that is the last child of some other element.
+	 * Same as {@code :nth-last-child(1)}. Represents an element that is the last child of some other element.
 	 */
 	public static class LAST_CHILD extends PseudoClass {
 		@Override
@@ -57,7 +57,7 @@ public abstract class PseudoClass {
 
 	/**
 	 * Represents an element that has a parent element and whose parent element has no other element children.
-	 * Same as <code>:first-child:last-child</code> or <code>:nth-child(1):nth-last-child(1)</code>, but with
+	 * Same as {@code :first-child:last-child} or {@code :nth-child(1):nth-last-child(1)}, but with
 	 * a lower specificity.
 	 */
 	public static class ONLY_CHILD extends PseudoClass {
@@ -68,7 +68,7 @@ public abstract class PseudoClass {
 	}
 
 	/**
-	 * Same as <code>:nth-of-type(1)</code>. Represents an element that is the first sibling of its
+	 * Same as {@code :nth-of-type(1)}. Represents an element that is the first sibling of its
 	 * type in the list of children of its parent element.
 	 */
 	public static class FIRST_OF_TYPE extends PseudoClass {
@@ -79,7 +79,7 @@ public abstract class PseudoClass {
 	}
 
 	/**
-	 * Same as <code>:nth-last-of-type(1)</code>. Represents an element that is the last sibling of its
+	 * Same as {@code :nth-last-of-type(1)}. Represents an element that is the last sibling of its
 	 * type in the list of children of its parent element.
 	 */
 	public static class LAST_OF_TYPE extends PseudoClass {
@@ -113,8 +113,8 @@ public abstract class PseudoClass {
 	/**
 	 * Represents an element that has a parent element and whose parent
 	 * element has no other element children with the same expanded element
-	 * name. Same as <code>:first-of-type:last-of-type</code> or
-	 * <code>:nth-of-type(1):nth-last-of-type(1)</code>, but with a lower specificity.
+	 * name. Same as {@code :first-of-type:last-of-type} or
+	 * {@code :nth-of-type(1):nth-last-of-type(1)}, but with a lower specificity.
 	 */
 	public static class ONLY_OF_TYPE extends PseudoClass {
 		@Override
@@ -139,7 +139,7 @@ public abstract class PseudoClass {
 			if (currentResults.isEmpty()) {
 				return false;
 			}
-			Node firstNode = currentResults.get(0);	// getFirst();
+			final Node firstNode = currentResults.get(0);	// getFirst();
 			if (firstNode == null) {
 				return false;
 			}
@@ -148,7 +148,7 @@ public abstract class PseudoClass {
 	}
 
 	/**
-	 * Selects the last matched element. Note that <code>:last</code> selects
+	 * Selects the last matched element. Note that {@code :last} selects
 	 * a single element by filtering the current collection and matching the
 	 * last element within it.
 	 */
@@ -160,11 +160,11 @@ public abstract class PseudoClass {
 
 		@Override
 		public boolean match(final List<Node> currentResults, final Node node, final int index) {
-			int size = currentResults.size();
+			final int size = currentResults.size();
 			if (size == 0) {
 				return false;
 			}
-			Node lastNode = currentResults.get(size - 1); // getLast();
+			final Node lastNode = currentResults.get(size - 1); // getLast();
 			if (lastNode == null) {
 				return false;
 			}
@@ -178,7 +178,7 @@ public abstract class PseudoClass {
 	public static class BUTTON extends PseudoClass {
 		@Override
 		public boolean match(final Node node) {
-			String type = node.getAttribute("type");
+			final String type = node.getAttribute("type");
 			if (type == null) {
 				return false;
 			}
@@ -192,7 +192,7 @@ public abstract class PseudoClass {
 	public static class CHECKBOX extends PseudoClass {
 		@Override
 		public boolean match(final Node node) {
-			String type = node.getAttribute("type");
+			final String type = node.getAttribute("type");
 			if (type == null) {
 				return false;
 			}
@@ -206,7 +206,7 @@ public abstract class PseudoClass {
 	public static class FILE extends PseudoClass {
 		@Override
 		public boolean match(final Node node) {
-			String type = node.getAttribute("type");
+			final String type = node.getAttribute("type");
 			if (type == null) {
 				return false;
 			}
@@ -220,18 +220,18 @@ public abstract class PseudoClass {
 	public static class HEADER extends PseudoClass {
 		@Override
 		public boolean match(final Node node) {
-			String name = node.getNodeName();
+			final String name = node.getNodeName();
 			if (name == null) {
 				return false;
 			}
 			if (name.length() != 2) {
 				return false;
 			}
-			char c1 = name.charAt(0);
+			final char c1 = name.charAt(0);
 			if (c1 != 'h' && c1 != 'H') {
 				return false;
 			}
-			int c2 = name.charAt(1) - '0';
+			final int c2 = name.charAt(1) - '0';
 			return c2 >= 1 && c2 <= 6;
 		}
 	}
@@ -242,7 +242,7 @@ public abstract class PseudoClass {
 	public static class IMAGE extends PseudoClass {
 		@Override
 		public boolean match(final Node node) {
-			String type = node.getAttribute("type");
+			final String type = node.getAttribute("type");
 			if (type == null) {
 				return false;
 			}
@@ -256,7 +256,7 @@ public abstract class PseudoClass {
 	public static class INPUT extends PseudoClass {
 		@Override
 		public boolean match(final Node node) {
-			String tagName = node.getNodeName();
+			final String tagName = node.getNodeName();
 			if (tagName == null) {
 				return false;
 			}
@@ -279,7 +279,7 @@ public abstract class PseudoClass {
 
 	/**
 	 * Select all elements that are the parent of another element, including text nodes.
-	 * This is the inverse of <code>:empty</code>.
+	 * This is the inverse of {@code :empty}.
 	 */
 	public static class PARENT extends PseudoClass {
 		@Override
@@ -294,7 +294,7 @@ public abstract class PseudoClass {
 	public static class PASSWORD extends PseudoClass {
 		@Override
 		public boolean match(final Node node) {
-			String type = node.getAttribute("type");
+			final String type = node.getAttribute("type");
 			if (type == null) {
 				return false;
 			}
@@ -308,7 +308,7 @@ public abstract class PseudoClass {
 	public static class RADIO extends PseudoClass {
 		@Override
 		public boolean match(final Node node) {
-			String type = node.getAttribute("type");
+			final String type = node.getAttribute("type");
 			if (type == null) {
 				return false;
 			}
@@ -322,7 +322,7 @@ public abstract class PseudoClass {
 	public static class RESET extends PseudoClass {
 		@Override
 		public boolean match(final Node node) {
-			String type = node.getAttribute("type");
+			final String type = node.getAttribute("type");
 			if (type == null) {
 				return false;
 			}
@@ -356,7 +356,7 @@ public abstract class PseudoClass {
 	public static class SUBMIT extends PseudoClass {
 		@Override
 		public boolean match(final Node node) {
-			String type = node.getAttribute("type");
+			final String type = node.getAttribute("type");
 			if (type == null) {
 				return false;
 			}
@@ -370,7 +370,7 @@ public abstract class PseudoClass {
 	public static class TEXT extends PseudoClass {
 		@Override
 		public boolean match(final Node node) {
-			String type = node.getAttribute("type");
+			final String type = node.getAttribute("type");
 			if (type == null) {
 				return false;
 			}
@@ -412,12 +412,12 @@ public abstract class PseudoClass {
 	// ---------------------------------------------------------------- interface
 
 	/**
-	 * Returns <code>true</code> if node matches the pseudoclass.
+	 * Returns {@code true} if node matches the pseudoclass.
 	 */
 	public abstract boolean match(Node node);
 
 	/**
-	 * Returns <code>true</code> if node matches the pseudoclass within current results.
+	 * Returns {@code true} if node matches the pseudoclass within current results.
 	 */
 	public boolean match(final List<Node> currentResults, final Node node, final int index) {
 		return true;

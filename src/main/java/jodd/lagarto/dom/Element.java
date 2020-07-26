@@ -42,10 +42,10 @@ public class Element extends Node {
 		this.selfClosed = selfClosed;
 		this.rawTag = tag.isRawTag();
 
-		int attrCount = tag.getAttributeCount();
+		final int attrCount = tag.getAttributeCount();
 		for (int i = 0; i < attrCount; i++) {
-			String key = Util.toString(tag.getAttributeName(i));
-			String value = Util.toString(tag.getAttributeValue(i));
+			final String key = Util.toString(tag.getAttributeName(i));
+			final String value = Util.toString(tag.getAttributeValue(i));
 			setAttribute(key, value);
 		}
 	}
@@ -71,21 +71,21 @@ public class Element extends Node {
 	// ---------------------------------------------------------------- html
 
 	/**
-	 * Returns <code>true</code> if element is void.
+	 * Returns {@code true} if element is void.
 	 */
 	public boolean isVoidElement() {
 		return voidElement;
 	}
 
 	/**
-	 * Returns <code>true</code> if element can self-close itself when empty.
+	 * Returns {@code true} if element can self-close itself when empty.
 	 */
 	public boolean isSelfClosed() {
 		return selfClosed;
 	}
 
 	/**
-	 * Returns <code>true</code> if tags content is RAW text.
+	 * Returns {@code true} if tags content is RAW text.
 	 */
 	public boolean isRawTag() {
 		return rawTag;
