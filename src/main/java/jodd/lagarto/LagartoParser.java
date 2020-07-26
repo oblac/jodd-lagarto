@@ -1464,7 +1464,7 @@ public class LagartoParser {
 			if (s.isEOF()) {
 				errorEOF();
 				state = DATA_STATE;
-				doctype.setQuirksMode(true);
+				doctype.quirksMode = true;
 				emitDoctype();
 				return;
 			}
@@ -1491,7 +1491,7 @@ public class LagartoParser {
 				if (s.isEOF()) {
 					errorEOF();
 					state = DATA_STATE;
-					doctype.setQuirksMode(true);
+					doctype.quirksMode = true;
 					emitDoctype();
 					return;
 				}
@@ -1505,7 +1505,7 @@ public class LagartoParser {
 				if (c == '>') {
 					errorInvalidToken();
 					state = DATA_STATE;
-					doctype.setQuirksMode(true);
+					doctype.quirksMode = true;
 					emitDoctype();
 					return;
 				}
@@ -1527,8 +1527,8 @@ public class LagartoParser {
 				if (s.isEOF()) {
 					errorEOF();
 					state = DATA_STATE;
-					doctype.setName(s.subSequence(nameStartNdx, s.ndx));
-					doctype.setQuirksMode(true);
+					doctype.name = s.subSequence(nameStartNdx, s.ndx);
+					doctype.quirksMode = true;
 					emitDoctype();
 					return;
 				}
@@ -1537,13 +1537,13 @@ public class LagartoParser {
 
 				if (equalsOne(c, TAG_WHITESPACES)) {
 					state = AFTER_DOCUMENT_NAME;
-					doctype.setName(s.subSequence(nameStartNdx, s.ndx));
+					doctype.name = s.subSequence(nameStartNdx, s.ndx);
 					return;
 				}
 
 				if (c == '>') {
 					state = DATA_STATE;
-					doctype.setName(s.subSequence(nameStartNdx, s.ndx));
+					doctype.name = s.subSequence(nameStartNdx, s.ndx);
 					emitDoctype();
 					return;
 				}
@@ -1560,7 +1560,7 @@ public class LagartoParser {
 				if (s.isEOF()) {
 					errorEOF();
 					state = DATA_STATE;
-					doctype.setQuirksMode(true);
+					doctype.quirksMode = true;
 					emitDoctype();
 					return;
 				}
@@ -1590,7 +1590,7 @@ public class LagartoParser {
 
 				errorInvalidToken();
 				state = BOGUS_DOCTYPE;
-				doctype.setQuirksMode(true);
+				doctype.quirksMode = true;
 				return;
 			}
 		}
@@ -1606,7 +1606,7 @@ public class LagartoParser {
 			if (s.isEOF()) {
 				errorEOF();
 				state = DATA_STATE;
-				doctype.setQuirksMode(true);
+				doctype.quirksMode = true;
 				emitDoctype();
 				return;
 			}
@@ -1635,14 +1635,14 @@ public class LagartoParser {
 			if (c == '>') {
 				errorInvalidToken();
 				state = DATA_STATE;
-				doctype.setQuirksMode(true);
+				doctype.quirksMode = true;
 				emitDoctype();
 				return;
 			}
 
 			errorInvalidToken();
 			state = BOGUS_DOCTYPE;
-			doctype.setQuirksMode(true);
+			doctype.quirksMode = true;
 		}
 	};
 
@@ -1680,13 +1680,13 @@ public class LagartoParser {
 				if (c == '>') {
 					errorInvalidToken();
 					state = DATA_STATE;
-					doctype.setQuirksMode(true);
+					doctype.quirksMode = true;
 					emitDoctype();
 					return;
 				}
 
 				errorInvalidToken();
-				doctype.setQuirksMode(true);
+				doctype.quirksMode = true;
 				state = BOGUS_DOCTYPE;
 				return;
 			}
@@ -1700,26 +1700,26 @@ public class LagartoParser {
 				s.ndx++;
 
 				if (s.isEOF()) {
-					doctype.setPublicIdentifier(s.subSequence(doctypeIdNameStart, s.ndx));
+					doctype.publicIdentifier = s.subSequence(doctypeIdNameStart, s.ndx);
 					errorEOF();
 					state = DATA_STATE;
-					doctype.setQuirksMode(true);
+					doctype.quirksMode = true;
 					emitDoctype();
 				}
 
 				final char c = s.charAtNdx();
 
 				if (c == '\"') {
-					doctype.setPublicIdentifier(s.subSequence(doctypeIdNameStart, s.ndx));
+					doctype.publicIdentifier = s.subSequence(doctypeIdNameStart, s.ndx);
 					state = AFTER_DOCTYPE_PUBLIC_IDENTIFIER;
 					return;
 				}
 
 				if (c == '>') {
-					doctype.setPublicIdentifier(s.subSequence(doctypeIdNameStart, s.ndx));
+					doctype.publicIdentifier = s.subSequence(doctypeIdNameStart, s.ndx);
 					errorInvalidToken();
 					state = DATA_STATE;
-					doctype.setQuirksMode(true);
+					doctype.quirksMode = true;
 					emitDoctype();
 					return;
 				}
@@ -1734,26 +1734,26 @@ public class LagartoParser {
 				s.ndx++;
 
 				if (s.isEOF()) {
-					doctype.setPublicIdentifier(s.subSequence(doctypeIdNameStart, s.ndx));
+					doctype.publicIdentifier = s.subSequence(doctypeIdNameStart, s.ndx);
 					errorEOF();
 					state = DATA_STATE;
-					doctype.setQuirksMode(true);
+					doctype.quirksMode = true;
 					emitDoctype();
 				}
 
 				final char c = s.charAtNdx();
 
 				if (c == '\'') {
-					doctype.setPublicIdentifier(s.subSequence(doctypeIdNameStart, s.ndx));
+					doctype.publicIdentifier = s.subSequence(doctypeIdNameStart, s.ndx);
 					state = AFTER_DOCTYPE_PUBLIC_IDENTIFIER;
 					return;
 				}
 
 				if (c == '>') {
-					doctype.setPublicIdentifier(s.subSequence(doctypeIdNameStart, s.ndx));
+					doctype.publicIdentifier = s.subSequence(doctypeIdNameStart, s.ndx);
 					errorInvalidToken();
 					state = DATA_STATE;
-					doctype.setQuirksMode(true);
+					doctype.quirksMode = true;
 					emitDoctype();
 					return;
 				}
@@ -1769,7 +1769,7 @@ public class LagartoParser {
 			if (s.isEOF()) {
 				errorEOF();
 				state = DATA_STATE;
-				doctype.setQuirksMode(true);
+				doctype.quirksMode = true;
 				emitDoctype();
 				return;
 			}
@@ -1802,7 +1802,7 @@ public class LagartoParser {
 			}
 
 			errorInvalidToken();
-			doctype.setQuirksMode(true);
+			doctype.quirksMode = true;
 			state = BOGUS_DOCTYPE;
 		}
 	};
@@ -1845,7 +1845,7 @@ public class LagartoParser {
 				}
 
 				errorInvalidToken();
-				doctype.setQuirksMode(true);
+				doctype.quirksMode = true;
 				state = BOGUS_DOCTYPE;
 				return;
 			}
@@ -1884,7 +1884,7 @@ public class LagartoParser {
 			if (s.isEOF()) {
 				errorEOF();
 				state = DATA_STATE;
-				doctype.setQuirksMode(true);
+				doctype.quirksMode = true;
 				emitDoctype();
 				return;
 			}
@@ -1913,14 +1913,14 @@ public class LagartoParser {
 			if (c == '>') {
 				errorInvalidToken();
 				state = DATA_STATE;
-				doctype.setQuirksMode(true);
+				doctype.quirksMode = true;
 				emitDoctype();
 				return;
 			}
 
 			errorInvalidToken();
 			state = BOGUS_DOCTYPE;
-			doctype.setQuirksMode(true);
+			doctype.quirksMode = true;
 		}
 	};
 
@@ -1958,13 +1958,13 @@ public class LagartoParser {
 				if (c == '>') {
 					errorInvalidToken();
 					state = DATA_STATE;
-					doctype.setQuirksMode(true);
+					doctype.quirksMode = true;
 					emitDoctype();
 					return;
 				}
 
 				errorInvalidToken();
-				doctype.setQuirksMode(true);
+				doctype.quirksMode = true;
 				state = BOGUS_DOCTYPE;
 				return;
 			}
@@ -1978,26 +1978,26 @@ public class LagartoParser {
 				s.ndx++;
 
 				if (s.isEOF()) {
-					doctype.setSystemIdentifier(s.subSequence(doctypeIdNameStart, s.ndx));
+					doctype.systemIdentifier = s.subSequence(doctypeIdNameStart, s.ndx);
 					errorEOF();
 					state = DATA_STATE;
-					doctype.setQuirksMode(true);
+					doctype.quirksMode = true;
 					emitDoctype();
 				}
 
 				final char c = s.charAtNdx();
 
 				if (c == '\"') {
-					doctype.setSystemIdentifier(s.subSequence(doctypeIdNameStart, s.ndx));
+					doctype.systemIdentifier = s.subSequence(doctypeIdNameStart, s.ndx);
 					state = AFTER_DOCTYPE_SYSTEM_IDENTIFIER;
 					return;
 				}
 
 				if (c == '>') {
-					doctype.setSystemIdentifier(s.subSequence(doctypeIdNameStart, s.ndx));
+					doctype.systemIdentifier = s.subSequence(doctypeIdNameStart, s.ndx);
 					errorInvalidToken();
 					state = DATA_STATE;
-					doctype.setQuirksMode(true);
+					doctype.quirksMode = true;
 					emitDoctype();
 					return;
 				}
@@ -2012,26 +2012,26 @@ public class LagartoParser {
 				s.ndx++;
 
 				if (s.isEOF()) {
-					doctype.setSystemIdentifier(s.subSequence(doctypeIdNameStart, s.ndx));
+					doctype.systemIdentifier = s.subSequence(doctypeIdNameStart, s.ndx);
 					errorEOF();
 					state = DATA_STATE;
-					doctype.setQuirksMode(true);
+					doctype.quirksMode = true;
 					emitDoctype();
 				}
 
 				final char c = s.charAtNdx();
 
 				if (c == '\'') {
-					doctype.setSystemIdentifier(s.subSequence(doctypeIdNameStart, s.ndx));
+					doctype.systemIdentifier = s.subSequence(doctypeIdNameStart, s.ndx);
 					state = AFTER_DOCTYPE_SYSTEM_IDENTIFIER;
 					return;
 				}
 
 				if (c == '>') {
-					doctype.setSystemIdentifier(s.subSequence(doctypeIdNameStart, s.ndx));
+					doctype.systemIdentifier = s.subSequence(doctypeIdNameStart, s.ndx);
 					errorInvalidToken();
 					state = DATA_STATE;
-					doctype.setQuirksMode(true);
+					doctype.quirksMode = true;
 					emitDoctype();
 					return;
 				}
@@ -2048,7 +2048,7 @@ public class LagartoParser {
 				if (s.isEOF()) {
 					errorEOF();
 					state = DATA_STATE;
-					doctype.setQuirksMode(true);
+					doctype.quirksMode = true;
 					emitDoctype();
 					return;
 				}

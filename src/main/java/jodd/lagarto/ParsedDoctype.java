@@ -30,33 +30,16 @@ package jodd.lagarto;
  */
 class ParsedDoctype implements Doctype {
 
-	protected CharSequence name;
-	protected CharSequence publicIdentifier;
-	protected CharSequence systemIdentifier;
-	protected boolean quirksMode;
-
-	public void setName(final CharSequence name) {
-		this.name = name;
-	}
-
-	public void setQuirksMode(final boolean quirksMode) {
-		this.quirksMode = quirksMode;
-	}
+	CharSequence name;
+	CharSequence publicIdentifier;
+	CharSequence systemIdentifier;
+	boolean quirksMode;
 
 	public void reset() {
 		name = null;
 		quirksMode = false;
 		publicIdentifier = null;
 		systemIdentifier = null;
-	}
-
-	// todo remove methods and access fields directly
-	public void setPublicIdentifier(final CharSequence publicIdentifier) {
-		this.publicIdentifier = publicIdentifier;
-	}
-
-	public void setSystemIdentifier(final CharSequence systemIdentifier) {
-		this.systemIdentifier = systemIdentifier;
 	}
 
 	// ---------------------------------------------------------------- get
