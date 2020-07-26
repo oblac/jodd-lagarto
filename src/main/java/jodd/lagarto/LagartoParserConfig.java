@@ -30,7 +30,7 @@ package jodd.lagarto;
 public class LagartoParserConfig {
 
 	protected boolean parseXmlTags = false;
-	protected boolean enableConditionalComments = true; // todo make false
+	protected boolean enableConditionalComments = false;
 	protected boolean caseSensitive = false;
 	protected boolean calculatePosition = false;
 	protected boolean enableRawTextModes = true;
