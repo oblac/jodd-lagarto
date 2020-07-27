@@ -106,7 +106,7 @@ public class LagartoParser {
 	// ---------------------------------------------------------------- configuration
 
 	/**
-	 * Returns {@link jodd.lagarto.LagartoParserConfig configuration} for the parser.
+	 * Returns {@link jodd.lagarto.LagartoParserConfig configuration} of the parser.
 	 */
 	public LagartoParserConfig getConfig() {
 		return config;

@@ -47,14 +47,23 @@ public class LagartoDOMBuilder implements DOMBuilder {
 
 	protected final LagartoDomBuilderConfig config;
 
+	/**
+	 * Returns {@link jodd.lagarto.dom.LagartoDomBuilderConfig configuration} of the DOM parser.
+	 */
 	public LagartoDomBuilderConfig getConfig() {
 		return config;
 	}
 
+	/**
+	 * Returns {@link jodd.lagarto.LagartoParserConfig configuration} of the internal {@link LagartoParser}.
+	 */
 	public LagartoParserConfig getParserConfig() {
 		return config.parserConfig;
 	}
 
+	/**
+	 * Configures this DOM parser.
+	 */
 	public LagartoDOMBuilder configure(final Consumer<LagartoDomBuilderConfig> configConsumer) {
 		configConsumer.accept(this.config);
 		return this;
@@ -152,7 +161,7 @@ public class LagartoDOMBuilder implements DOMBuilder {
 	 * Creates DOM tree from the provided content.
 	 */
 	@Override
-	public Document parse(final String content) {
+	public Document parse(final CharSequence content) {
 		final LagartoParser lagartoParser = new LagartoParser(config.parserConfig, content);
 		return parseWithLagarto(lagartoParser);
 	}

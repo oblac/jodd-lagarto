@@ -38,6 +38,6 @@ public interface DOMBuilder {
 	/**
 	 * Parses content and returns root {@link Document document node}.
 	 */
-	Document parse(String content);
+	Document parse(CharSequence content);
 
 }
