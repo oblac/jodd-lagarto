@@ -25,7 +25,7 @@
 package jodd.lagarto;
 
 /**
- * Tag adapter.
+ * Tag adapter. Usually, an adapter changes the input contents for the wrapped visitor.
  */
 public class TagAdapter implements TagVisitor {
 

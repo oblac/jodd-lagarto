@@ -30,7 +30,7 @@ import jodd.util.CharUtil;
 /**
  * Scanner over an input that consist of characters.
  */
-abstract class Scanner implements CharSequence {
+abstract class CharsInput implements CharSequence {
 
 	/**
 	 * Current position.
@@ -38,7 +38,7 @@ abstract class Scanner implements CharSequence {
 	protected int ndx;
 	protected final int total;
 
-	public Scanner(final int total) {
+	public CharsInput(final int total) {
 		this.total = total;
 		this.ndx = -1;
 	}

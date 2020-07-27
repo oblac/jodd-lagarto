@@ -32,7 +32,6 @@ import jodd.util.CharUtil;
 /**
  * URL Rewriter.
  *
- * todo should this be just a visitor?
  * todo add more util methods for easier URL parsing
  */
 public abstract class UrlRewriterTagAdapter extends TagAdapter {

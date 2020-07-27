@@ -207,7 +207,7 @@ class ParsedTag implements Tag {
 		return position;
 	}
 
-	public void setPosition(final Scanner.Position position) {
+	public void setPosition(final CharsInput.Position position) {
 		this.position = position.toString();
 	}
 

@@ -26,6 +26,9 @@ package jodd.lagarto;
 
 /**
  * Handler that receives callbacks as content is parsed.
+ *
+ * @see TagAdapter
+ * @see EmptyTagVisitor
  */
 public interface TagVisitor {
 

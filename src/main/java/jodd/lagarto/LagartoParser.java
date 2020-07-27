@@ -58,7 +58,7 @@ public class LagartoParser {
 	protected TagVisitor visitor;
 	protected ParsedTag tag;
 	protected ParsedDoctype doctype;
-	protected final Scanner s;
+	protected final CharsInput in;
 	protected final LagartoParserConfig config;
 
 	/**
@@ -66,7 +66,7 @@ public class LagartoParser {
 	 */
 	public LagartoParser(final LagartoParserConfig parserConfig, final char[] input) {
 		this.config = parserConfig;
-		s = new CharArrayScanner(input);
+		in = new CharArrayInput(input);
 		initialize();
 	}
 
@@ -82,7 +82,7 @@ public class LagartoParser {
 	 */
 	public LagartoParser(final LagartoParserConfig parserConfig, final CharSequence input) {
 		this.config = parserConfig;
-		s = new CharSequenceScanner(input);
+		in = new CharSequenceInput(input);
 		initialize();
 	}
 
@@ -155,15 +155,15 @@ public class LagartoParser {
 		@Override
 		public void parse() {
 			while (true) {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					emitText();
 					parsing = false;
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (c == '<') {
 					emitText();
@@ -182,16 +182,16 @@ public class LagartoParser {
 	};
 
 	protected void consumeCharacterReference(final char allowedChar) {
-		s.ndx++;
+		in.ndx++;
 
-		if (s.isEOF()) {
+		if (in.isEOF()) {
 			return;
 		}
 
-		final char c = s.charAtNdx();
+		final char c = in.charAtNdx();
 
 		if (c == allowedChar) {
-			s.ndx--;
+			in.ndx--;
 			return;
 		}
 
@@ -199,9 +199,9 @@ public class LagartoParser {
 	}
 
 	protected void consumeCharacterReference() {
-		s.ndx++;
+		in.ndx++;
 
-		if (s.isEOF()) {
+		if (in.isEOF()) {
 			return;
 		}
 
@@ -209,12 +209,12 @@ public class LagartoParser {
 	}
 
 	private void _consumeCharacterReference() {
-		final int unconsumeNdx = s.ndx - 1;
+		final int unconsumeNdx = in.ndx - 1;
 
-		char c = s.charAtNdx();
+		char c = in.charAtNdx();
 
 		if (equalsOne(c, CONTINUE_CHARS)) {
-			s.ndx = unconsumeNdx;
+			in.ndx = unconsumeNdx;
 			textEmitChar('&');
 			return;
 		}
@@ -222,7 +222,7 @@ public class LagartoParser {
 		if (c == '#') {
 			_consumeNumber(unconsumeNdx);
 		} else {
-			final String name = s.decodeHtmlName();
+			final String name = in.decodeHtmlName();
 
 			if (name == null) {
 				// this error is not quite as by the spec. The spec says that
@@ -230,32 +230,32 @@ public class LagartoParser {
 				// gives na error
 				errorCharReference();
 				textEmitChar('&');
-				s.ndx = unconsumeNdx;
+				in.ndx = unconsumeNdx;
 				return;
 			}
 
 			// missing legacy attribute thing
 
-			s.ndx += name.length();
+			in.ndx += name.length();
 
 			textEmitChars(HtmlDecoder.lookup(name));
 
-			c = s.charAtNdx();
+			c = in.charAtNdx();
 
 			if (c != ';') {
 				errorCharReference();
-				s.ndx--;
+				in.ndx--;
 			}
 		}
 	}
 
 	private void _consumeAttrCharacterReference() {
-		final int unconsumeNdx = s.ndx - 1;
+		final int unconsumeNdx = in.ndx - 1;
 
-		char c = s.charAtNdx();
+		char c = in.charAtNdx();
 
 		if (equalsOne(c, CONTINUE_CHARS)) {
-			s.ndx = unconsumeNdx;
+			in.ndx = unconsumeNdx;
 			textEmitChar('&');
 			return;
 		}
@@ -263,7 +263,7 @@ public class LagartoParser {
 		if (c == '#') {
 			_consumeNumber(unconsumeNdx);
 		} else {
-			final String name = s.decodeHtmlName();
+			final String name = in.decodeHtmlName();
 
 			if (name == null) {
 				// this error is not quite as by the spec. The spec says that
@@ -271,47 +271,47 @@ public class LagartoParser {
 				// gives na error
 				errorCharReference();
 				textEmitChar('&');
-				s.ndx = unconsumeNdx;
+				in.ndx = unconsumeNdx;
 				return;
 			}
 
 			// missing legacy attribute thing
 
-			s.ndx += name.length();
-			c = s.charAtNdx();
+			in.ndx += name.length();
+			c = in.charAtNdx();
 
 			if (c == ';') {
 				textEmitChars(HtmlDecoder.lookup(name));
 			} else {
 				textEmitChar('&');
-				s.ndx = unconsumeNdx;
+				in.ndx = unconsumeNdx;
 			}
 		}
 	}
 
 	private void _consumeNumber(final int unconsumeNdx) {
-		s.ndx++;
+		in.ndx++;
 
-		if (s.isEOF()) {
-			s.ndx = unconsumeNdx;
+		if (in.isEOF()) {
+			in.ndx = unconsumeNdx;
 			return;
 		}
 
-		char c = s.charAtNdx();
+		char c = in.charAtNdx();
 
 		int value = 0;
 		int digitCount = 0;
 
 		if (c == 'X' || c == 'x') {
 			while (true) {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
-					s.ndx = unconsumeNdx;
+				if (in.isEOF()) {
+					in.ndx = unconsumeNdx;
 					return;
 				}
 
-				c = s.charAtNdx();
+				c = in.charAtNdx();
 
 				if (isDigit(c)) {
 					value *= 16;
@@ -334,14 +334,14 @@ public class LagartoParser {
 				value *= 10;
 				value += c - '0';
 
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
-					s.ndx = unconsumeNdx;
+				if (in.isEOF()) {
+					in.ndx = unconsumeNdx;
 					return;
 				}
 
-				c = s.charAtNdx();
+				c = in.charAtNdx();
 				digitCount++;
 			}
 		}
@@ -349,13 +349,13 @@ public class LagartoParser {
 		if (digitCount == 0) {
 			// no character matches the range
 			errorCharReference();
-			s.ndx = unconsumeNdx;
+			in.ndx = unconsumeNdx;
 			return;
 		}
 
 		if (c != ';') {
 			errorCharReference();
-			s.ndx--;    // go back, as pointer is on the next char
+			in.ndx--;    // go back, as pointer is on the next char
 		}
 
 		boolean isErr = true;
@@ -432,18 +432,18 @@ public class LagartoParser {
 	protected State TAG_OPEN = new State() {
 		@Override
 		public void parse() {
-			tag.start(s.ndx);
+			tag.start(in.ndx);
 
-			s.ndx++;
+			in.ndx++;
 
-			if (s.isEOF()) {
+			if (in.isEOF()) {
 				errorEOF();
 				state = DATA_STATE;
 				textEmitChar('<');
 				return;
 			}
 
-			final char c = s.charAtNdx();
+			final char c = in.charAtNdx();
 
 			if (c == '!') {
 				state = MARKUP_DECLARATION_OPEN;
@@ -458,8 +458,8 @@ public class LagartoParser {
 				return;
 			}
 			if (config.parseXmlTags) {
-				if (s.match(XML)) {
-					s.ndx += XML.length - 1;
+				if (in.match(XML)) {
+					in.ndx += XML.length - 1;
 					if (xmlDeclaration == null) {
 						xmlDeclaration = new XmlDeclaration();
 					}
@@ -477,22 +477,22 @@ public class LagartoParser {
 			state = DATA_STATE;
 			textEmitChar('<');
 
-			s.ndx--;
+			in.ndx--;
 		}
 	};
 
 	protected State END_TAG_OPEN = new State() {
 		@Override
 		public void parse() {
-			s.ndx++;
+			in.ndx++;
 
-			if (s.isEOF()) {
+			if (in.isEOF()) {
 				errorEOF();
 				state = DATA_STATE;
 				return;
 			}
 
-			final char c = s.charAtNdx();
+			final char c = in.charAtNdx();
 
 			if (isAlpha(c)) {
 				tag.setType(TagType.END);
@@ -508,34 +508,34 @@ public class LagartoParser {
 	protected State TAG_NAME = new State() {
 		@Override
 		public void parse() {
-			final int nameNdx = s.ndx;
+			final int nameNdx = in.ndx;
 
 			while (true) {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					errorEOF();
 					state = DATA_STATE;
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (equalsOne(c, TAG_WHITESPACES)) {
 					state = BEFORE_ATTRIBUTE_NAME;
-					tag.setName(s.subSequence(nameNdx, s.ndx));
+					tag.setName(in.subSequence(nameNdx, in.ndx));
 					break;
 				}
 
 				if (c == '/') {
 					state = SELF_CLOSING_START_TAG;
-					tag.setName(s.subSequence(nameNdx, s.ndx));
+					tag.setName(in.subSequence(nameNdx, in.ndx));
 					break;
 				}
 
 				if (c == '>') {
 					state = DATA_STATE;
-					tag.setName(s.subSequence(nameNdx, s.ndx));
+					tag.setName(in.subSequence(nameNdx, in.ndx));
 					emitTag();
 					break;
 				}
@@ -547,15 +547,15 @@ public class LagartoParser {
 		@Override
 		public void parse() {
 			while (true) {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					errorEOF();
 					state = DATA_STATE;
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (equalsOne(c, TAG_WHITESPACES)) {
 					continue;
@@ -585,41 +585,41 @@ public class LagartoParser {
 	protected State ATTRIBUTE_NAME = new State() {
 		@Override
 		public void parse() {
-			attrStartNdx = s.ndx;
+			attrStartNdx = in.ndx;
 
 			while (true) {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					errorEOF();
 					state = DATA_STATE;
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (equalsOne(c, TAG_WHITESPACES)) {
-					attrEndNdx = s.ndx;
+					attrEndNdx = in.ndx;
 					state = AFTER_ATTRIBUTE_NAME;
 					return;
 				}
 
 				if (c == '/') {
-					attrEndNdx = s.ndx;
+					attrEndNdx = in.ndx;
 					_addAttribute();
 					state = SELF_CLOSING_START_TAG;
 					return;
 				}
 
 				if (c == '=') {
-					attrEndNdx = s.ndx;
+					attrEndNdx = in.ndx;
 					state = BEFORE_ATTRIBUTE_VALUE;
 					return;
 				}
 
 				if (c == '>') {
 					state = DATA_STATE;
-					attrEndNdx = s.ndx;
+					attrEndNdx = in.ndx;
 					_addAttribute();
 					emitTag();
 					return;
@@ -636,15 +636,15 @@ public class LagartoParser {
 		@Override
 		public void parse() {
 			while (true) {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					errorEOF();
 					state = DATA_STATE;
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (equalsOne(c, TAG_WHITESPACES)) {
 					continue;
@@ -678,15 +678,15 @@ public class LagartoParser {
 		@Override
 		public void parse() {
 			while (true) {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					errorEOF();
 					state = DATA_STATE;
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (equalsOne(c, TAG_WHITESPACES)) {
 					continue;
@@ -702,7 +702,7 @@ public class LagartoParser {
 				}
 				if (c == '&') {
 					state = ATTR_VALUE_UNQUOTED;
-					s.ndx--;
+					in.ndx--;
 					return;
 				}
 				if (c == '>') {
@@ -726,18 +726,18 @@ public class LagartoParser {
 		@Override
 		public void parse() {
 			textStart();
-			textEmitChar(s.charAtNdx());
+			textEmitChar(in.charAtNdx());
 
 			while (true) {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					errorEOF();
 					state = DATA_STATE;
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (equalsOne(c, TAG_WHITESPACES)) {
 					_addAttributeWithValue();
@@ -772,15 +772,15 @@ public class LagartoParser {
 			textStart();
 
 			while (true) {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					errorEOF();
 					state = DATA_STATE;
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (c == '\'') {
 					_addAttributeWithValue();
@@ -802,15 +802,15 @@ public class LagartoParser {
 		public void parse() {
 			textStart();
 			while (true) {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					errorEOF();
 					state = DATA_STATE;
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (c == '"') {
 					_addAttributeWithValue();
@@ -831,15 +831,15 @@ public class LagartoParser {
 	protected State AFTER_ATTRIBUTE_VALUE_QUOTED = new State() {
 		@Override
 		public void parse() {
-			s.ndx++;
+			in.ndx++;
 
-			if (s.isEOF()) {
+			if (in.isEOF()) {
 				errorEOF();
 				state = DATA_STATE;
 				return;
 			}
 
-			final char c = s.charAtNdx();
+			final char c = in.charAtNdx();
 
 			if (equalsOne(c, TAG_WHITESPACES)) {
 				state = BEFORE_ATTRIBUTE_NAME;
@@ -859,22 +859,22 @@ public class LagartoParser {
 
 			errorInvalidToken();
 			state = BEFORE_ATTRIBUTE_NAME;
-			s.ndx--;
+			in.ndx--;
 		}
 	};
 
 	protected State SELF_CLOSING_START_TAG = new State() {
 		@Override
 		public void parse() {
-			s.ndx++;
+			in.ndx++;
 
-			if (s.isEOF()) {
+			if (in.isEOF()) {
 				errorEOF();
 				state = DATA_STATE;
 				return;
 			}
 
-			final char c = s.charAtNdx();
+			final char c = in.charAtNdx();
 
 			if (c == '>') {
 				tag.setType(TagType.SELF_CLOSING);
@@ -886,7 +886,7 @@ public class LagartoParser {
 			errorInvalidToken();
 
 			state = BEFORE_ATTRIBUTE_NAME;
-			s.ndx--;
+			in.ndx--;
 		}
 	};
 
@@ -895,72 +895,72 @@ public class LagartoParser {
 	protected State BOGUS_COMMENT = new State() {
 		@Override
 		public void parse() {
-			int commentEndNdx = s.find('>');
+			int commentEndNdx = in.find('>');
 
 			if (commentEndNdx == -1) {
-				commentEndNdx = s.total;
+				commentEndNdx = in.total;
 			}
 
-			emitComment(s.ndx, commentEndNdx);
+			emitComment(in.ndx, commentEndNdx);
 
 			state = DATA_STATE;
-			s.ndx = commentEndNdx;
+			in.ndx = commentEndNdx;
 		}
 	};
 
 	protected State MARKUP_DECLARATION_OPEN = new State() {
 		@Override
 		public void parse() {
-			s.ndx++;
+			in.ndx++;
 
-			if (s.isEOF()) {
+			if (in.isEOF()) {
 				errorEOF();
 				state = BOGUS_COMMENT;
 				return;
 			}
 
-			if (s.match(COMMENT_DASH)) {
+			if (in.match(COMMENT_DASH)) {
 				state = COMMENT_START;
-				s.ndx++;
+				in.ndx++;
 				return;
 			}
 
-			if (s.matchUpperCase(T_DOCTYPE)) {
+			if (in.matchUpperCase(T_DOCTYPE)) {
 				state = DOCTYPE;
-				s.ndx += T_DOCTYPE.length - 1;
+				in.ndx += T_DOCTYPE.length - 1;
 				return;
 			}
 
 			if (config.enableConditionalComments) {
 				// CC: downlevel-revealed starting
-				if (s.match(CC_IF)) {
-					int ccEndNdx = s.find(CC_END, s.ndx + CC_IF.length);
+				if (in.match(CC_IF)) {
+					int ccEndNdx = in.find(CC_END, in.ndx + CC_IF.length);
 
 					if (ccEndNdx == -1) {
-						ccEndNdx = s.total;
+						ccEndNdx = in.total;
 					}
 
-					final CharSequence expression = s.subSequence(s.ndx + 1, ccEndNdx);
+					final CharSequence expression = in.subSequence(in.ndx + 1, ccEndNdx);
 
 					conditionalCommentStarted = true;
 					visitor.condComment(expression, true, false, false);
 
-					s.ndx = ccEndNdx + 1;
+					in.ndx = ccEndNdx + 1;
 					state = DATA_STATE;
 					return;
 				}
 
 				// CC: downlevel-* ending tag
-				if (s.match(CC_ENDIF) && conditionalCommentStarted) {
-					s.ndx += CC_ENDIF.length;
+				if (in.match(CC_ENDIF) && conditionalCommentStarted) {
+					in.ndx += CC_ENDIF.length;
 
-					int ccEndNdx = s.find('>');
+					int ccEndNdx = in.find('>');
 
 					if (ccEndNdx == -1) {
-						ccEndNdx = s.total;
+						ccEndNdx = in.total;
 					}
 
-					if (s.match(COMMENT_DASH, ccEndNdx - 2)) {
+					if (in.match(COMMENT_DASH, ccEndNdx - 2)) {
 						// downlevel-hidden ending tag
 						visitor.condComment(_ENDIF, false, true, false);
 					} else {
@@ -968,15 +968,15 @@ public class LagartoParser {
 					}
 					conditionalCommentStarted = false;
 
-					s.ndx = ccEndNdx;
+					in.ndx = ccEndNdx;
 					state = DATA_STATE;
 					return;
 				}
 			}
 
 			if (config.parseXmlTags) {
-				if (s.match(CDATA)) {
-					s.ndx += CDATA.length - 1;
+				if (in.match(CDATA)) {
+					in.ndx += CDATA.length - 1;
 
 					if (xmlDeclaration == null) {
 						xmlDeclaration = new XmlDeclaration();
@@ -1002,17 +1002,17 @@ public class LagartoParser {
 		@Override
 		public void parse() {
 			while (true) {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					state = DATA_STATE;
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (c == '<') {
-					rawTextEnd = s.ndx;
+					rawTextEnd = in.ndx;
 					state = RAWTEXT_LESS_THAN_SIGN;
 					return;
 				}
@@ -1023,14 +1023,14 @@ public class LagartoParser {
 	protected State RAWTEXT_LESS_THAN_SIGN = new State() {
 		@Override
 		public void parse() {
-			s.ndx++;
+			in.ndx++;
 
-			if (s.isEOF()) {
+			if (in.isEOF()) {
 				state = RAWTEXT;
 				return;
 			}
 
-			final char c = s.charAtNdx();
+			final char c = in.charAtNdx();
 
 			if (c == '/') {
 				state = RAWTEXT_END_TAG_OPEN;
@@ -1044,14 +1044,14 @@ public class LagartoParser {
 	protected State RAWTEXT_END_TAG_OPEN = new State() {
 		@Override
 		public void parse() {
-			s.ndx++;
+			in.ndx++;
 
-			if (s.isEOF()) {
+			if (in.isEOF()) {
 				state = RAWTEXT;
 				return;
 			}
 
-			final char c = s.charAtNdx();
+			final char c = in.charAtNdx();
 
 			if (isAlpha(c)) {
 				state = RAWTEXT_END_TAG_NAME;
@@ -1065,26 +1065,26 @@ public class LagartoParser {
 	protected State RAWTEXT_END_TAG_NAME = new State() {
 		@Override
 		public void parse() {
-			final int rawtextEndTagNameStartNdx = s.ndx;
+			final int rawtextEndTagNameStartNdx = in.ndx;
 
 			while (true) {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					state = RAWTEXT;
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (equalsOne(c, TAG_WHITESPACES)) {
-					if (isAppropriateTagName(rawTagName, rawtextEndTagNameStartNdx, s.ndx)) {
+					if (isAppropriateTagName(rawTagName, rawtextEndTagNameStartNdx, in.ndx)) {
 						textEmitChars(rawTextStart, rawTextEnd);
 						emitText();
 
 						state = BEFORE_ATTRIBUTE_NAME;
 						tag.start(rawTextEnd);
-						tag.setName(s.subSequence(rawtextEndTagNameStartNdx, s.ndx));
+						tag.setName(in.subSequence(rawtextEndTagNameStartNdx, in.ndx));
 						tag.setType(TagType.END);
 					} else {
 						state = RAWTEXT;
@@ -1093,13 +1093,13 @@ public class LagartoParser {
 				}
 
 				if (c == '/') {
-					if (isAppropriateTagName(rawTagName, rawtextEndTagNameStartNdx, s.ndx)) {
+					if (isAppropriateTagName(rawTagName, rawtextEndTagNameStartNdx, in.ndx)) {
 						textEmitChars(rawTextStart, rawTextEnd);
 						emitText();
 
 						state = SELF_CLOSING_START_TAG;
 						tag.start(rawTextEnd);
-						tag.setName(s.subSequence(rawtextEndTagNameStartNdx, s.ndx));
+						tag.setName(in.subSequence(rawtextEndTagNameStartNdx, in.ndx));
 						tag.setType(TagType.SELF_CLOSING);
 					} else {
 						state = RAWTEXT;
@@ -1108,15 +1108,15 @@ public class LagartoParser {
 				}
 
 				if (c == '>') {
-					if (isAppropriateTagName(rawTagName, rawtextEndTagNameStartNdx, s.ndx)) {
+					if (isAppropriateTagName(rawTagName, rawtextEndTagNameStartNdx, in.ndx)) {
 						textEmitChars(rawTextStart, rawTextEnd);
 						emitText();
 
 						state = DATA_STATE;
 						tag.start(rawTextEnd);
-						tag.setName(s.subSequence(rawtextEndTagNameStartNdx, s.ndx));
+						tag.setName(in.subSequence(rawtextEndTagNameStartNdx, in.ndx));
 						tag.setType(TagType.END);
-						tag.end(s.ndx);
+						tag.end(in.ndx);
 						emitTag();
 					} else {
 						state = RAWTEXT;
@@ -1142,17 +1142,17 @@ public class LagartoParser {
 		@Override
 		public void parse() {
 			while (true) {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					state = DATA_STATE;
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (c == '<') {
-					rcdataTagStart = s.ndx;
+					rcdataTagStart = in.ndx;
 					state = RCDATA_LESS_THAN_SIGN;
 					return;
 				}
@@ -1170,14 +1170,14 @@ public class LagartoParser {
 	protected State RCDATA_LESS_THAN_SIGN = new State() {
 		@Override
 		public void parse() {
-			s.ndx++;
+			in.ndx++;
 
-			if (s.isEOF()) {
+			if (in.isEOF()) {
 				state = RCDATA;
 				return;
 			}
 
-			final char c = s.charAtNdx();
+			final char c = in.charAtNdx();
 
 			if (c == '/') {
 				state = RCDATA_END_TAG_OPEN;
@@ -1193,14 +1193,14 @@ public class LagartoParser {
 	protected State RCDATA_END_TAG_OPEN = new State() {
 		@Override
 		public void parse() {
-			s.ndx++;
+			in.ndx++;
 
-			if (s.isEOF()) {
+			if (in.isEOF()) {
 				state = RCDATA;
 				return;
 			}
 
-			final char c = s.charAtNdx();
+			final char c = in.charAtNdx();
 
 			if (isAlpha(c)) {
 				state = RCDATA_END_TAG_NAME;
@@ -1217,25 +1217,25 @@ public class LagartoParser {
 	protected State RCDATA_END_TAG_NAME = new State() {
 		@Override
 		public void parse() {
-			final int rcdataEndTagNameStartNdx = s.ndx;
+			final int rcdataEndTagNameStartNdx = in.ndx;
 
 			while (true) {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					state = RCDATA;
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (equalsOne(c, TAG_WHITESPACES)) {
-					if (isAppropriateTagName(rcdataTagName, rcdataEndTagNameStartNdx, s.ndx)) {
+					if (isAppropriateTagName(rcdataTagName, rcdataEndTagNameStartNdx, in.ndx)) {
 						emitText();
 
 						state = BEFORE_ATTRIBUTE_NAME;
 						tag.start(rcdataTagStart);
-						tag.setName(s.subSequence(rcdataEndTagNameStartNdx, s.ndx));
+						tag.setName(in.subSequence(rcdataEndTagNameStartNdx, in.ndx));
 						tag.setType(TagType.END);
 					} else {
 						state = RCDATA;
@@ -1244,12 +1244,12 @@ public class LagartoParser {
 				}
 
 				if (c == '/') {
-					if (isAppropriateTagName(rcdataTagName, rcdataEndTagNameStartNdx, s.ndx)) {
+					if (isAppropriateTagName(rcdataTagName, rcdataEndTagNameStartNdx, in.ndx)) {
 						emitText();
 
 						state = SELF_CLOSING_START_TAG;
 						tag.start(rcdataTagStart);
-						tag.setName(s.subSequence(rcdataEndTagNameStartNdx, s.ndx));
+						tag.setName(in.subSequence(rcdataEndTagNameStartNdx, in.ndx));
 						tag.setType(TagType.SELF_CLOSING);
 					} else {
 						state = RCDATA;
@@ -1258,14 +1258,14 @@ public class LagartoParser {
 				}
 
 				if (c == '>') {
-					if (isAppropriateTagName(rcdataTagName, rcdataEndTagNameStartNdx, s.ndx)) {
+					if (isAppropriateTagName(rcdataTagName, rcdataEndTagNameStartNdx, in.ndx)) {
 						emitText();
 
 						state = DATA_STATE;
 						tag.start(rcdataTagStart);
-						tag.setName(s.subSequence(rcdataEndTagNameStartNdx, s.ndx));
+						tag.setName(in.subSequence(rcdataEndTagNameStartNdx, in.ndx));
 						tag.setType(TagType.END);
-						tag.end(s.ndx);
+						tag.end(in.ndx);
 						emitTag();
 					} else {
 						state = RCDATA;
@@ -1290,17 +1290,17 @@ public class LagartoParser {
 	protected State COMMENT_START = new State() {
 		@Override
 		public void parse() {
-			s.ndx++;
-			commentStart = s.ndx;
+			in.ndx++;
+			commentStart = in.ndx;
 
-			if (s.isEOF()) {
+			if (in.isEOF()) {
 				errorEOF();
 				state = DATA_STATE;
-				emitComment(commentStart, s.total);
+				emitComment(commentStart, in.total);
 				return;
 			}
 
-			final char c = s.charAtNdx();
+			final char c = in.charAtNdx();
 
 			if (c == '-') {
 				state = COMMENT_START_DASH;
@@ -1310,7 +1310,7 @@ public class LagartoParser {
 			if (c == '>') {
 				errorInvalidToken();
 				state = DATA_STATE;
-				emitComment(commentStart, s.ndx);
+				emitComment(commentStart, in.ndx);
 				return;
 			}
 
@@ -1321,16 +1321,16 @@ public class LagartoParser {
 	protected State COMMENT_START_DASH = new State() {
 		@Override
 		public void parse() {
-			s.ndx++;
+			in.ndx++;
 
-			if (s.isEOF()) {
+			if (in.isEOF()) {
 				errorEOF();
 				state = DATA_STATE;
-				emitComment(commentStart, s.total);
+				emitComment(commentStart, in.total);
 				return;
 			}
 
-			final char c = s.charAtNdx();
+			final char c = in.charAtNdx();
 
 			if (c == '-') {
 				state = COMMENT_END;
@@ -1339,7 +1339,7 @@ public class LagartoParser {
 			if (c == '>') {
 				errorInvalidToken();
 				state = DATA_STATE;
-				emitComment(commentStart, s.ndx);
+				emitComment(commentStart, in.ndx);
 			}
 
 			state = COMMENT;
@@ -1350,16 +1350,16 @@ public class LagartoParser {
 		@Override
 		public void parse() {
 			while (true) {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					errorEOF();
 					state = DATA_STATE;
-					emitComment(commentStart, s.total);
+					emitComment(commentStart, in.total);
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (c == '-') {
 					state = COMMENT_END_DASH;
@@ -1372,16 +1372,16 @@ public class LagartoParser {
 	protected State COMMENT_END_DASH = new State() {
 		@Override
 		public void parse() {
-			s.ndx++;
+			in.ndx++;
 
-			if (s.isEOF()) {
+			if (in.isEOF()) {
 				errorEOF();
 				state = DATA_STATE;
-				emitComment(commentStart, s.total);
+				emitComment(commentStart, in.total);
 				return;
 			}
 
-			final char c = s.charAtNdx();
+			final char c = in.charAtNdx();
 
 			if (c == '-') {
 				state = COMMENT_END;
@@ -1395,20 +1395,20 @@ public class LagartoParser {
 	protected State COMMENT_END = new State() {
 		@Override
 		public void parse() {
-			s.ndx++;
+			in.ndx++;
 
-			if (s.isEOF()) {
+			if (in.isEOF()) {
 				errorEOF();
 				state = DATA_STATE;
-				emitComment(commentStart, s.total);
+				emitComment(commentStart, in.total);
 				return;
 			}
 
-			final char c = s.charAtNdx();
+			final char c = in.charAtNdx();
 
 			if (c == '>') {
 				state = DATA_STATE;
-				emitComment(commentStart, s.ndx - 2);
+				emitComment(commentStart, in.ndx - 2);
 				return;
 			}
 
@@ -1430,16 +1430,16 @@ public class LagartoParser {
 	protected State COMMENT_END_BANG = new State() {
 		@Override
 		public void parse() {
-			s.ndx++;
+			in.ndx++;
 
-			if (s.isEOF()) {
+			if (in.isEOF()) {
 				errorEOF();
 				state = DATA_STATE;
-				emitComment(commentStart, s.total);
+				emitComment(commentStart, in.total);
 				return;
 			}
 
-			final char c = s.charAtNdx();
+			final char c = in.charAtNdx();
 
 			if (c == '-') {
 				state = COMMENT_END_DASH;
@@ -1447,7 +1447,7 @@ public class LagartoParser {
 			}
 			if (c == '>') {
 				state = DATA_STATE;
-				emitComment(commentStart, s.ndx - 3);
+				emitComment(commentStart, in.ndx - 3);
 				return;
 			}
 			state = COMMENT;
@@ -1459,9 +1459,9 @@ public class LagartoParser {
 	protected State DOCTYPE = new State() {
 		@Override
 		public void parse() {
-			s.ndx++;
+			in.ndx++;
 
-			if (s.isEOF()) {
+			if (in.isEOF()) {
 				errorEOF();
 				state = DATA_STATE;
 				doctype.quirksMode = true;
@@ -1469,7 +1469,7 @@ public class LagartoParser {
 				return;
 			}
 
-			final char c = s.charAtNdx();
+			final char c = in.charAtNdx();
 
 			if (equalsOne(c, TAG_WHITESPACES)) {
 				state = BEFORE_DOCTYPE_NAME;
@@ -1478,7 +1478,7 @@ public class LagartoParser {
 
 			errorInvalidToken();
 			state = BEFORE_DOCTYPE_NAME;
-			s.ndx--;
+			in.ndx--;
 		}
 	};
 
@@ -1486,9 +1486,9 @@ public class LagartoParser {
 		@Override
 		public void parse() {
 			while (true) {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					errorEOF();
 					state = DATA_STATE;
 					doctype.quirksMode = true;
@@ -1496,7 +1496,7 @@ public class LagartoParser {
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (equalsOne(c, TAG_WHITESPACES)) {
 					continue;
@@ -1519,31 +1519,31 @@ public class LagartoParser {
 	protected State DOCTYPE_NAME = new State() {
 		@Override
 		public void parse() {
-			final int nameStartNdx = s.ndx;
+			final int nameStartNdx = in.ndx;
 
 			while (true) {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					errorEOF();
 					state = DATA_STATE;
-					doctype.name = s.subSequence(nameStartNdx, s.ndx);
+					doctype.name = in.subSequence(nameStartNdx, in.ndx);
 					doctype.quirksMode = true;
 					emitDoctype();
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (equalsOne(c, TAG_WHITESPACES)) {
 					state = AFTER_DOCUMENT_NAME;
-					doctype.name = s.subSequence(nameStartNdx, s.ndx);
+					doctype.name = in.subSequence(nameStartNdx, in.ndx);
 					return;
 				}
 
 				if (c == '>') {
 					state = DATA_STATE;
-					doctype.name = s.subSequence(nameStartNdx, s.ndx);
+					doctype.name = in.subSequence(nameStartNdx, in.ndx);
 					emitDoctype();
 					return;
 				}
@@ -1555,9 +1555,9 @@ public class LagartoParser {
 		@Override
 		public void parse() {
 			while (true) {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					errorEOF();
 					state = DATA_STATE;
 					doctype.quirksMode = true;
@@ -1565,7 +1565,7 @@ public class LagartoParser {
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (equalsOne(c, TAG_WHITESPACES)) {
 					continue;
@@ -1577,13 +1577,13 @@ public class LagartoParser {
 					return;
 				}
 
-				if (s.matchUpperCase(A_PUBLIC)) {
-					s.ndx += A_PUBLIC.length - 1;
+				if (in.matchUpperCase(A_PUBLIC)) {
+					in.ndx += A_PUBLIC.length - 1;
 					state = AFTER_DOCTYPE_PUBLIC_KEYWORD;
 					return;
 				}
-				if (s.matchUpperCase(A_SYSTEM)) {
-					s.ndx += A_SYSTEM.length - 1;
+				if (in.matchUpperCase(A_SYSTEM)) {
+					in.ndx += A_SYSTEM.length - 1;
 					state = AFTER_DOCTYPE_SYSTEM_KEYWORD;
 					return;
 				}
@@ -1601,9 +1601,9 @@ public class LagartoParser {
 	protected State AFTER_DOCTYPE_PUBLIC_KEYWORD = new State() {
 		@Override
 		public void parse() {
-			s.ndx++;
+			in.ndx++;
 
-			if (s.isEOF()) {
+			if (in.isEOF()) {
 				errorEOF();
 				state = DATA_STATE;
 				doctype.quirksMode = true;
@@ -1611,7 +1611,7 @@ public class LagartoParser {
 				return;
 			}
 
-			final char c = s.charAtNdx();
+			final char c = in.charAtNdx();
 
 			if (equalsOne(c, TAG_WHITESPACES)) {
 				state = BEFORE_DOCTYPE_PUBLIC_IDENTIFIER;
@@ -1620,14 +1620,14 @@ public class LagartoParser {
 
 			if (c == '\"') {
 				errorInvalidToken();
-				doctypeIdNameStart = s.ndx + 1;
+				doctypeIdNameStart = in.ndx + 1;
 				state = DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED;
 				return;
 			}
 
 			if (c == '\'') {
 				errorInvalidToken();
-				doctypeIdNameStart = s.ndx + 1;
+				doctypeIdNameStart = in.ndx + 1;
 				state = DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED;
 				return;
 			}
@@ -1650,29 +1650,29 @@ public class LagartoParser {
 		@Override
 		public void parse() {
 			while (true) {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					errorEOF();
 					state = DATA_STATE;
 					emitDoctype();
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (equalsOne(c, TAG_WHITESPACES)) {
 					continue;
 				}
 
 				if (c == '\"') {
-					doctypeIdNameStart = s.ndx + 1;
+					doctypeIdNameStart = in.ndx + 1;
 					state = DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED;
 					return;
 				}
 
 				if (c == '\'') {
-					doctypeIdNameStart = s.ndx + 1;
+					doctypeIdNameStart = in.ndx + 1;
 					state = DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED;
 					return;
 				}
@@ -1697,26 +1697,26 @@ public class LagartoParser {
 		@Override
 		public void parse() {
 			while (true) {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
-					doctype.publicIdentifier = s.subSequence(doctypeIdNameStart, s.ndx);
+				if (in.isEOF()) {
+					doctype.publicIdentifier = in.subSequence(doctypeIdNameStart, in.ndx);
 					errorEOF();
 					state = DATA_STATE;
 					doctype.quirksMode = true;
 					emitDoctype();
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (c == '\"') {
-					doctype.publicIdentifier = s.subSequence(doctypeIdNameStart, s.ndx);
+					doctype.publicIdentifier = in.subSequence(doctypeIdNameStart, in.ndx);
 					state = AFTER_DOCTYPE_PUBLIC_IDENTIFIER;
 					return;
 				}
 
 				if (c == '>') {
-					doctype.publicIdentifier = s.subSequence(doctypeIdNameStart, s.ndx);
+					doctype.publicIdentifier = in.subSequence(doctypeIdNameStart, in.ndx);
 					errorInvalidToken();
 					state = DATA_STATE;
 					doctype.quirksMode = true;
@@ -1731,26 +1731,26 @@ public class LagartoParser {
 		@Override
 		public void parse() {
 			while (true) {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
-					doctype.publicIdentifier = s.subSequence(doctypeIdNameStart, s.ndx);
+				if (in.isEOF()) {
+					doctype.publicIdentifier = in.subSequence(doctypeIdNameStart, in.ndx);
 					errorEOF();
 					state = DATA_STATE;
 					doctype.quirksMode = true;
 					emitDoctype();
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (c == '\'') {
-					doctype.publicIdentifier = s.subSequence(doctypeIdNameStart, s.ndx);
+					doctype.publicIdentifier = in.subSequence(doctypeIdNameStart, in.ndx);
 					state = AFTER_DOCTYPE_PUBLIC_IDENTIFIER;
 					return;
 				}
 
 				if (c == '>') {
-					doctype.publicIdentifier = s.subSequence(doctypeIdNameStart, s.ndx);
+					doctype.publicIdentifier = in.subSequence(doctypeIdNameStart, in.ndx);
 					errorInvalidToken();
 					state = DATA_STATE;
 					doctype.quirksMode = true;
@@ -1764,9 +1764,9 @@ public class LagartoParser {
 	protected State AFTER_DOCTYPE_PUBLIC_IDENTIFIER = new State() {
 		@Override
 		public void parse() {
-			s.ndx++;
+			in.ndx++;
 
-			if (s.isEOF()) {
+			if (in.isEOF()) {
 				errorEOF();
 				state = DATA_STATE;
 				doctype.quirksMode = true;
@@ -1774,7 +1774,7 @@ public class LagartoParser {
 				return;
 			}
 
-			final char c = s.charAtNdx();
+			final char c = in.charAtNdx();
 
 			if (equalsOne(c, TAG_WHITESPACES)) {
 				state = BETWEEN_DOCTYPE_PUBLIC_AND_SYSTEM_IDENTIFIERS;
@@ -1789,14 +1789,14 @@ public class LagartoParser {
 
 			if (c == '\"') {
 				errorInvalidToken();
-				doctypeIdNameStart = s.ndx + 1;
+				doctypeIdNameStart = in.ndx + 1;
 				state = DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED;
 				return;
 			}
 
 			if (c == '\'') {
 				errorInvalidToken();
-				doctypeIdNameStart = s.ndx + 1;
+				doctypeIdNameStart = in.ndx + 1;
 				state = DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED;
 				return;
 			}
@@ -1811,16 +1811,16 @@ public class LagartoParser {
 		@Override
 		public void parse() {
 			while (true) {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					errorEOF();
 					state = DATA_STATE;
 					emitDoctype();
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (equalsOne(c, TAG_WHITESPACES)) {
 					continue;
@@ -1833,13 +1833,13 @@ public class LagartoParser {
 				}
 
 				if (c == '\"') {
-					doctypeIdNameStart = s.ndx + 1;
+					doctypeIdNameStart = in.ndx + 1;
 					state = DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED;
 					return;
 				}
 
 				if (c == '\'') {
-					doctypeIdNameStart = s.ndx + 1;
+					doctypeIdNameStart = in.ndx + 1;
 					state = DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED;
 					return;
 				}
@@ -1857,15 +1857,15 @@ public class LagartoParser {
 		@Override
 		public void parse() {
 			while (true) {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					state = DATA_STATE;
 					emitDoctype();
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (c == '>') {
 					state = DATA_STATE;
@@ -1879,9 +1879,9 @@ public class LagartoParser {
 	protected State AFTER_DOCTYPE_SYSTEM_KEYWORD = new State() {
 		@Override
 		public void parse() {
-			s.ndx++;
+			in.ndx++;
 
-			if (s.isEOF()) {
+			if (in.isEOF()) {
 				errorEOF();
 				state = DATA_STATE;
 				doctype.quirksMode = true;
@@ -1889,7 +1889,7 @@ public class LagartoParser {
 				return;
 			}
 
-			final char c = s.charAtNdx();
+			final char c = in.charAtNdx();
 
 			if (equalsOne(c, TAG_WHITESPACES)) {
 				state = BEFORE_DOCTYPE_SYSTEM_IDENTIFIER;
@@ -1898,14 +1898,14 @@ public class LagartoParser {
 
 			if (c == '\"') {
 				errorInvalidToken();
-				doctypeIdNameStart = s.ndx + 1;
+				doctypeIdNameStart = in.ndx + 1;
 				state = DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED;
 				return;
 			}
 
 			if (c == '\'') {
 				errorInvalidToken();
-				doctypeIdNameStart = s.ndx + 1;
+				doctypeIdNameStart = in.ndx + 1;
 				state = DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED;
 				return;
 			}
@@ -1928,29 +1928,29 @@ public class LagartoParser {
 		@Override
 		public void parse() {
 			while (true) {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					errorEOF();
 					state = DATA_STATE;
 					emitDoctype();
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (equalsOne(c, TAG_WHITESPACES)) {
 					continue;
 				}
 
 				if (c == '\"') {
-					doctypeIdNameStart = s.ndx + 1;
+					doctypeIdNameStart = in.ndx + 1;
 					state = DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED;
 					return;
 				}
 
 				if (c == '\'') {
-					doctypeIdNameStart = s.ndx + 1;
+					doctypeIdNameStart = in.ndx + 1;
 					state = DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED;
 					return;
 				}
@@ -1975,26 +1975,26 @@ public class LagartoParser {
 		@Override
 		public void parse() {
 			while (true) {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
-					doctype.systemIdentifier = s.subSequence(doctypeIdNameStart, s.ndx);
+				if (in.isEOF()) {
+					doctype.systemIdentifier = in.subSequence(doctypeIdNameStart, in.ndx);
 					errorEOF();
 					state = DATA_STATE;
 					doctype.quirksMode = true;
 					emitDoctype();
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (c == '\"') {
-					doctype.systemIdentifier = s.subSequence(doctypeIdNameStart, s.ndx);
+					doctype.systemIdentifier = in.subSequence(doctypeIdNameStart, in.ndx);
 					state = AFTER_DOCTYPE_SYSTEM_IDENTIFIER;
 					return;
 				}
 
 				if (c == '>') {
-					doctype.systemIdentifier = s.subSequence(doctypeIdNameStart, s.ndx);
+					doctype.systemIdentifier = in.subSequence(doctypeIdNameStart, in.ndx);
 					errorInvalidToken();
 					state = DATA_STATE;
 					doctype.quirksMode = true;
@@ -2009,26 +2009,26 @@ public class LagartoParser {
 		@Override
 		public void parse() {
 			while (true) {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
-					doctype.systemIdentifier = s.subSequence(doctypeIdNameStart, s.ndx);
+				if (in.isEOF()) {
+					doctype.systemIdentifier = in.subSequence(doctypeIdNameStart, in.ndx);
 					errorEOF();
 					state = DATA_STATE;
 					doctype.quirksMode = true;
 					emitDoctype();
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (c == '\'') {
-					doctype.systemIdentifier = s.subSequence(doctypeIdNameStart, s.ndx);
+					doctype.systemIdentifier = in.subSequence(doctypeIdNameStart, in.ndx);
 					state = AFTER_DOCTYPE_SYSTEM_IDENTIFIER;
 					return;
 				}
 
 				if (c == '>') {
-					doctype.systemIdentifier = s.subSequence(doctypeIdNameStart, s.ndx);
+					doctype.systemIdentifier = in.subSequence(doctypeIdNameStart, in.ndx);
 					errorInvalidToken();
 					state = DATA_STATE;
 					doctype.quirksMode = true;
@@ -2043,9 +2043,9 @@ public class LagartoParser {
 		@Override
 		public void parse() {
 			while (true) {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					errorEOF();
 					state = DATA_STATE;
 					doctype.quirksMode = true;
@@ -2053,7 +2053,7 @@ public class LagartoParser {
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (equalsOne(c, TAG_WHITESPACES)) {
 					continue;
@@ -2084,18 +2084,18 @@ public class LagartoParser {
 		public void parse() {
 
 			while (true) {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
-					emitScript(scriptStartNdx, s.total);
+				if (in.isEOF()) {
+					emitScript(scriptStartNdx, in.total);
 					state = DATA_STATE;
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (c == '<') {
-					scriptEndNdx = s.ndx;
+					scriptEndNdx = in.ndx;
 					state = SCRIPT_DATA_LESS_THAN_SIGN;
 					return;
 				}
@@ -2106,15 +2106,15 @@ public class LagartoParser {
 	protected State SCRIPT_DATA_LESS_THAN_SIGN = new State() {
 		@Override
 		public void parse() {
-			s.ndx++;
+			in.ndx++;
 
-			if (s.isEOF()) {
+			if (in.isEOF()) {
 				state = SCRIPT_DATA;
-				s.ndx--;
+				in.ndx--;
 				return;
 			}
 
-			final char c = s.charAtNdx();
+			final char c = in.charAtNdx();
 
 			if (c == '/') {
 				state = SCRIPT_DATA_END_TAG_OPEN;
@@ -2135,19 +2135,19 @@ public class LagartoParser {
 	protected State SCRIPT_DATA_END_TAG_OPEN = new State() {
 		@Override
 		public void parse() {
-			s.ndx++;
+			in.ndx++;
 
-			if (s.isEOF()) {
+			if (in.isEOF()) {
 				state = SCRIPT_DATA;
-				s.ndx--;
+				in.ndx--;
 				return;
 			}
 
-			final char c = s.charAtNdx();
+			final char c = in.charAtNdx();
 
 			if (isAlpha(c)) {
 				state = SCRIPT_DATA_END_TAG_NAME;
-				scriptEndTagName = s.ndx;
+				scriptEndTagName = in.ndx;
 				return;
 			}
 
@@ -2159,17 +2159,17 @@ public class LagartoParser {
 		@Override
 		public void parse() {
 			while (true) {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					state = SCRIPT_DATA;
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (equalsOne(c, TAG_WHITESPACES)) {
-					if (isAppropriateTagName(T_SCRIPT, scriptEndTagName, s.ndx)) {
+					if (isAppropriateTagName(T_SCRIPT, scriptEndTagName, in.ndx)) {
 						state = BEFORE_ATTRIBUTE_NAME;
 					} else {
 						state = SCRIPT_DATA;
@@ -2177,7 +2177,7 @@ public class LagartoParser {
 					return;
 				}
 				if (c == '/') {
-					if (isAppropriateTagName(T_SCRIPT, scriptEndTagName, s.ndx)) {
+					if (isAppropriateTagName(T_SCRIPT, scriptEndTagName, in.ndx)) {
 						state = SELF_CLOSING_START_TAG;
 					} else {
 						state = SCRIPT_DATA;
@@ -2185,7 +2185,7 @@ public class LagartoParser {
 					return;
 				}
 				if (c == '>') {
-					if (isAppropriateTagName(T_SCRIPT, scriptEndTagName, s.ndx)) {
+					if (isAppropriateTagName(T_SCRIPT, scriptEndTagName, in.ndx)) {
 						state = DATA_STATE;
 						emitScript(scriptStartNdx, scriptEndNdx);
 					} else {
@@ -2219,15 +2219,15 @@ public class LagartoParser {
 		protected State SCRIPT_DATA_ESCAPE_START = new State() {
 			@Override
 			public void parse() {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					state = SCRIPT_DATA;
-					s.ndx--;
+					in.ndx--;
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (c == '-') {
 					state = SCRIPT_DATA_ESCAPE_START_DASH;
@@ -2241,14 +2241,14 @@ public class LagartoParser {
 		protected State SCRIPT_DATA_ESCAPE_START_DASH = new State() {
 			@Override
 			public void parse() {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					state = SCRIPT_DATA;
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (c == '-') {
 					state = SCRIPT_DATA_ESCAPED_DASH_DASH;
@@ -2262,15 +2262,15 @@ public class LagartoParser {
 		protected State SCRIPT_DATA_ESCAPED_DASH_DASH = new State() {
 			@Override
 			public void parse() {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					errorEOF();
 					state = DATA_STATE;
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (c == '-') {
 					return;
@@ -2293,14 +2293,14 @@ public class LagartoParser {
 		protected State SCRIPT_DATA_ESCAPED_LESS_THAN_SIGN = new State() {
 			@Override
 			public void parse() {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					state = SCRIPT_DATA_ESCAPED;
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (c == '/') {
 					doubleEscapedNdx = -1;
@@ -2309,7 +2309,7 @@ public class LagartoParser {
 				}
 
 				if (isAlpha(c)) {
-					doubleEscapedNdx = s.ndx;
+					doubleEscapedNdx = in.ndx;
 					state = SCRIPT_DATA_DOUBLE_ESCAPE_START;
 					return;
 				}
@@ -2322,16 +2322,16 @@ public class LagartoParser {
 			@Override
 			public void parse() {
 				while (true) {
-					s.ndx++;
+					in.ndx++;
 
-					if (s.isEOF()) {
+					if (in.isEOF()) {
 						errorEOF();
-						emitScript(scriptStartNdx, s.total);
+						emitScript(scriptStartNdx, in.total);
 						state = DATA_STATE;
 						return;
 					}
 
-					final char c = s.charAtNdx();
+					final char c = in.charAtNdx();
 
 					if (c == '-') {
 						state = SCRIPT_DATA_ESCAPED_DASH;
@@ -2350,15 +2350,15 @@ public class LagartoParser {
 		protected State SCRIPT_DATA_ESCAPED_DASH = new State() {
 			@Override
 			public void parse() {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					errorEOF();
 					state = DATA_STATE;
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (c == '-') {
 					state = SCRIPT_DATA_ESCAPED_DASH_DASH;
@@ -2377,14 +2377,14 @@ public class LagartoParser {
 		protected State SCRIPT_DATA_ESCAPED_END_TAG_OPEN = new State() {
 			@Override
 			public void parse() {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					state = SCRIPT_DATA_ESCAPED;
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (isAlpha(c)) {
 					// todo Create a new end tag token?
@@ -2399,17 +2399,17 @@ public class LagartoParser {
 			@Override
 			public void parse() {
 				while (true) {
-					s.ndx++;
+					in.ndx++;
 
-					if (s.isEOF()) {
+					if (in.isEOF()) {
 						state = SCRIPT_DATA_ESCAPED;
 						return;
 					}
 
-					final char c = s.charAtNdx();
+					final char c = in.charAtNdx();
 
 					if (equalsOne(c, TAG_WHITESPACES)) {
-						if (isAppropriateTagName(T_SCRIPT, scriptEndTagName, s.ndx)) {
+						if (isAppropriateTagName(T_SCRIPT, scriptEndTagName, in.ndx)) {
 							state = BEFORE_ATTRIBUTE_NAME;
 						} else {
 							state = SCRIPT_DATA_ESCAPED;
@@ -2417,7 +2417,7 @@ public class LagartoParser {
 						return;
 					}
 					if (c == '/') {
-						if (isAppropriateTagName(T_SCRIPT, scriptEndTagName, s.ndx)) {
+						if (isAppropriateTagName(T_SCRIPT, scriptEndTagName, in.ndx)) {
 							state = SELF_CLOSING_START_TAG;
 						} else {
 							state = SCRIPT_DATA_ESCAPED;
@@ -2425,7 +2425,7 @@ public class LagartoParser {
 						return;
 					}
 					if (c == '>') {
-						if (isAppropriateTagName(T_SCRIPT, scriptEndTagName, s.ndx)) {
+						if (isAppropriateTagName(T_SCRIPT, scriptEndTagName, in.ndx)) {
 							state = DATA_STATE;
 							emitTag();
 						} else {
@@ -2448,17 +2448,17 @@ public class LagartoParser {
 			@Override
 			public void parse() {
 				while (true) {
-					s.ndx++;
+					in.ndx++;
 
-					if (s.isEOF()) {
+					if (in.isEOF()) {
 						state = SCRIPT_DATA_ESCAPED;
 						return;
 					}
 
-					final char c = s.charAtNdx();
+					final char c = in.charAtNdx();
 
 					if (equalsOne(c, TAG_WHITESPACES_OR_END)) {
-						if (isAppropriateTagName(T_SCRIPT, doubleEscapedNdx, s.ndx)) {
+						if (isAppropriateTagName(T_SCRIPT, doubleEscapedNdx, in.ndx)) {
 							state = SCRIPT_DATA_DOUBLE_ESCAPED;
 						} else {
 							state = SCRIPT_DATA_ESCAPED;
@@ -2479,15 +2479,15 @@ public class LagartoParser {
 			@Override
 			public void parse() {
 				while (true) {
-					s.ndx++;
+					in.ndx++;
 
-					if (s.isEOF()) {
+					if (in.isEOF()) {
 						errorEOF();
 						state = DATA_STATE;
 						return;
 					}
 
-					final char c = s.charAtNdx();
+					final char c = in.charAtNdx();
 
 					if (c == '-') {
 						state = SCRIPT_DATA_DOUBLE_ESCAPED_DASH;
@@ -2505,15 +2505,15 @@ public class LagartoParser {
 		protected State SCRIPT_DATA_DOUBLE_ESCAPED_DASH = new State() {
 			@Override
 			public void parse() {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					errorEOF();
 					state = DATA_STATE;
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (c == '-') {
 					state = SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH;
@@ -2531,15 +2531,15 @@ public class LagartoParser {
 			@Override
 			public void parse() {
 				while (true) {
-					s.ndx++;
+					in.ndx++;
 
-					if (s.isEOF()) {
+					if (in.isEOF()) {
 						errorEOF();
 						state = DATA_STATE;
 						return;
 					}
 
-					final char c = s.charAtNdx();
+					final char c = in.charAtNdx();
 
 					if (c == '-') {
 						continue;
@@ -2562,14 +2562,14 @@ public class LagartoParser {
 		protected State SCRIPT_DATA_DOUBLE_ESCAPED_LESS_THAN_SIGN = new State() {
 			@Override
 			public void parse() {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					state = SCRIPT_DATA_DOUBLE_ESCAPED;
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (c == '/') {
 					state = SCRIPT_DATA_DOUBLE_ESCAPE_END;
@@ -2583,20 +2583,20 @@ public class LagartoParser {
 		protected State SCRIPT_DATA_DOUBLE_ESCAPE_END = new State() {
 			@Override
 			public void parse() {
-				doubleEscapedEndTag = s.ndx + 1;
+				doubleEscapedEndTag = in.ndx + 1;
 
 				while (true) {
-					s.ndx++;
+					in.ndx++;
 
-					if (s.isEOF()) {
+					if (in.isEOF()) {
 						state = SCRIPT_DATA_DOUBLE_ESCAPED;
 						return;
 					}
 
-					final char c = s.charAtNdx();
+					final char c = in.charAtNdx();
 
 					if (equalsOne(c, TAG_WHITESPACES_OR_END)) {
-						if (isAppropriateTagName(T_SCRIPT, doubleEscapedEndTag, s.ndx)) {
+						if (isAppropriateTagName(T_SCRIPT, doubleEscapedEndTag, in.ndx)) {
 							state = SCRIPT_DATA_ESCAPED;
 						} else {
 							state = SCRIPT_DATA_DOUBLE_ESCAPED;
@@ -2638,15 +2638,15 @@ public class LagartoParser {
 			public void parse() {
 
 				while (true) {
-					s.ndx++;
+					in.ndx++;
 
-					if (s.isEOF()) {
+					if (in.isEOF()) {
 						errorEOF();
 						state = DATA_STATE;
 						return;
 					}
 
-					final char c = s.charAtNdx();
+					final char c = in.charAtNdx();
 
 					if (equalsOne(c, TAG_WHITESPACES)) {
 						continue;
@@ -2659,22 +2659,22 @@ public class LagartoParser {
 
 					switch (xmlAttrCount) {
 						case 0:
-							if (s.match(XML_VERSION)) {
-								s.ndx += XML_VERSION.length - 1;
+							if (in.match(XML_VERSION)) {
+								in.ndx += XML_VERSION.length - 1;
 								state = AFTER_XML_ATTRIBUTE_NAME;
 								return;
 							}
 							break;
 						case 1:
-							if (s.match(XML_ENCODING)) {
-								s.ndx += XML_ENCODING.length - 1;
+							if (in.match(XML_ENCODING)) {
+								in.ndx += XML_ENCODING.length - 1;
 								state = AFTER_XML_ATTRIBUTE_NAME;
 								return;
 							}
 							break;
 						case 2:
-							if (s.match(XML_STANDALONE)) {
-								s.ndx += XML_STANDALONE.length - 1;
+							if (in.match(XML_STANDALONE)) {
+								in.ndx += XML_STANDALONE.length - 1;
 								state = AFTER_XML_ATTRIBUTE_NAME;
 								return;
 							}
@@ -2691,15 +2691,15 @@ public class LagartoParser {
 			@Override
 			public void parse() {
 				while (true) {
-					s.ndx++;
+					in.ndx++;
 
-					if (s.isEOF()) {
+					if (in.isEOF()) {
 						errorEOF();
 						state = DATA_STATE;
 						return;
 					}
 
-					final char c = s.charAtNdx();
+					final char c = in.charAtNdx();
 
 					if (equalsOne(c, TAG_WHITESPACES)) {
 						continue;
@@ -2721,15 +2721,15 @@ public class LagartoParser {
 			@Override
 			public void parse() {
 				while (true) {
-					s.ndx++;
+					in.ndx++;
 
-					if (s.isEOF()) {
+					if (in.isEOF()) {
 						errorEOF();
 						state = DATA_STATE;
 						return;
 					}
 
-					final char c = s.charAtNdx();
+					final char c = in.charAtNdx();
 
 					if (equalsOne(c, TAG_WHITESPACES)) {
 						continue;
@@ -2751,21 +2751,21 @@ public class LagartoParser {
 		protected State XML_ATTRIBUTE_VALUE = new State() {
 			@Override
 			public void parse() {
-				xmlAttrStartNdx = s.ndx + 1;
+				xmlAttrStartNdx = in.ndx + 1;
 
 				while (true) {
-					s.ndx++;
+					in.ndx++;
 
-					if (s.isEOF()) {
+					if (in.isEOF()) {
 						errorEOF();
 						state = DATA_STATE;
 						return;
 					}
 
-					final char c = s.charAtNdx();
+					final char c = in.charAtNdx();
 
 					if (c == attrQuote) {
-						final CharSequence value = s.subSequence(xmlAttrStartNdx, s.ndx);
+						final CharSequence value = in.subSequence(xmlAttrStartNdx, in.ndx);
 
 						switch (xmlAttrCount) {
 							case 0:
@@ -2792,15 +2792,15 @@ public class LagartoParser {
 		protected State XML_CLOSE = new State() {
 			@Override
 			public void parse() {
-				s.ndx++;
+				in.ndx++;
 
-				if (s.isEOF()) {
+				if (in.isEOF()) {
 					errorEOF();
 					state = DATA_STATE;
 					return;
 				}
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (c == '>') {
 					emitXml();
@@ -2818,19 +2818,19 @@ public class LagartoParser {
 		protected State CDATA = new State() {
 			@Override
 			public void parse() {
-				s.ndx++;
+				in.ndx++;
 
-				int cdataEndNdx = s.find(CDATA_END, s.ndx);
+				int cdataEndNdx = in.find(CDATA_END, in.ndx);
 
 				if (cdataEndNdx == -1) {
-					cdataEndNdx = s.total;
+					cdataEndNdx = in.total;
 				}
 
-				final CharSequence cdata = s.subSequence(s.ndx, cdataEndNdx);
+				final CharSequence cdata = in.subSequence(in.ndx, cdataEndNdx);
 
 				emitCData(cdata);
 
-				s.ndx = cdataEndNdx + 2;
+				in.ndx = cdataEndNdx + 2;
 
 				state = DATA_STATE;
 			}
@@ -2875,7 +2875,7 @@ public class LagartoParser {
 		ensureCapacity(to - from);
 		// todo make it better, not char by char?
 		while (from < to) {
-			text[textLen++] = s.charAt(from++);
+			text[textLen++] = in.charAt(from++);
 		}
 	}
 
@@ -2888,7 +2888,7 @@ public class LagartoParser {
 
 	protected CharSequence textWrap() {
 		if (textLen == 0) {
-			return CharArrayScanner.EMPTY_CHAR_SEQUENCE;
+			return CharArrayInput.EMPTY_CHAR_SEQUENCE;
 		}
 		return new String(text, 0, textLen);    // todo use charSequence pointer instead!
 	}
@@ -2899,11 +2899,11 @@ public class LagartoParser {
 	protected int attrEndNdx = -1;
 
 	private void _addAttribute() {
-		_addAttribute(s.subSequence(attrStartNdx, attrEndNdx), null);
+		_addAttribute(in.subSequence(attrStartNdx, attrEndNdx), null);
 	}
 
 	private void _addAttributeWithValue() {
-		_addAttribute(s.subSequence(attrStartNdx, attrEndNdx), textWrap().toString());
+		_addAttribute(in.subSequence(attrStartNdx, attrEndNdx), textWrap().toString());
 	}
 
 	private void _addAttribute(final CharSequence attrName, final CharSequence attrValue) {
@@ -2923,16 +2923,16 @@ public class LagartoParser {
 	}
 
 	protected void emitTag() {
-		tag.end(s.ndx + 1);
+		tag.end(in.ndx + 1);
 
 		if (config.calculatePosition) {
-			tag.setPosition(s.positionOf(tag.getTagPosition()));
+			tag.setPosition(in.positionOf(tag.getTagPosition()));
 		}
 
 		if (tag.getType().isStartingTag()) {
 
 			if (matchTagName(T_SCRIPT)) {
-				scriptStartNdx = s.ndx + 1;
+				scriptStartNdx = in.ndx + 1;
 				state = SCRIPT_DATA;
 				return;
 			}
@@ -2944,7 +2944,7 @@ public class LagartoParser {
 					if (matchTagName(rawtextTagName)) {
 						tag.setRawTag(true);
 						state = RAWTEXT;
-						rawTextStart = s.ndx + 1;
+						rawTextStart = in.ndx + 1;
 						rawTagName = rawtextTagName;
 						break;
 					}
@@ -2955,7 +2955,7 @@ public class LagartoParser {
 				for (final char[] rcdataTextTagName : RCDATA_TAGS) {
 					if (matchTagName(rcdataTextTagName)) {
 						state = RCDATA;
-						rcdataTagStart = s.ndx + 1;
+						rcdataTagStart = in.ndx + 1;
 						rcdataTagName = rcdataTextTagName;
 						break;
 					}
@@ -2980,28 +2980,28 @@ public class LagartoParser {
 	protected void emitComment(final int from, final int to) {
 		if (from == -1) {
 			// special case when `from` is `-1` in invalid comment
-			visitor.comment(CharArrayScanner.EMPTY_CHAR_SEQUENCE);
+			visitor.comment(CharArrayInput.EMPTY_CHAR_SEQUENCE);
 			return;
 		}
 		if (config.enableConditionalComments) {
 			// CC: downlevel-hidden starting
-			if (s.match(CC_IF, from)) {
-				final int endBracketNdx = s.find(']', from + 3, to);
+			if (in.match(CC_IF, from)) {
+				final int endBracketNdx = in.find(']', from + 3, to);
 
 				if (endBracketNdx == -1) {
 					// wrong syntax for CC, then it's just a comment
 					// meh, the code repeats, see the end of the method.
-					final CharSequence comment = s.subSequence(from, to);
+					final CharSequence comment = in.subSequence(from, to);
 					visitor.comment(comment);
 					commentStart = -1;
 					return;
 				}
 
-				final CharSequence expression = s.subSequence(from + 1, endBracketNdx);
+				final CharSequence expression = in.subSequence(from + 1, endBracketNdx);
 
-				s.ndx = endBracketNdx + 1;
+				in.ndx = endBracketNdx + 1;
 
-				final char c = s.charAtNdx();
+				final char c = in.charAtNdx();
 
 				if (c != '>') {
 					errorInvalidToken();
@@ -3014,7 +3014,7 @@ public class LagartoParser {
 				return;
 			}
 
-			if (to > CC_ENDIF2.length && s.match(CC_ENDIF2, to - CC_ENDIF2.length) && conditionalCommentStarted) {
+			if (to > CC_ENDIF2.length && in.match(CC_ENDIF2, to - CC_ENDIF2.length) && conditionalCommentStarted) {
 				// CC: downlevel-hidden ending
 				visitor.condComment(_ENDIF, false, true, true);
 				conditionalCommentStarted = false;
@@ -3025,7 +3025,7 @@ public class LagartoParser {
 		}
 
 		// just a comment
-		final CharSequence comment = s.subSequence(from, to);
+		final CharSequence comment = in.subSequence(from, to);
 		visitor.comment(comment);
 		commentStart = -1;
 	}
@@ -3044,7 +3044,7 @@ public class LagartoParser {
 		tag.increaseDeepLevel();
 
 		tag.setRawTag(true);
-		visitor.script(tag, s.subSequence(from, to));
+		visitor.script(tag, in.subSequence(from, to));
 
 		tag.decreaseDeepLevel();
 		scriptStartNdx = -1;
@@ -3086,14 +3086,14 @@ public class LagartoParser {
 	 */
 	protected void _error(String message) {
 		if (config.calculatePosition) {
-			final Scanner.Position currentPosition = s.positionOf(s.ndx);
+			final CharsInput.Position currentPosition = in.positionOf(in.ndx);
 			message = message
 					.concat(" ")
 					.concat(currentPosition.toString());
 		} else {
 			message = message
 					.concat(" [@")
-					.concat(Integer.toString(s.ndx))
+					.concat(Integer.toString(in.ndx))
 					.concat("]");
 		}
 
@@ -3110,7 +3110,7 @@ public class LagartoParser {
 		}
 
 		for (int i = from, k = 0; i < to; i++, k++) {
-			char c = s.charAt(i);
+			char c = in.charAt(i);
 
 			c = CharUtil.toLowerAscii(c);
 

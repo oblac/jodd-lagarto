@@ -28,7 +28,6 @@ import jodd.lagarto.Tag;
 import jodd.lagarto.TagAdapter;
 import jodd.lagarto.TagType;
 import jodd.lagarto.TagVisitor;
-import jodd.util.CharArraySequence;
 import jodd.util.CharUtil;
 
 import java.nio.CharBuffer;
@@ -62,7 +61,7 @@ public class StripHtmlTagAdapter extends TagAdapter {
 		strippedCharsCount += comment.length() + 7;
 	}
 
-	private static CharSequence PRE = CharArraySequence.of('p', 'r', 'e');
+	private static final CharSequence PRE = "PRE";
 
 	@Override
 	public void tag(final Tag tag) {
@@ -87,9 +86,9 @@ public class StripHtmlTagAdapter extends TagAdapter {
 			return;
 		}
 
-		int textLength = text.length();
+		final int textLength = text.length();
 
-		char[] dest = new char[textLength];
+		final char[] dest = new char[textLength];
 
 		int ndx = 0;
 		boolean regularChar = true;

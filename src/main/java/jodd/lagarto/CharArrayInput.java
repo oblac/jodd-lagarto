@@ -3,14 +3,14 @@ package jodd.lagarto;
 import java.nio.CharBuffer;
 
 /**
- * Implementation of the {@link Scanner} over a {@code char[]}.
+ * Implementation of the {@link CharsInput} over a {@code char[]}.
  */
-final class CharArrayScanner extends Scanner {
+final class CharArrayInput extends CharsInput {
 	public static final CharSequence EMPTY_CHAR_SEQUENCE = CharBuffer.allocate(0);
 
 	private final char[] input;
 
-	CharArrayScanner(final char[] input) {
+	CharArrayInput(final char[] input) {
 		super(input.length);
 		this.input = input;
 	}

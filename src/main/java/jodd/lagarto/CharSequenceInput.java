@@ -1,13 +1,13 @@
 package jodd.lagarto;
 
 /**
- * Implementation of {@link Scanner} over the {@code CharSequence}.
+ * Implementation of {@link CharsInput} over the {@code CharSequence}.
  */
-final class CharSequenceScanner extends Scanner {
+final class CharSequenceInput extends CharsInput {
 
 	private final CharSequence input;
 
-	CharSequenceScanner(final CharSequence input) {
+	CharSequenceInput(final CharSequence input) {
 		super(input.length());
 		this.input = input;
 	}
