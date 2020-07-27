@@ -29,7 +29,6 @@ import jodd.csselly.selector.PseudoClassSelector;
 import jodd.csselly.selector.PseudoFunctionSelector;
 import jodd.lagarto.dom.Node;
 import jodd.lagarto.dom.NodeFilter;
-import jodd.util.StringPool;
 import jodd.util.StringUtil;
 
 import java.util.ArrayList;
@@ -45,6 +44,7 @@ public class CssSelector implements NodeFilter {
 
 	private static final String ID = "id";
 	private static final String CLASS = "class";
+	private static final String STAR = "*";
 
 	protected CssSelector prevCssSelector;
 	protected CssSelector nextCssSelector;
@@ -60,7 +60,7 @@ public class CssSelector implements NodeFilter {
 
 	public CssSelector(String element) {
 		if (element == null) {
-			element = StringPool.STAR;
+			element = STAR;
 		}
 		this.element = unescape(element);
 		this.selectors = new ArrayList<>();
@@ -263,7 +263,7 @@ public class CssSelector implements NodeFilter {
 		}
 		final String element = getElement();
 		final String nodeName = node.getNodeName();
-		return element.equals(StringPool.STAR) || element.equals(nodeName);
+		return element.equals(STAR) || element.equals(nodeName);
 	}
 
 

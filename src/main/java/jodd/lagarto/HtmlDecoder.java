@@ -21,9 +21,10 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-package jodd;
+package jodd.lagarto;
 
 import jodd.util.BinarySearchBase;
+import jodd.util.CharUtil;
 
 import java.io.InputStream;
 import java.util.Arrays;
@@ -33,16 +34,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-public class HtmlDecoder {
+/**
+ * Internal HTML Decoder from Jodd, that accepts {@code CharSequence}.
+ */
+class HtmlDecoder {
 	private static final Map<String, char[]> ENTITY_MAP;
 	private static final char[][] ENTITY_NAMES;
 
 	static {
 		final Properties entityReferences = new Properties();
 
-		final String propertiesName = HtmlDecoder.class.getSimpleName() + ".properties";
-
-		try (final InputStream is = HtmlDecoder.class.getResourceAsStream(propertiesName)) {
+		try (final InputStream is = HtmlDecoder.class.getResourceAsStream("/jodd/net/HtmlDecoder.properties")) {
 			entityReferences.load(is);
 		} catch (final Exception ex) {
 			throw new IllegalStateException(ex);
@@ -118,7 +120,7 @@ public class HtmlDecoder {
 		while (true) {
 			ptr.c = input.charAt(ndx);
 
-			if (!isAlphaOrDigit(ptr.c)) {
+			if (!CharUtil.isAlphaOrDigit(ptr.c)) {
 				return lastName != null ? new String(lastName) : null;
 			}
 
@@ -154,10 +156,6 @@ public class HtmlDecoder {
 				return lastName != null ? new String(lastName) : null;
 			}
 		}
-	}
-
-	private static boolean isAlphaOrDigit(final char c) {
-		return (c >= '0' && c <= '9') || ((c >= 'a') && (c <= 'z')) || ((c >= 'A') && (c <= 'Z'));
 	}
 
 }

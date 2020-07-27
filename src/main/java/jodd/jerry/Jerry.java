@@ -33,7 +33,6 @@ import jodd.lagarto.dom.NodeUtil;
 import jodd.lagarto.dom.Text;
 import jodd.util.ArraysUtil;
 import jodd.util.Format;
-import jodd.util.StringPool;
 import jodd.util.StringUtil;
 
 import java.util.ArrayList;
@@ -52,6 +51,7 @@ import java.util.Set;
  */
 @SuppressWarnings("MethodNamesDifferingOnlyByCase")
 public class Jerry implements Iterable<Jerry> {
+	private static final String EMPTY = "";
 
 	@SuppressWarnings("CloneableClassWithoutClone")
 	private static class NodeList extends ArrayList<Node> {
@@ -126,7 +126,7 @@ public class Jerry implements Iterable<Jerry> {
 		 */
 		public Jerry parse(String content) {
 			if (content == null) {
-				content = StringPool.EMPTY;
+				content = EMPTY;
 			}
 			final Document doc = domBuilder.parse(content);
 			return new Jerry(domBuilder, doc);
@@ -896,7 +896,7 @@ public class Jerry implements Iterable<Jerry> {
 	 */
 	public String text() {
 		if (nodes.length == 0) {
-			return StringPool.EMPTY;
+			return EMPTY;
 		}
 
 		final StringBuilder sb = new StringBuilder();
@@ -914,7 +914,7 @@ public class Jerry implements Iterable<Jerry> {
 			return this;
 		}
 		if (text == null) {
-			text = StringPool.EMPTY;
+			text = EMPTY;
 		}
 		for (final Node node : nodes) {
 			node.removeAllChilds();
@@ -944,7 +944,7 @@ public class Jerry implements Iterable<Jerry> {
 	 */
 	public String htmlAll(final boolean setIncluded) {
 		if (nodes.length == 0) {
-			return StringPool.EMPTY;
+			return EMPTY;
 		}
 		final StringBuilder sb = new StringBuilder();
 		for (final Node node : nodes) {
@@ -958,7 +958,7 @@ public class Jerry implements Iterable<Jerry> {
 	 */
 	public Jerry html(String html) {
 		if (html == null) {
-			html = StringPool.EMPTY;
+			html = EMPTY;
 		}
 
 		final Document doc = builder.parse(html);
@@ -986,7 +986,7 @@ public class Jerry implements Iterable<Jerry> {
 	 */
 	public Jerry append(String html) {
 		if (html == null) {
-			html = StringPool.EMPTY;
+			html = EMPTY;
 		}
 		final Document doc = builder.parse(html);
 
@@ -1006,7 +1006,7 @@ public class Jerry implements Iterable<Jerry> {
 	 */
 	public Jerry prepend(String html) {
 		if (html == null) {
-			html = StringPool.EMPTY;
+			html = EMPTY;
 		}
 		final Document doc = builder.parse(html);
 
@@ -1026,7 +1026,7 @@ public class Jerry implements Iterable<Jerry> {
 	 */
 	public Jerry before(String html) {
 		if (html == null) {
-			html = StringPool.EMPTY;
+			html = EMPTY;
 		}
 		final Document doc = builder.parse(html);
 		if (nodes.length == 0) {
@@ -1045,7 +1045,7 @@ public class Jerry implements Iterable<Jerry> {
 	 */
 	public Jerry after(String html) {
 		if (html == null) {
-			html = StringPool.EMPTY;
+			html = EMPTY;
 		}
 		final Document doc = builder.parse(html);
 		if (nodes.length == 0) {
@@ -1064,8 +1064,8 @@ public class Jerry implements Iterable<Jerry> {
 	 */
 	public Jerry replaceWith(String html) {
  		if (html == null) {
-			html = StringPool.EMPTY;
-		}
+		    html = EMPTY;
+	    }
 		final Document doc = builder.parse(html);
 
 		if (nodes.length == 0) {
@@ -1136,7 +1136,7 @@ public class Jerry implements Iterable<Jerry> {
 	 */
 	public Jerry wrap(String html) {
 		if (html == null) {
-			html = StringPool.EMPTY;
+			html = EMPTY;
 		}
 		final Document doc = builder.parse(html);
 

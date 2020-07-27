@@ -24,7 +24,6 @@
 
 package jodd.lagarto;
 
-import jodd.HtmlDecoder;
 import jodd.util.CharUtil;
 
 /**

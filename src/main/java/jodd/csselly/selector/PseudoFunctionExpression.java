@@ -25,13 +25,13 @@
 package jodd.csselly.selector;
 
 import jodd.csselly.CSSellyException;
-import jodd.util.StringPool;
 import jodd.util.StringUtil;
 
 /**
  * {@link PseudoFunction Pseudo function expression}, in form: {@code an + b}.
  */
 public class PseudoFunctionExpression {
+	private static final String DASH = "-";
 
 	protected final int a;
 	protected final int b;
@@ -51,7 +51,7 @@ public class PseudoFunctionExpression {
 				if (aVal.length() == 0) {
 					a = 1;
 				} else {
-					if (aVal.equals(StringPool.DASH)) {
+					if (aVal.equals(DASH)) {
 						a = -1;
 					} else {
 						a = parseInt(aVal);
