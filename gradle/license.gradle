@@ -81,36 +81,21 @@ def license(overwrite) {
             rootProject.sourceSets.test.allJava
 
     allSource.files.each { file ->
+		if (!file.name.endsWith(".java")) {
+			return
+		}
 
-        def fileNamePath = file.absolutePath
-        fileNamePath = fileNamePath.substring(project.rootDir.absolutePath.length() + 1)
+		def fileNamePath = file.absolutePath
+		fileNamePath = fileNamePath.substring(project.rootDir.absolutePath.length() + 1)
 
-        // default header, java
-        def headerContent = doubleslashHeader
-        def headerPrefix = doubleslashPrefix
-        def headerIsBlock = doubleslashIsBlock
-        def headerStart = doubleslashStart
-        def headerEnd = doubleslashEnd
+		// default header, java
+		def headerContent = doubleslashHeader
+		def headerPrefix = doubleslashPrefix
+		def headerIsBlock = doubleslashIsBlock
+		def headerStart = doubleslashStart
+		def headerEnd = doubleslashEnd
 
-        // python, properties
-        if (file.name.endsWith(".py") || file.name.endsWith(".properties")) {
-            headerContent = hashHeader
-            headerPrefix = hashPrefix
-            headerIsBlock = hashIsBlock
-            headerStart = hashStart
-            headerEnd = hashEnd
-        }
-
-        // xml, tld
-        if (file.name.endsWith(".xml") || file.name.endsWith(".tld")) {
-            headerContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + tagHeader
-            headerPrefix = tagPrefix
-            headerIsBlock = tagIsBlock
-            headerStart = tagStart
-            headerEnd = tagEnd
-        }
-
-        // apply the license
+		// apply the license
         if (headerContent != null) {
             def fileText = file.text
 

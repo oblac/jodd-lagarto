@@ -1,3 +1,28 @@
+// Copyright (c) 2003-present, Jodd Team (http://jodd.org)
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+// 1. Redistributions of source code must retain the above copyright notice, this
+//    list of conditions and the following disclaimer.
+//
+// 2. Redistributions in binary form must reproduce the above copyright notice,
+//    this list of conditions and the following disclaimer in the documentation
+//    and/or other materials provided with the distribution.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+// Copyright (c) 2003-present, Jodd Team (https://jodd.org)
+
 plugins {
 	id 'java-library'
 	id 'maven-publish'
@@ -8,15 +33,12 @@ plugins {
 }
 
 repositories {
-    mavenCentral()
-    mavenLocal()
+	mavenCentral()
+	mavenLocal()
 }
 
-group = 'jodd'
-version = '6.0.0-' + timestamp()
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+group = 'org.jodd'
+version = '6.0.0.' + timestamp() + "-SNAPSHOT"
 
 rootProject.description = 'Java HTML parsers suite'
 
@@ -24,6 +46,8 @@ ext {
 }
 
 java {
+	sourceCompatibility = JavaVersion.VERSION_1_8
+	targetCompatibility = JavaVersion.VERSION_1_8
 	withSourcesJar()
 	withJavadocJar()
 }
@@ -40,8 +64,22 @@ jflex {
 	skel file('src/main/jflex/jodd/csselly/skeleton-1.8.2.jodd')
 }
 
-tasks.withType(Javadoc) {
+jar {
+	manifest {
+		attributes(
+				'Implementation-Title': project.name,
+				'Implementation-Version': project.version,
+				'Debug-Info': 'on',
+				'Built-By': 'jodd.org'
+		)
+	}
+}
+
+javadoc {
 	options.addStringOption('Xdoclint:none', '-quiet')
+	if (JavaVersion.current().isJava9Compatible()) {
+		options.addBooleanOption('html5', true)
+	}
 }
 
 test {
@@ -66,10 +104,10 @@ test {
 
 jacocoTestReport {
     reports {
-        xml.enabled false
-        csv.enabled false
-        html.enabled true
-    }
+		xml.enabled false
+		csv.enabled false
+		html.enabled true
+	}
 }
 
 //
@@ -78,20 +116,62 @@ jacocoTestReport {
 
 ext.admin = hasProperty('sonatypeUsername')
 
-artifacts {
-    archives jar
-    archives sourcesJar
-    archives javadocJar
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			artifactId = 'jodd-lagarto'
+			from components.java
+			versionMapping {
+				usage('java-api') {
+					fromResolutionOf('runtimeClasspath')
+				}
+				usage('java-runtime') {
+					fromResolutionResult()
+				}
+			}
+			pom {
+				name = 'Jodd Lagarto'
+				description = 'Java HTML/XML parsers suite'
+				url = 'https://https://www.joddlagarto.com'
+				licenses {
+					license {
+						name = 'BSD-2-Clause'
+						url = 'https://github.com/oblac/jodd-lagarto/blob/master/LICENSE'
+					}
+				}
+				developers {
+					developer {
+						id = 'igor'
+						name = 'Igor Spasić'
+						email = 'igor@jodd.org'
+						timezone = '+1'
+					}
+				}
+				scm {
+					url = 'https://github.com/oblac/jodd-lagarto.git'
+					connection = 'scm:git:git://github.com/oblac/jodd-lagarto.git'
+					developerConnection = 'scm:git:ssh://git@github.com/oblac/jodd-lagarto.git'
+				}
+			}
+		}
+	}
+	repositories {
+		maven {
+			def releasesRepoUrl = "$buildDir/repos/releases"
+			def snapshotsRepoUrl = "$buildDir/repos/snapshots"
+			url = version.contains('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+		}
+	}
 }
 
 signing {
-    required { admin }
-    sign configurations.archives
+	required { admin }
+	sign publishing.publications.mavenJava
 }
 
 task install(dependsOn: publishToMavenLocal) {
-    group = 'Publishing'
-    description = 'Installs artifacts to local Maven repository'
+	group = 'Publishing'
+	description = 'Installs artifacts to local Maven repository'
 }
 
 //
@@ -99,13 +179,13 @@ task install(dependsOn: publishToMavenLocal) {
 //
 
 task release() {
-    group 'Project'
-    description 'ReBuilds everything for the release.'
+	group 'Project'
+	description 'Rebuilds everything for the release.'
 
-    dependsOn clean
-    dependsOn build
-    dependsOn javadoc
-    dependsOn jacocoTestReport
+	dependsOn clean
+	dependsOn build
+	dependsOn javadoc
+	dependsOn jacocoTestReport
 }
 
 
