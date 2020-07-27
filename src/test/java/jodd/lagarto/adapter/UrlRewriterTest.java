@@ -34,22 +34,18 @@ class UrlRewriterTest {
 
 	@Test
 	void testUrlRewriter() {
-		LagartoParser lagartoParser = new LagartoParser(
+		final LagartoParser lagartoParser = new LagartoParser(
 				"<a href=\"http://jodd.org\">1</a><a href=\"page.html\">2</a>");
 
-		StringBuilder out = new StringBuilder();
-		UrlRewriterTagAdapter urlRewriterTagAdapter = new UrlRewriterTagAdapter(new TagWriter(out)) {
-
-			@Override
-			protected CharSequence rewriteUrl(CharSequence url) {
-				String u = url.toString();
-				if (u.startsWith("http")) {
-					return url;
-				}
-
-				return "/ctx/" + url;
+		final StringBuilder out = new StringBuilder();
+		final UrlRewriterTagAdapter urlRewriterTagAdapter = new UrlRewriterTagAdapter(new TagWriter(out), url -> {
+			final String u = url.toString();
+			if (u.startsWith("http")) {
+				return url;
 			}
-		};
+
+			return "/ctx/" + url;
+		});
 
 		lagartoParser.parse(urlRewriterTagAdapter);
 
