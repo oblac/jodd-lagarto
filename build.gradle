@@ -157,9 +157,15 @@ publishing {
 	}
 	repositories {
 		maven {
-			def releasesRepoUrl = "$buildDir/repos/releases"
-			def snapshotsRepoUrl = "$buildDir/repos/snapshots"
+			def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+			def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
 			url = version.contains('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+			if (admin) {
+				credentials {
+					username sonatypeUsername
+					password sonatypePassword
+				}
+			}
 		}
 	}
 }
