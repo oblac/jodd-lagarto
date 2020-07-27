@@ -29,15 +29,18 @@ import jodd.lagarto.TagAdapter;
 import jodd.lagarto.TagVisitor;
 import jodd.util.CharUtil;
 
+import java.util.function.Function;
+
 /**
  * URL Rewriter.
- *
- * todo add more util methods for easier URL parsing
  */
-public abstract class UrlRewriterTagAdapter extends TagAdapter {
+public class UrlRewriterTagAdapter extends TagAdapter {
 
-	public UrlRewriterTagAdapter(final TagVisitor target) {
+	private final Function<CharSequence, CharSequence> rewriter;
+
+	public UrlRewriterTagAdapter(final TagVisitor target, final Function<CharSequence, CharSequence> rewriter) {
 		super(target);
+		this.rewriter = rewriter;
 	}
 
 	@Override
@@ -49,7 +52,7 @@ public abstract class UrlRewriterTagAdapter extends TagAdapter {
 				final CharSequence href = tag.getAttributeValue("href");
 
 				if (href != null) {
-					final CharSequence newHref = rewriteUrl(href);
+					final CharSequence newHref = rewriter.apply(href);
 
 					if (newHref != href) {
 						tag.setAttribute("href", newHref);
@@ -59,11 +62,4 @@ public abstract class UrlRewriterTagAdapter extends TagAdapter {
 		}
 		super.tag(tag);
 	}
-
-	/**
-	 * Rewrites URLs. Returns input value when no rewriting is needed.
-	 * todo provide as lambda argument
-	 */
-	protected abstract CharSequence rewriteUrl(CharSequence url);
-
 }
