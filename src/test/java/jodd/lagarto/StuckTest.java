@@ -26,6 +26,7 @@ package jodd.lagarto;
 
 import jodd.io.StreamUtil;
 import jodd.jerry.Jerry;
+import jodd.jerry.JerryParser;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -50,7 +51,7 @@ class StuckTest {
 		StreamUtil.copy(in, out);
 		in.close();
 
-		final Jerry.JerryParser jerryParser = new Jerry.JerryParser();
+		final JerryParser jerryParser = new JerryParser();
 //		LagartoDOMBuilder lagartoDOMBuilder = (LagartoDOMBuilder) jerryParser.getDOMBuilder();
 //		lagartoDOMBuilder.setParsingErrorLogLevelName("ERROR");
 		final Jerry doc = jerryParser.parse(out.toString("UTF-8"));

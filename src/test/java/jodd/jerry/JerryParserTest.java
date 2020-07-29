@@ -38,7 +38,7 @@ class JerryParserTest {
 
 	@Test
 	void testJerryParserCreation() {
-		final Jerry.JerryParser jerryParser = Jerry.jerry();
+		final JerryParser jerryParser = Jerry.create();
 
 		((LagartoDOMBuilder) jerryParser.getDOMBuilder()).enableXmlMode();
 
@@ -53,7 +53,7 @@ class JerryParserTest {
 
 	@Test
 	void testAppendContent() {
-		final Jerry.JerryParser jerryParser = Jerry.jerry();
+		final JerryParser jerryParser = Jerry.create();
 
 		((LagartoDOMBuilder) jerryParser.getDOMBuilder()).enableHtmlMode();
 
@@ -68,7 +68,7 @@ class JerryParserTest {
 
 	@Test
 	void testAppendContent2() {
-		final Jerry.JerryParser jerryParser = Jerry.jerry();
+		final JerryParser jerryParser = Jerry.create();
 
 		((LagartoDOMBuilder) jerryParser.getDOMBuilder()).enableXmlMode();
 
@@ -83,7 +83,7 @@ class JerryParserTest {
 
 	@Test
 	void testAppendContent3() {
-		final Jerry.JerryParser jerryParser = Jerry.jerry();
+		final JerryParser jerryParser = Jerry.create();
 
 		((LagartoDOMBuilder) jerryParser.getDOMBuilder()).enableXhtmlMode();
 
@@ -100,7 +100,7 @@ class JerryParserTest {
 	void testAttributeCaseSensitive() {
 		final String str = "<dIV id='one' myAttr='aaa'>xxx</dIV>";
 
-		final Jerry.JerryParser jerryParser = Jerry.jerry();
+		final JerryParser jerryParser = Jerry.create();
 		((LagartoDOMBuilder) jerryParser.getDOMBuilder()).enableHtmlMode();
 
 		// default, case not sensitive

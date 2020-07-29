@@ -26,6 +26,7 @@ package jodd.lagarto;
 
 import jodd.io.FileUtil;
 import jodd.jerry.Jerry;
+import jodd.jerry.JerryParser;
 import jodd.lagarto.dom.Document;
 import jodd.lagarto.dom.Element;
 import jodd.lagarto.dom.LagartoDOMBuilder;
@@ -137,7 +138,7 @@ class ParsingProblemsTest {
 		// (1564 open DTs + 1564 open DDs) 1 open P
 		assertEquals(19, document.getErrors().size());
 
-		Jerry doc = Jerry.jerry(FileUtil.readString(file));
+		Jerry doc = Jerry.of(FileUtil.readString(file));
 		assertEquals(16, doc.s("td.NavBarCell1").size());
 		assertEquals(2, doc.s("table td.NavBarCell1Rev").size());
 
@@ -148,7 +149,7 @@ class ParsingProblemsTest {
 
 		// http://docs.oracle.com/javase/6/docs/api/index-files/index-4.html
 		file = new File(testDataRoot, "index-4-eng.html");
-		doc = Jerry.jerry(FileUtil.readString(file));
+		doc = Jerry.of(FileUtil.readString(file));
 
 		assertEquals(16, doc.s("td.NavBarCell1").size());
 		assertEquals(2, doc.s("table td.NavBarCell1Rev").size());
@@ -235,8 +236,7 @@ class ParsingProblemsTest {
 		assertEquals("cfg:node", cfgNode.getNodeName());
 
 
-
-		final Jerry.JerryParser jerryParser = new Jerry.JerryParser();
+		final JerryParser jerryParser = new JerryParser();
 
 		((LagartoDOMBuilder) jerryParser.getDOMBuilder()).enableXmlMode();
 
@@ -258,7 +258,7 @@ class ParsingProblemsTest {
 
 		final String expectedResult = FileUtil.readString(file);
 
-		final Jerry.JerryParser jerryParser = new Jerry.JerryParser();
+		final JerryParser jerryParser = new JerryParser();
 		((LagartoDOMBuilder) jerryParser.getDOMBuilder()).enableHtmlMode();
 		((LagartoDOMBuilder) jerryParser.getDOMBuilder()).getParserConfig().setEnableConditionalComments(false);
 
@@ -273,7 +273,7 @@ class ParsingProblemsTest {
 		final File file = new File(testDataRoot, "kelkoo.html");
 		final Jerry jerry;
 		try {
-			jerry = Jerry.jerry().parse(FileUtil.readString(file));
+			jerry = Jerry.create().parse(FileUtil.readString(file));
 		} catch (final Exception ex) {
 			fail(ex.toString());
 			throw ex;
@@ -295,11 +295,11 @@ class ParsingProblemsTest {
 	@Test
 	void testEntity() {
 		assertEquals(
-			"<head><title>Peanut Butter &amp; Jelly</title>" +
-				"it's yummy &amp; delicious</head>",
-			Jerry.jerry().parse(
-				"<head><title>Peanut Butter & Jelly</title>" +
-					"it's yummy & delicious").html());
+				"<head><title>Peanut Butter &amp; Jelly</title>" +
+						"it's yummy &amp; delicious</head>",
+				Jerry.create().parse(
+						"<head><title>Peanut Butter & Jelly</title>" +
+								"it's yummy & delicious").html());
 	}
 
 	@Test

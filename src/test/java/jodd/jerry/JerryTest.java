@@ -35,7 +35,6 @@ import java.io.UncheckedIOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static jodd.jerry.Jerry.jerry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -46,7 +45,7 @@ class JerryTest {
 	@Test
 	void testText1() {
 		final String html = readFile("text1.html");
-		String text = jerry(html).s("div.demo-container").text();
+		String text = Jerry.of(html).s("div.demo-container").text();
 		final String sub = (SystemUtil.info().isWindows()) ? "\r\n" : "\n";
 
 		text = StringUtil.remove(text, sub).trim();
@@ -58,7 +57,7 @@ class JerryTest {
 	@Test
 	void testHtml1() {
 		final String html = readFile("html1.html");
-		final String text = jerry(html).s("div.demo-container").html();
+		final String text = Jerry.of(html).s("div.demo-container").html();
 
 		assertEquals("<div class=\"demo-box\">Demonstration Box</div>", text.trim());
 	}
@@ -68,7 +67,7 @@ class JerryTest {
 		final String html = readFile("html2.html");
 		final String htmlOK = readFile("html2-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		final Jerry p = doc.s("p:first");
 		final String htmlContent = p.html();
 		p.text(htmlContent);
@@ -81,7 +80,7 @@ class JerryTest {
 		final String html = readFile("html3.html");
 		final String htmlOK = readFile("html3-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s("div.demo-container").html("<p>All new content. <em>You bet!</em></p>");
 
 		assertEquals(htmlOK, actualHtml(doc));
@@ -92,7 +91,7 @@ class JerryTest {
 		final String html = readFile("html4.html");
 		final String htmlOK = readFile("html4-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s("div").html("<span class='red'>Hello <b>Again</b></span>");
 
 		assertEquals(htmlOK, actualHtml(doc));
@@ -103,7 +102,7 @@ class JerryTest {
 		final String html = readFile("html5.html");
 		final String htmlOK = readFile("html5-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s("div").html("<b>Wow!</b> Such excitement...");
 		doc.s("div b").append("!!!").css("color", "red");
 
@@ -115,7 +114,7 @@ class JerryTest {
 		final String html = readFile("add.html");
 		final String htmlOK = readFile("add-ok.html");
 
-		final Jerry $ = jerry(html).s("div").css("border", "2px solid red")
+		final Jerry $ = Jerry.of(html).s("div").css("border", "2px solid red")
 				.add("p")
 				.css("background", "yellow");
 
@@ -127,7 +126,7 @@ class JerryTest {
 		final String html = readFile("end.html");
 		final String htmlOK = readFile("end-ok.html");
 
-		final Jerry $ = jerry(html).s("p").find("span").end().css("border", "2px red solid");
+		final Jerry $ = Jerry.of(html).s("p").find("span").end().css("border", "2px red solid");
 		assertEquals(htmlOK, actualHtml($));
 	}
 
@@ -136,7 +135,7 @@ class JerryTest {
 		final String html = readFile("not.html");
 		final String htmlOK = readFile("not-ok.html");
 
-		final Jerry $ = jerry(html).s("div").not(".green, #blueone").css("border-color", "red");
+		final Jerry $ = Jerry.of(html).s("div").not(".green, #blueone").css("border-color", "red");
 		assertEquals(htmlOK, actualHtml($));
 	}
 
@@ -145,7 +144,7 @@ class JerryTest {
 		final String html = readFile("first.html");
 		final String htmlOK = readFile("first-ok.html");
 
-		final Jerry $ = jerry(html).s("p span").first().addClass("highlight");
+		final Jerry $ = Jerry.of(html).s("p span").first().addClass("highlight");
 		assertEquals(htmlOK, actualHtml($));
 	}
 
@@ -154,7 +153,7 @@ class JerryTest {
 		final String html = readFile("last.html");
 		final String htmlOK = readFile("last-ok.html");
 
-		final Jerry $ = jerry(html).s("p span").last().addClass("highlight");
+		final Jerry $ = Jerry.of(html).s("p span").last().addClass("highlight");
 		assertEquals(htmlOK, actualHtml($));
 	}
 
@@ -163,7 +162,7 @@ class JerryTest {
 		final String html = readFile("addClass.html");
 		final String htmlOK = readFile("addClass-ok.html");
 
-		final Jerry $ = jerry(html).s("p:last").addClass("selected");
+		final Jerry $ = Jerry.of(html).s("p:last").addClass("selected");
 		assertEquals(htmlOK, actualHtml($));
 	}
 
@@ -172,7 +171,7 @@ class JerryTest {
 		final String html = readFile("pseudoLast.html");
 		final String htmlOK = readFile("pseudoLast-ok.html");
 
-		final Jerry $ = jerry(html).s("tr:last").css("background-color", "yellow", "font-weight", "bolder");
+		final Jerry $ = Jerry.of(html).s("tr:last").css("background-color", "yellow", "font-weight", "bolder");
 		assertEquals(htmlOK, actualHtml($));
 	}
 
@@ -181,7 +180,7 @@ class JerryTest {
 		final String html = readFile("pseudoFirst.html");
 		final String htmlOK = readFile("pseudoFirst-ok.html");
 
-		final Jerry $ = jerry(html).s("tr:first").css("font-style", "italic");
+		final Jerry $ = Jerry.of(html).s("tr:first").css("font-style", "italic");
 		assertEquals(htmlOK, actualHtml($));
 	}
 
@@ -190,7 +189,7 @@ class JerryTest {
 		final String html = readFile("pseudoButton.html");
 		final String htmlOK = readFile("pseudoButton-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		final Jerry input = doc.s(":button").css("background", "yellow", "border", "3px red solid");
 		doc.s("div").text("For this type jQuery found " + input.length() + ".").css("color", "red");
 		assertEquals(htmlOK, actualHtml(doc));
@@ -201,7 +200,7 @@ class JerryTest {
 		final String html = readFile("pseudoCheckbox.html");
 		final String htmlOK = readFile("pseudoCheckbox-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		final Jerry input = doc.s("form input:checkbox").wrap("<span></span>").parent().css("background", "yellow", "border", "3px red solid");
 		doc.s("div").text("For this type jQuery found " + input.length() + ".").css("color", "red");
 		assertEquals(htmlOK, actualHtml(doc));
@@ -212,7 +211,7 @@ class JerryTest {
 		final String html = readFile("pseudoFile.html");
 		final String htmlOK = readFile("pseudoFile-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		final Jerry input = doc.s("form input:file").css("background", "yellow", "border", "3px red solid");
 		doc.s("div").text("For this type jQuery found " + input.length() + ".").css("color", "red");
 		assertEquals(htmlOK, actualHtml(doc));
@@ -223,7 +222,7 @@ class JerryTest {
 		final String html = readFile("pseudoInput.html");
 		final String htmlOK = readFile("pseudoInput-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		final Jerry allInputs = doc.s(":input");
 		final Jerry formChildren = doc.s("form > *");
 		doc.s("#messages").text("Found " + allInputs.length() + " inputs and the form has " +
@@ -236,7 +235,7 @@ class JerryTest {
 		final String html = readFile("pseudoHeader.html");
 		final String htmlOK = readFile("pseudoHeader-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s(":header").css("background", "#ccc", "color", "blue");
 		assertEquals(htmlOK, actualHtml(doc));
 	}
@@ -246,7 +245,7 @@ class JerryTest {
 		final String html = readFile("pseudoParent.html");
 		final String htmlOK = readFile("pseudoParent-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s("td:parent").css("background", "red");
 		assertEquals(htmlOK, actualHtml(doc));
 	}
@@ -256,7 +255,7 @@ class JerryTest {
 		final String html = readFile("pseudoSelected.html");
 		final String htmlOK = readFile("pseudoSelected-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		final StringBuilder str = new StringBuilder();
 		doc.s("select option:selected").each(($this, index) -> {
 			str.append($this.text()).append(' ');
@@ -271,7 +270,7 @@ class JerryTest {
 		final String html = readFile("pseudoEq.html");
 		final String htmlOK = readFile("pseudoEq-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s("td:eq(2)").css("color", "red");
 		assertEquals(htmlOK, actualHtml(doc));
 	}
@@ -281,7 +280,7 @@ class JerryTest {
 		final String html = readFile("pseudoEq2.html");
 		final String htmlOK = readFile("pseudoEq2-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s("ul.nav li:eq(1)").css("backgroundColor", "#ff0");
 
 		doc.s("ul.nav").each(($this, index) -> {
@@ -298,7 +297,7 @@ class JerryTest {
 		final String html = readFile("pseudoHas.html");
 		final String htmlOK = readFile("pseudoHas-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s("div:has(p)").addClass("test");
 		assertEquals(htmlOK, actualHtml(doc));
 	}
@@ -308,7 +307,7 @@ class JerryTest {
 		final String html = readFile("pseudoNot.html");
 		final String htmlOK = readFile("pseudoNot-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s("input:not(\':checked\') + span").css("background-color", "yellow");
 		assertEquals(htmlOK, actualHtml(doc));
 	}
@@ -318,7 +317,7 @@ class JerryTest {
 		final String html = readFile("pseudoEven.html");
 		final String htmlOK = readFile("pseudoEven-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s("tr:even").css("background-color", "#bbbbff");
 
 		assertEquals(htmlOK, actualHtml(doc));
@@ -329,7 +328,7 @@ class JerryTest {
 		final String html = readFile("pseudoGt.html");
 		final String htmlOK = readFile("pseudoGt-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s("td:gt(4)").css("text-decoration", "line-through");
 
 		assertEquals(htmlOK, actualHtml(doc));
@@ -340,7 +339,7 @@ class JerryTest {
 		final String html = readFile("pseudoContains.html");
 		final String htmlOK = readFile("pseudoContains-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s("div:contains('John')").css("text-decoration", "underline");
 
 		assertEquals(htmlOK, actualHtml(doc));
@@ -351,7 +350,7 @@ class JerryTest {
 		final String html = readFile("pseudoContains.html");
 		final String htmlOK = readFile("pseudoContains-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s("div:contains(John)").css("text-decoration", "underline");
 
 		assertEquals(htmlOK, actualHtml(doc));
@@ -362,7 +361,7 @@ class JerryTest {
 		final String html = readFile("next.html");
 		final String htmlOK = readFile("next-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s("button[disabled]").next().text("this button is disabled");
 
 		assertEquals(htmlOK, actualHtml(doc));
@@ -373,7 +372,7 @@ class JerryTest {
 		final String html = readFile("prevNextAll.html");
 		final String htmlOK = readFile("prevNextAll-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s(".prev :last-child").prevAll().remove();
 		doc.s(".next :first-child").nextAll().remove();
 
@@ -385,7 +384,7 @@ class JerryTest {
 		final String html = readFile("eq.html");
 		final String htmlOK = readFile("eq-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s("li").eq(1).css("background-color", "red");
 		doc.s("li").eq(-1).css("background-color", "red");
 
@@ -397,7 +396,7 @@ class JerryTest {
 		final String html = readFile("has.html");
 		final String htmlOK = readFile("has-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s("li").has("ul").css("background-color", "red");
 
 		assertEquals(htmlOK, actualHtml(doc));
@@ -408,7 +407,7 @@ class JerryTest {
 		final String html = readFile("has2.html");
 		final String htmlOK = readFile("has2-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s("li").has("ul").css("background-color", "red");
 
 		doc.s("ul").append("<li>" +
@@ -424,7 +423,7 @@ class JerryTest {
 		final String html = readFile("contents.html");
 		final String htmlOK = readFile("contents-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s("span.contents").contents().remove();
 		doc.s("span.children").children().remove();
 		final int count = doc.s(".count").contents().length();
@@ -438,7 +437,7 @@ class JerryTest {
 		final String html = readFile("sibling.html");
 		final String htmlOK = readFile("sibling-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s("li.third-item").siblings().css("background-color", "red");
 
 		assertEquals(htmlOK, actualHtml(doc));
@@ -449,7 +448,7 @@ class JerryTest {
 		final String html = readFile("sibling2.html");
 		final String htmlOK = readFile("sibling2-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		final int len = doc.s(".hilite").siblings().css("color", "red").length();
 		doc.s("b").text(String.valueOf(len));
 
@@ -461,7 +460,7 @@ class JerryTest {
 		final String html = readFile("remove.html");
 		final String htmlOK = readFile("remove-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s("p").remove();
 
 		assertEquals(htmlOK, actualHtml(doc));
@@ -472,7 +471,7 @@ class JerryTest {
 		final String html = readFile("empty.html");
 		final String htmlOK = readFile("empty-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s("p").empty();
 
 		assertEquals(htmlOK, actualHtml(doc));
@@ -483,7 +482,7 @@ class JerryTest {
 		final String html = readFile("appendPrepend.html");
 		final String htmlOK = readFile("appendPrepend-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s(".append p").append("<span>C</span>");
 		doc.s(".prepend p").prepend("<span>C</span>");
 
@@ -495,7 +494,7 @@ class JerryTest {
 		final String html = readFile("before.html");
 		final String htmlOK = readFile("before-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s("p").before("<b>Hello</b>");
 
 		assertEquals(htmlOK, actualHtml(doc));
@@ -506,7 +505,7 @@ class JerryTest {
 		final String html = readFile("after.html");
 		final String htmlOK = readFile("after-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s("p").after("<b>what is the question?</b>");
 
 		assertEquals(htmlOK, actualHtml(doc));
@@ -517,7 +516,7 @@ class JerryTest {
 		final String html = readFile("replaceWith.html");
 		final String htmlOK = readFile("replaceWith-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s("div.second").replaceWith("<h2>New heading</h2>");
 
 		assertEquals(htmlOK, actualHtml(doc));
@@ -528,7 +527,7 @@ class JerryTest {
 		final String html = readFile("unwrap.html");
 		final String htmlOK = readFile("unwrap-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s("p").unwrap();
 
 		assertEquals(htmlOK, actualHtml(doc));
@@ -539,7 +538,7 @@ class JerryTest {
 		final String html = readFile("is.html");
 		final String htmlOK = readFile("is-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s("div").each(($this, index) -> {
 			if ($this.is(":first-child")) {
 				$this.text("Its the first div.");
@@ -561,7 +560,7 @@ class JerryTest {
 		final String html = readFile("is2.html");
 		final String htmlOK = readFile("is2-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		final boolean isFormParent = doc.s("input[type='checkbox']").parent().is("form");
 		doc.s("div").text("isFormParent = " + isFormParent);
 
@@ -573,7 +572,7 @@ class JerryTest {
 		final String html = readFile("is3.html");
 		final String htmlOK = readFile("is3-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		final boolean isFormParent = doc.s("input[type='checkbox']").parent().is("form");
 		doc.s("div").text("isFormParent = " + isFormParent);
 
@@ -585,7 +584,7 @@ class JerryTest {
 		final String html = readFile("filter.html");
 		final String htmlOK = readFile("filter-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s("li").filter(":even").css("background-color", "red");
 
 		assertEquals(htmlOK, actualHtml(doc));
@@ -596,7 +595,7 @@ class JerryTest {
 		final String html = readFile("filter2.html");
 		final String htmlOK = readFile("filter2-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s("li").filter(($this, index) -> $this.find("strong").length() == 1).css("background-color", "red");
 
 		assertEquals(htmlOK, actualHtml(doc));
@@ -607,7 +606,7 @@ class JerryTest {
 		final String html = readFile("filter2.html");
 		final String htmlOK = readFile("filter2-ok2.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s("li").filter(($this, index) -> index % 3 == 2).css("background-color", "red");
 
 		assertEquals(htmlOK, actualHtml(doc));
@@ -618,7 +617,7 @@ class JerryTest {
 		final String html = readFile("filter3.html");
 		final String htmlOK = readFile("filter3-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s("div").css("background", "#c8ebcc")
 				.filter(".middle")
 				.css("border-color", "red");
@@ -631,7 +630,7 @@ class JerryTest {
 		final String html = readFile("filter4.html");
 		final String htmlOK = readFile("filter4-ok.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 		doc.s("div").css("background", "#b4b0da")
 				.filter(($this, index) -> index == 1 || $this.attr("id").equals("fourth"))
 				.css("border", "3px double red");
@@ -643,7 +642,7 @@ class JerryTest {
 	void testForm() {
 		final String html = readFile("form.html");
 
-		final Jerry doc = jerry(html);
+		final Jerry doc = Jerry.of(html);
 
 		final Map<String, String[]> params = new HashMap<>();
 
@@ -663,7 +662,7 @@ class JerryTest {
 
 	@Test
 	void testHtmlAll() {
-		Jerry j = Jerry.jerry("<div><span>1</span></div><div><span>2</span></div>");
+		Jerry j = Jerry.of("<div><span>1</span></div><div><span>2</span></div>");
 
 		assertEquals(j.htmlAll(true), j.htmlAll(false));
 
@@ -683,7 +682,7 @@ class JerryTest {
 
 	@Test
 	void testCamelCaseClassesIssue() {
-		final Jerry j = Jerry.jerry("<div id='d'></div>");
+		final Jerry j = Jerry.of("<div id='d'></div>");
 
 		j.s("#d").css("background-color", "red");
 

@@ -26,7 +26,6 @@ package jodd.jerry;
 
 import jodd.lagarto.dom.DOMBuilder;
 import jodd.lagarto.dom.Document;
-import jodd.lagarto.dom.LagartoDOMBuilder;
 import jodd.lagarto.dom.Node;
 import jodd.lagarto.dom.NodeSelector;
 import jodd.lagarto.dom.NodeUtil;
@@ -79,73 +78,32 @@ public class Jerry implements Iterable<Jerry> {
 	/**
 	 * Parses input sequence and creates new {@code Jerry}.
 	 */
-	public static Jerry jerry(final char[] content) {
-		return jerry().parse(content);
+	public static Jerry of(final char[] content) {
+		return create().parse(content);
 	}
 
 	/**
 	 * Parses input content and creates new {@code Jerry}.
 	 */
-	public static Jerry jerry(final String content) {
-		return jerry().parse(content);
+	public static Jerry of(final CharSequence content) {
+		return create().parse(content);
 	}
 
 	// ---------------------------------------------------------------- 2-steps init
 
 	/**
-	 * Content parser and Jerry factory.
-	 */
-	public static class JerryParser {
-
-		protected final DOMBuilder domBuilder;
-
-		public JerryParser() {
-			this(new LagartoDOMBuilder());
-		}
-		public JerryParser(final DOMBuilder domBuilder) {
-			this.domBuilder = domBuilder;
-		}
-
-		/**
-		 * Returns {@link DOMBuilder} for additional configuration.
-		 */
-		public DOMBuilder getDOMBuilder() {
-			return domBuilder;
-		}
-
-		/**
-		 * Invokes parsing on {@link DOMBuilder}.
-		 */
-		public Jerry parse(final char[] content) {
-			final Document doc = domBuilder.parse(content);
-			return new Jerry(domBuilder, doc);
-		}
-
-		/**
-		 * Invokes parsing on {@link DOMBuilder}.
-		 */
-		public Jerry parse(String content) {
-			if (content == null) {
-				content = EMPTY;
-			}
-			final Document doc = domBuilder.parse(content);
-			return new Jerry(domBuilder, doc);
-		}
-	}
-
-	/**
-	 * Just creates new {@link jodd.jerry.Jerry.JerryParser Jerry runner} to separate
+	 * Just creates new {@link JerryParser Jerry runner} to separate
 	 * parser creation and creation of new Jerry instances.
 	 */
-	public static JerryParser jerry() {
+	public static JerryParser create() {
 		return new JerryParser();
 	}
 
 	/**
-	 * Creates new {@link jodd.jerry.Jerry.JerryParser Jerry runner} with
+	 * Creates new {@link JerryParser Jerry runner} with
 	 * provided implementation of {@link jodd.lagarto.dom.DOMBuilder}.
 	 */
-	public static JerryParser jerry(final DOMBuilder domBuilder) {
+	public static JerryParser create(final DOMBuilder domBuilder) {
 		return new JerryParser(domBuilder);
 	}
 
@@ -420,7 +378,7 @@ public class Jerry implements Iterable<Jerry> {
 			final Node node = nodes[i];
 			final Jerry $this = new Jerry(this, node);
 			final Boolean result = function.onNode($this, i);
-			if (result != null && result == Boolean.FALSE) {
+			if (result == Boolean.FALSE) {
 				break;
 			}
 		}

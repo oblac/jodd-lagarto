@@ -26,6 +26,7 @@ package jodd.lagarto;
 
 import jodd.io.FileUtil;
 import jodd.jerry.Jerry;
+import jodd.jerry.JerryParser;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -42,7 +43,7 @@ class SpringApiTest {
 		final File file = new File(testDataRoot, "PortletUtils.html");
 		final String content = FileUtil.readString(file);
 
-		final Jerry.JerryParser jerryParser = new Jerry.JerryParser();
+		final JerryParser jerryParser = new JerryParser();
 		//jerryParser.getDOMBuilder().setCalculatePosition(true);
 
 		final Jerry doc = jerryParser.parse(content);
@@ -59,7 +60,7 @@ class SpringApiTest {
 		final File file = new File(testDataRoot, "AbstractFormController.html");
 		final String content = FileUtil.readString(file);
 
-		final Jerry.JerryParser jerryParser = new Jerry.JerryParser();
+		final JerryParser jerryParser = new JerryParser();
 		//jerryParser.getDOMBuilder().setCalculatePosition(true);
 
 		final Jerry doc = jerryParser.parse(content);

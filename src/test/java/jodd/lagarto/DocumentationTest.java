@@ -1,5 +1,6 @@
 package jodd.lagarto;
 
+import jodd.jerry.Jerry;
 import jodd.lagarto.adapter.StripHtmlTagAdapter;
 import jodd.lagarto.dom.Document;
 import jodd.lagarto.dom.LagartoDOMBuilder;
@@ -87,5 +88,29 @@ class DocumentationTest {
 
 		System.out.println(text.getCssPath());
 		assertEquals("html h1", text.getCssPath());
+	}
+
+	@Test
+	void test_3_1() {
+		final Jerry doc = Jerry.of("<html><div id='jodd'><b>Hello</b> Jerry</div></html>");
+
+		doc.s("div#jodd b").css("color", "red").addClass("ohmy");
+
+		System.out.println(doc.html());
+		assertEquals("<html><div id=\"jodd\"><b style=\"color:red;\" class=\"ohmy\">Hello</b> Jerry</div></html>", doc.html());
+	}
+
+	void test_3_2() {
+		Jerry.of("html")
+				.s("select option:selected")
+				.each(($this, index) -> {
+					System.out.println($this.text());
+					return true;
+				});
+
+		Jerry.of("html")
+				.form("#myform", (form, parameters) -> {
+					// process form and parameters
+				});
 	}
 }

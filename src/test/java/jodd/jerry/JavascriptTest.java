@@ -47,7 +47,7 @@ class JavascriptTest {
 	}
 
 	protected String run(final String html, final String query) throws ScriptException {
-		final Jerry doc = Jerry.jerry(html);
+		final Jerry doc = Jerry.of(html);
 
 		scriptEngine.put("doc", doc);
 

@@ -34,7 +34,7 @@ class JerryCustomTest {
 
 	@Test
 	void testConditionalTags() {
-		final Jerry.JerryParser jerry = new Jerry.JerryParser();
+		final JerryParser jerry = new JerryParser();
 
 		((LagartoDOMBuilder) jerry.getDOMBuilder())
 				.configure(cfg -> {
@@ -59,7 +59,7 @@ class JerryCustomTest {
 
 	@Test
 	void testConditionalTags2() {
-		final Jerry.JerryParser jerry = new Jerry.JerryParser();
+		final JerryParser jerry = new JerryParser();
 		((LagartoDOMBuilder) jerry.getDOMBuilder()).getConfig()
 				.setIgnoreComments(true)
 				.setCondCommentIEVersion(8)
@@ -86,7 +86,7 @@ class JerryCustomTest {
 
 	@Test
 	void testConditionalTags3() {
-		final Jerry.JerryParser jerry = new Jerry.JerryParser();
+		final JerryParser jerry = new JerryParser();
 		((LagartoDOMBuilder) jerry.getDOMBuilder()).getConfig()
 				.setIgnoreComments(true)
 				.setCondCommentIEVersion(10)
