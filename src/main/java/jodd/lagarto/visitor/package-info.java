@@ -22,26 +22,7 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-package jodd.lagarto.adapter;
-
-import jodd.lagarto.LagartoParser;
-import jodd.lagarto.visitor.TagWriter;
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-class StripHtmlTest {
-
-	@Test
-	void testStripHtml() {
-		final LagartoParser lagartoParser = new LagartoParser(
-				"<html>  <div   id='a'>   x \n\n\n </div>  </html>");
-
-		final StringBuilder out = new StringBuilder();
-		final StripHtmlTagAdapter stripHtmlTagAdapter = new StripHtmlTagAdapter(new TagWriter(out));
-
-		lagartoParser.parse(stripHtmlTagAdapter);
-
-		assertEquals("<html><div id=\"a\"> x </div></html>", out.toString());
-	}
-}
+/**
+ * Some visitor implementations.
+ */
+package jodd.lagarto.visitor;

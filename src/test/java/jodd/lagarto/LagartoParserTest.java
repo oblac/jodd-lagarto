@@ -27,6 +27,7 @@ package jodd.lagarto;
 import jodd.io.FileUtil;
 import jodd.io.findfile.FindFile;
 import jodd.io.findfile.WildcardFindFile;
+import jodd.lagarto.visitor.TagWriter;
 import jodd.util.StringUtil;
 import org.junit.jupiter.api.Test;
 

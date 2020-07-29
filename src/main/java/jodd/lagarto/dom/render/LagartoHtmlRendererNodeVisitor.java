@@ -24,7 +24,6 @@
 
 package jodd.lagarto.dom.render;
 
-import jodd.lagarto.TagWriterUtil;
 import jodd.lagarto.dom.Attribute;
 import jodd.lagarto.dom.CData;
 import jodd.lagarto.dom.Comment;
@@ -36,6 +35,7 @@ import jodd.lagarto.dom.Node;
 import jodd.lagarto.dom.NodeVisitor;
 import jodd.lagarto.dom.Text;
 import jodd.lagarto.dom.XmlDeclaration;
+import jodd.lagarto.visitor.TagWriterUtil;
 import jodd.net.HtmlEncoder;
 
 import java.io.IOException;

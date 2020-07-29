@@ -28,7 +28,7 @@ import jodd.io.FileUtil;
 import jodd.lagarto.LagartoParser;
 import jodd.lagarto.Tag;
 import jodd.lagarto.TagAdapter;
-import jodd.lagarto.TagWriter;
+import jodd.lagarto.visitor.TagWriter;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;

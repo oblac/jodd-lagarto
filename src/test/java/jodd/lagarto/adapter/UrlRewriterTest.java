@@ -25,7 +25,7 @@
 package jodd.lagarto.adapter;
 
 import jodd.lagarto.LagartoParser;
-import jodd.lagarto.TagWriter;
+import jodd.lagarto.visitor.TagWriter;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

@@ -22,27 +22,34 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-package jodd.lagarto;
+package jodd.lagarto.visitor;
 
+import jodd.lagarto.Doctype;
+import jodd.lagarto.LagartoException;
+import jodd.lagarto.Tag;
+import jodd.lagarto.TagVisitor;
 import jodd.net.HtmlEncoder;
 
 import java.io.IOException;
 
 /**
- * Tag writer outputs content to destination.
+ * Tag writer outputs content to an {@code Appendable}.
  */
 public class TagWriter implements TagVisitor {
 
-	protected Appendable appendable;
+	protected final Appendable appendable;
 
 	public TagWriter(final Appendable appendable) {
 		this.appendable = appendable;
 	}
 
-	public void setOutput(final Appendable out) {
-		this.appendable = out;
+	public TagWriter() {
+		this.appendable = new StringBuilder();
 	}
 
+	/**
+	 * Returns the content.
+	 */
 	public Appendable getOutput() {
 		return appendable;
 	}
@@ -70,7 +77,7 @@ public class TagWriter implements TagVisitor {
 				appendable.append(body);
 			}
 			appendable.append("</script>");
-		} catch (IOException ioex) {
+		} catch (final IOException ioex) {
 			throw new LagartoException(ioex);
 		}
 	}
@@ -79,7 +86,7 @@ public class TagWriter implements TagVisitor {
 	public void comment(final CharSequence comment) {
 		try {
 			TagWriterUtil.writeComment(appendable, comment);
-		} catch (IOException ioex) {
+		} catch (final IOException ioex) {
 			throw new LagartoException(ioex);
 		}
 	}
@@ -88,7 +95,7 @@ public class TagWriter implements TagVisitor {
 	public void text(final CharSequence text) {
 		try {
 			appendable.append(HtmlEncoder.text(text));
-		} catch (IOException ioex) {
+		} catch (final IOException ioex) {
 			throw new LagartoException(ioex);
 		}
 	}
@@ -97,7 +104,7 @@ public class TagWriter implements TagVisitor {
 	public void cdata(final CharSequence cdata) {
 		try {
 			TagWriterUtil.writeCData(appendable, cdata);
-		} catch (IOException ioex) {
+		} catch (final IOException ioex) {
 			throw new LagartoException(ioex);
 		}
 	}
@@ -106,7 +113,7 @@ public class TagWriter implements TagVisitor {
 	public void xml(final CharSequence version, final CharSequence encoding, final CharSequence standalone) {
 		try {
 			TagWriterUtil.writeXml(appendable, version, encoding, standalone);
-		} catch (IOException ioex) {
+		} catch (final IOException ioex) {
 			throw new LagartoException(ioex);
 		}
 	}
@@ -119,7 +126,7 @@ public class TagWriter implements TagVisitor {
 					doctype.getName(),
 					doctype.getPublicIdentifier(),
 					doctype.getSystemIdentifier());
-		} catch (IOException ioex) {
+		} catch (final IOException ioex) {
 			throw new LagartoException(ioex);
 		}
 	}
@@ -128,7 +135,7 @@ public class TagWriter implements TagVisitor {
 	public void condComment(final CharSequence expression, final boolean isStartingTag, final boolean isHidden, final boolean isHiddenEndTag) {
 		try {
 			TagWriterUtil.writeConditionalComment(appendable, expression, isStartingTag, isHidden, isHiddenEndTag);
-		} catch (IOException ioex) {
+		} catch (final IOException ioex) {
 			throw new LagartoException(ioex);
 		}
 	}
