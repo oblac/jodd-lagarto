@@ -488,7 +488,7 @@ public class LagartoDOMBuilderTagVisitor implements TagVisitor {
 	protected HtmlCCommentExpressionMatcher htmlCCommentExpressionMatcher;
 
 
-	// ---------------------------------------------------------------- error
+	// ---------------------------------------------------------------- error log
 
 	@Override
 	public void error(final String message) {
@@ -496,12 +496,11 @@ public class LagartoDOMBuilderTagVisitor implements TagVisitor {
 		logError(() -> message);
 	}
 
-	// ---------------------------------------------------------------- log
-
 	public void logError(final Supplier<String> stringSupplier) {
-		System.err.println(stringSupplier.get());
+		domBuilder.getConfig().getErrorLogger().accept(stringSupplier);
 	}
 
 	public void logDebug(final Supplier<String> stringSupplier) {
+		domBuilder.getConfig().getErrorLogger().accept(stringSupplier);
 	}
 }

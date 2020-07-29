@@ -27,6 +27,10 @@ package jodd.lagarto.dom;
 import jodd.lagarto.LagartoParserConfig;
 import jodd.lagarto.dom.render.LagartoHtmlRenderer;
 
+import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
 /**
  * Additional configuration for {@link jodd.lagarto.dom.LagartoDOMBuilder}
  * based on {@link jodd.lagarto.LagartoParserConfig}.
@@ -46,6 +50,10 @@ public class LagartoDomBuilderConfig {
 
 	protected LagartoHtmlRenderer htmlRenderer = new LagartoHtmlRenderer();
 	protected LagartoParserConfig parserConfig = new LagartoParserConfig();
+
+	protected Consumer<Supplier<String>> errorLogger = c -> System.out.println(c.get());
+	protected Consumer<Supplier<String>> debugLogger = c -> {
+	};
 
 	// ---------------------------------------------------------------- access
 
@@ -159,8 +167,11 @@ public class LagartoDomBuilderConfig {
 		return htmlRenderer;
 	}
 
+	/**
+	 * Specifies new HTML rendered.
+	 */
 	public void setHtmlRenderer(final LagartoHtmlRenderer htmlRenderer) {
-		this.htmlRenderer = htmlRenderer;
+		this.htmlRenderer = Objects.requireNonNull(htmlRenderer);
 	}
 
 	public LagartoParserConfig getParserConfig() {
@@ -168,6 +179,29 @@ public class LagartoDomBuilderConfig {
 	}
 
 	public void setParserConfig(final LagartoParserConfig parserConfig) {
-		this.parserConfig = parserConfig;
+		this.parserConfig = Objects.requireNonNull(parserConfig);
+	}
+
+
+	public Consumer<Supplier<String>> getErrorLogger() {
+		return errorLogger;
+	}
+
+	/**
+	 * Specifies the error logger.
+	 */
+	public void setErrorLogger(final Consumer<Supplier<String>> errorLogger) {
+		this.errorLogger = errorLogger;
+	}
+
+	/**
+	 * Specifies the debug logger.
+	 */
+	public void setDebugLogger(final Consumer<Supplier<String>> debugLogger) {
+		this.debugLogger = debugLogger;
+	}
+
+	public Consumer<Supplier<String>> getDebugLogger() {
+		return debugLogger;
 	}
 }
