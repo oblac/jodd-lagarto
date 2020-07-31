@@ -29,7 +29,6 @@ import jodd.lagarto.dom.render.LagartoHtmlRenderer;
 
 import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 /**
  * Additional configuration for {@link jodd.lagarto.dom.LagartoDOMBuilder}
@@ -40,7 +39,6 @@ public class LagartoDomBuilderConfig {
 	protected boolean ignoreWhitespacesBetweenTags;
 	protected boolean ignoreComments;
 	protected boolean selfCloseVoidTags;
-	protected boolean collectErrors;
 	protected float condCommentIEVersion = 10;
 	protected boolean enabledVoidTags = true;
 	protected boolean impliedEndTags;
@@ -51,8 +49,11 @@ public class LagartoDomBuilderConfig {
 	protected LagartoHtmlRenderer htmlRenderer = new LagartoHtmlRenderer();
 	protected LagartoParserConfig parserConfig = new LagartoParserConfig();
 
-	protected Consumer<Supplier<String>> errorLogger = c -> System.out.println(c.get());
-	protected Consumer<Supplier<String>> debugLogger = c -> {
+	protected boolean collectErrors;
+	protected boolean logErrors = true;
+	protected boolean logDebugs = false;
+	protected Consumer<String> errorLogger = System.out::println;
+	protected Consumer<String> debugLogger = c -> {
 	};
 
 	// ---------------------------------------------------------------- access
@@ -183,25 +184,55 @@ public class LagartoDomBuilderConfig {
 	}
 
 
-	public Consumer<Supplier<String>> getErrorLogger() {
+	public Consumer<String> getErrorLogger() {
 		return errorLogger;
 	}
 
 	/**
 	 * Specifies the error logger.
 	 */
-	public void setErrorLogger(final Consumer<Supplier<String>> errorLogger) {
+	public LagartoDomBuilderConfig setErrorLogger(final Consumer<String> errorLogger) {
 		this.errorLogger = errorLogger;
+		return this;
 	}
 
 	/**
 	 * Specifies the debug logger.
 	 */
-	public void setDebugLogger(final Consumer<Supplier<String>> debugLogger) {
+	public LagartoDomBuilderConfig setDebugLogger(final Consumer<String> debugLogger) {
 		this.debugLogger = debugLogger;
+		return this;
 	}
 
-	public Consumer<Supplier<String>> getDebugLogger() {
+	public Consumer<String> getDebugLogger() {
 		return debugLogger;
+	}
+
+
+	public boolean isLogErrors() {
+		return logErrors;
+	}
+
+	/**
+	 * Enables error logging.
+	 *
+	 * @see #setErrorLogger(Consumer)
+	 */
+	public void setLogErrors(final boolean logErrors) {
+		this.logErrors = logErrors;
+	}
+
+	public boolean isLogDebugs() {
+		return logDebugs;
+	}
+
+	/**
+	 * Enables debug logging.
+	 *
+	 * @see #setDebugLogger(Consumer)
+	 */
+	public LagartoDomBuilderConfig setLogDebugs(final boolean logDebugs) {
+		this.logDebugs = logDebugs;
+		return this;
 	}
 }

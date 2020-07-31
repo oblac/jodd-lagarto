@@ -31,8 +31,6 @@ import jodd.lagarto.TagVisitor;
 import jodd.util.CharSequenceUtil;
 import jodd.util.Util;
 
-import java.util.function.Supplier;
-
 /**
  * Lagarto tag visitor that builds a DOM tree.
  * It (still) does not build the tree <i>fully</i> by the HTML specs,
@@ -104,7 +102,9 @@ public class LagartoDOMBuilderTagVisitor implements TagVisitor {
 					}
 				}
 
-				error("Unclosed tag closed: <" + thisNode.getNodeName() + ">");
+				if (errorEnabled()) {
+					error("Unclosed tag closed: <" + thisNode.getNodeName() + ">");
+				}
 
 				thisNode = thisNode.getParentNode();
 			}
@@ -124,7 +124,9 @@ public class LagartoDOMBuilderTagVisitor implements TagVisitor {
 		// elapsed
 		rootNode.end();
 
-		logDebug(() -> "LagartoDom tree created in " + rootNode.getElapsedTime() + " ms");
+		if (debugEnabled()) {
+			debug("LagartoDom tree created in " + rootNode.getElapsedTime() + " ms");
+		}
 	}
 
 	// ---------------------------------------------------------------- tag
@@ -182,7 +184,9 @@ public class LagartoDOMBuilderTagVisitor implements TagVisitor {
 						}
 						parentNode = parentNode.getParentNode();
 
-						logDebug(() -> "Implicitly closed tag <" + node.getNodeName() + "> ");
+						if (debugEnabled()) {
+							debug("Implicitly closed tag <" + node.getNodeName() + "> ");
+						}
 					}
 				}
 
@@ -207,8 +211,10 @@ public class LagartoDOMBuilderTagVisitor implements TagVisitor {
 					break;
 				}
 
-				if (matchingParent == null) {			// matching open tag not found, remove it
-					error("Orphan closed tag ignored: </" + tagName + "> " + tag.getTagPosition());
+				if (matchingParent == null) {            // matching open tag not found, remove it
+					if (errorEnabled()) {
+						error("Orphan closed tag ignored: </" + tagName + "> " + tag.getTagPosition());
+					}
 					break;
 				}
 
@@ -219,7 +225,9 @@ public class LagartoDOMBuilderTagVisitor implements TagVisitor {
 					while (implRules.implicitlyCloseParentTagOnTagEnd(parentNode.getNodeName(), tagName)) {
 						parentNode = parentNode.getParentNode();
 
-						logDebug(() -> "Implicitly closed tag <" + tagName + ">");
+						if (debugEnabled()) {
+							debug("Implicitly closed tag <" + tagName + ">");
+						}
 
 						if (parentNode == matchingParent) {
 							parentNode = matchingParent.parentNode;
@@ -339,7 +347,9 @@ public class LagartoDOMBuilderTagVisitor implements TagVisitor {
 							positionString = "";
 						}
 
-						error("Orphan closed tag ignored: </" + tag.getName() + "> " + positionString);
+						if (errorEnabled()) {
+							error("Orphan closed tag ignored: </" + tag.getName() + "> " + positionString);
+						}
 						return;
 					}
 					thisNode = thisNode.getParentNode();
@@ -368,7 +378,9 @@ public class LagartoDOMBuilderTagVisitor implements TagVisitor {
 
 			// debug message
 
-			error("Unclosed tag closed: <" + parentNode.getNodeName() + ">");
+			if (errorEnabled()) {
+				error("Unclosed tag closed: <" + parentNode.getNodeName() + ">");
+			}
 
 			// continue looping
 			parentNode = parentParentNode;
@@ -490,17 +502,27 @@ public class LagartoDOMBuilderTagVisitor implements TagVisitor {
 
 	// ---------------------------------------------------------------- error log
 
+	/**
+	 * Returns {@code true} if error logging or collecting is enabled.
+	 */
+	protected boolean errorEnabled() {
+		return domBuilder.config.collectErrors || domBuilder.config.logErrors;
+	}
+
+	/**
+	 * Returns {@code true} if debug logging is enabled.
+	 */
+	protected boolean debugEnabled() {
+		return domBuilder.config.logDebugs;
+	}
+
 	@Override
 	public void error(final String message) {
 		rootNode.addError(message);
-		logError(() -> message);
+		domBuilder.getConfig().getErrorLogger().accept(message);
 	}
 
-	public void logError(final Supplier<String> stringSupplier) {
-		domBuilder.getConfig().getErrorLogger().accept(stringSupplier);
-	}
-
-	public void logDebug(final Supplier<String> stringSupplier) {
+	protected void debug(final String stringSupplier) {
 		domBuilder.getConfig().getErrorLogger().accept(stringSupplier);
 	}
 }
