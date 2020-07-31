@@ -28,7 +28,7 @@ import jodd.csselly.CSSellyException;
 import jodd.util.StringUtil;
 
 /**
- * {@link PseudoFunction Pseudo function expression}, in form: {@code an + b}.
+ * {@link PseudoFunction Pseudo-function expression}, in form: {@code an + b}.
  */
 public class PseudoFunctionExpression {
 	private static final String DASH = "-";

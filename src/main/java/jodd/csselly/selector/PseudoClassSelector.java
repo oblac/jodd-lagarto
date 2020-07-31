@@ -56,43 +56,43 @@ public class PseudoClassSelector extends Selector implements NodeFilter, NodeLis
 	static {
 		PSEUDO_CLASS_MAP = new HashMap<>(26);
 
-		registerPseudoClass(PseudoClass.EMPTY.class);
-		registerPseudoClass(PseudoClass.FIRST_CHILD.class);
-		registerPseudoClass(PseudoClass.FIRST_OF_TYPE.class);
-		registerPseudoClass(PseudoClass.LAST_CHILD.class);
-		registerPseudoClass(PseudoClass.LAST_OF_TYPE.class);
-		registerPseudoClass(PseudoClass.ONLY_CHILD.class);
-		registerPseudoClass(PseudoClass.ONLY_OF_TYPE.class);
-		registerPseudoClass(PseudoClass.ROOT.class);
+		registerPseudoClass(PseudoClasses.EMPTY.class);
+		registerPseudoClass(PseudoClasses.FIRST_CHILD.class);
+		registerPseudoClass(PseudoClasses.FIRST_OF_TYPE.class);
+		registerPseudoClass(PseudoClasses.LAST_CHILD.class);
+		registerPseudoClass(PseudoClasses.LAST_OF_TYPE.class);
+		registerPseudoClass(PseudoClasses.ONLY_CHILD.class);
+		registerPseudoClass(PseudoClasses.ONLY_OF_TYPE.class);
+		registerPseudoClass(PseudoClasses.ROOT.class);
 
-		registerPseudoClass(PseudoClass.FIRST.class);
-		registerPseudoClass(PseudoClass.LAST.class);
-		registerPseudoClass(PseudoClass.BUTTON.class);
-		registerPseudoClass(PseudoClass.CHECKBOX.class);
-		registerPseudoClass(PseudoClass.FILE.class);
-		registerPseudoClass(PseudoClass.IMAGE.class);
-		registerPseudoClass(PseudoClass.INPUT.class);
-		registerPseudoClass(PseudoClass.HEADER.class);
-		registerPseudoClass(PseudoClass.PARENT.class);
-		registerPseudoClass(PseudoClass.PASSWORD.class);
-		registerPseudoClass(PseudoClass.RADIO.class);
-		registerPseudoClass(PseudoClass.RESET.class);
-		registerPseudoClass(PseudoClass.SELECTED.class);
-		registerPseudoClass(PseudoClass.CHECKED.class);
-		registerPseudoClass(PseudoClass.SUBMIT.class);
-		registerPseudoClass(PseudoClass.TEXT.class);
-		registerPseudoClass(PseudoClass.EVEN.class);
-		registerPseudoClass(PseudoClass.ODD.class);
+		registerPseudoClass(PseudoClasses.FIRST.class);
+		registerPseudoClass(PseudoClasses.LAST.class);
+		registerPseudoClass(PseudoClasses.BUTTON.class);
+		registerPseudoClass(PseudoClasses.CHECKBOX.class);
+		registerPseudoClass(PseudoClasses.FILE.class);
+		registerPseudoClass(PseudoClasses.IMAGE.class);
+		registerPseudoClass(PseudoClasses.INPUT.class);
+		registerPseudoClass(PseudoClasses.HEADER.class);
+		registerPseudoClass(PseudoClasses.PARENT.class);
+		registerPseudoClass(PseudoClasses.PASSWORD.class);
+		registerPseudoClass(PseudoClasses.RADIO.class);
+		registerPseudoClass(PseudoClasses.RESET.class);
+		registerPseudoClass(PseudoClasses.SELECTED.class);
+		registerPseudoClass(PseudoClasses.CHECKED.class);
+		registerPseudoClass(PseudoClasses.SUBMIT.class);
+		registerPseudoClass(PseudoClasses.TEXT.class);
+		registerPseudoClass(PseudoClasses.EVEN.class);
+		registerPseudoClass(PseudoClasses.ODD.class);
 	}
 
 	/**
 	 * Registers pseudo class.
 	 */
 	public static void registerPseudoClass(final Class<? extends PseudoClass> pseudoClassType) {
-		PseudoClass pseudoClass;
+		final PseudoClass pseudoClass;
 		try {
 			pseudoClass = ClassUtil.newInstance(pseudoClassType);
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			throw new CSSellyException(ex);
 		}
 		PSEUDO_CLASS_MAP.put(pseudoClass.getPseudoClassName(), pseudoClass);
@@ -102,7 +102,7 @@ public class PseudoClassSelector extends Selector implements NodeFilter, NodeLis
 	 * Lookups pseudo class for given pseudo class name.
 	 */
 	public static PseudoClass lookupPseudoClass(final String pseudoClassName) {
-		PseudoClass pseudoClass = PSEUDO_CLASS_MAP.get(pseudoClassName);
+		final PseudoClass pseudoClass = PSEUDO_CLASS_MAP.get(pseudoClassName);
 		if (pseudoClass == null) {
 			throw new CSSellyException("Unsupported pseudo class: " + pseudoClassName);
 		}
@@ -138,7 +138,7 @@ public class PseudoClassSelector extends Selector implements NodeFilter, NodeLis
 	 */
 	@Override
 	public boolean accept(final List<Node> currentResults, final Node node, final int index) {
-		return pseudoClass.match(currentResults, node, index);
+		return pseudoClass.matchInRange(currentResults, node, index);
 	}
 
 }

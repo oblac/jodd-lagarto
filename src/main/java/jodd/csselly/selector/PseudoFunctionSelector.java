@@ -45,28 +45,28 @@ public class PseudoFunctionSelector<E> extends Selector implements NodeFilter, N
 	static {
 		PSEUDO_FUNCTION_MAP = new HashMap<>(8);
 
-		registerPseudoFunction(PseudoFunction.NTH_CHILD.class);
-		registerPseudoFunction(PseudoFunction.NTH_LAST_CHILD.class);
-		registerPseudoFunction(PseudoFunction.NTH_LAST_OF_TYPE.class);
-		registerPseudoFunction(PseudoFunction.NTH_OF_TYPE.class);
+		registerPseudoFunction(PseudoFunctions.NTH_CHILD.class);
+		registerPseudoFunction(PseudoFunctions.NTH_LAST_CHILD.class);
+		registerPseudoFunction(PseudoFunctions.NTH_LAST_OF_TYPE.class);
+		registerPseudoFunction(PseudoFunctions.NTH_OF_TYPE.class);
 
-		registerPseudoFunction(PseudoFunction.EQ.class);
-		registerPseudoFunction(PseudoFunction.GT.class);
-		registerPseudoFunction(PseudoFunction.LT.class);
-		registerPseudoFunction(PseudoFunction.CONTAINS.class);
+		registerPseudoFunction(PseudoFunctions.EQ.class);
+		registerPseudoFunction(PseudoFunctions.GT.class);
+		registerPseudoFunction(PseudoFunctions.LT.class);
+		registerPseudoFunction(PseudoFunctions.CONTAINS.class);
 
-		registerPseudoFunction(PseudoFunction.HAS.class);
-		registerPseudoFunction(PseudoFunction.NOT.class);
+		registerPseudoFunction(PseudoFunctions.HAS.class);
+		registerPseudoFunction(PseudoFunctions.NOT.class);
 	}
 
 	/**
 	 * Registers pseudo function.
 	 */
 	public static void registerPseudoFunction(final Class<? extends PseudoFunction> pseudoFunctionType) {
-		PseudoFunction pseudoFunction;
+		final PseudoFunction pseudoFunction;
 		try {
 			pseudoFunction = ClassUtil.newInstance(pseudoFunctionType);
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			throw new CSSellyException(ex);
 		}
 		PSEUDO_FUNCTION_MAP.put(pseudoFunction.getPseudoFunctionName(), pseudoFunction);
@@ -76,7 +76,7 @@ public class PseudoFunctionSelector<E> extends Selector implements NodeFilter, N
 	 * Lookups pseudo function for given pseudo function name.
 	 */
 	public static PseudoFunction<?> lookupPseudoFunction(final String pseudoFunctionName) {
-		PseudoFunction pseudoFunction = PSEUDO_FUNCTION_MAP.get(pseudoFunctionName);
+		final PseudoFunction pseudoFunction = PSEUDO_FUNCTION_MAP.get(pseudoFunctionName);
 		if (pseudoFunction == null) {
 			throw new CSSellyException("Unsupported pseudo function: " + pseudoFunctionName);
 		}
@@ -135,7 +135,7 @@ public class PseudoFunctionSelector<E> extends Selector implements NodeFilter, N
 	 */
 	@Override
 	public boolean accept(final List<Node> currentResults, final Node node, final int index) {
-		return pseudoFunction.match(currentResults, node, index, parsedExpression);
+		return pseudoFunction.matchInRange(currentResults, node, index, parsedExpression);
 	}
 
 }

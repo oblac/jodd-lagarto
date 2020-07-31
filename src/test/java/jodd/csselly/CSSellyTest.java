@@ -25,15 +25,17 @@
 package jodd.csselly;
 
 import jodd.csselly.selector.AttributeSelector;
-import jodd.csselly.selector.PseudoClass;
 import jodd.csselly.selector.PseudoClassSelector;
+import jodd.csselly.selector.PseudoClasses;
 import jodd.csselly.selector.PseudoFunctionExpression;
 import jodd.csselly.selector.PseudoFunctionSelector;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 class CSSellyTest {
 
@@ -72,20 +74,20 @@ class CSSellyTest {
 
 	@Test
 	void testMultipleSelectors() {
-		CSSelly lexer = new CSSelly("  div  b#xo  foo.solid #jodd * #bib.box.red  ");
-		List<CssSelector> selectors = lexer.parse();
+		final CSSelly lexer = new CSSelly("  div  b#xo  foo.solid #jodd * #bib.box.red  ");
+		final List<CssSelector> selectors = lexer.parse();
 
 		assertEquals("div b#xo foo.solid *#jodd * *#bib.box.red", CSSelly.toString(selectors));
 		assertEquals(6, selectors.size());
 		assertEquals(0, selectors.get(4).selectorsCount());
 		assertEquals(3, selectors.get(5).selectorsCount());
 
-		CssSelector first = selectors.get(0);
-		CssSelector second = selectors.get(1);
-		CssSelector third = selectors.get(2);
-		CssSelector fourth = selectors.get(3);
-		CssSelector fifth = selectors.get(4);
-		CssSelector sixt = selectors.get(5);
+		final CssSelector first = selectors.get(0);
+		final CssSelector second = selectors.get(1);
+		final CssSelector third = selectors.get(2);
+		final CssSelector fourth = selectors.get(3);
+		final CssSelector fifth = selectors.get(4);
+		final CssSelector sixt = selectors.get(5);
 
 		assertNull(first.getPrevCssSelector());
 		assertEquals(second, first.getNextCssSelector());
@@ -113,13 +115,13 @@ class CSSellyTest {
 		assertEquals(1, selectors.size());
 		assertEquals("div[a1='123']", CSSelly.toString(selectors));
 
-		CssSelector cssSelector = selectors.get(0);
+		final CssSelector cssSelector = selectors.get(0);
 		assertEquals("div", cssSelector.getElement());
 		assertEquals(1, cssSelector.selectorsCount());
 
-		Selector selector = cssSelector.getSelector(0);
+		final Selector selector = cssSelector.getSelector(0);
 		assertEquals(Selector.Type.ATTRIBUTE, selector.getType());
-		AttributeSelector attributeSelector = (AttributeSelector) selector;
+		final AttributeSelector attributeSelector = (AttributeSelector) selector;
 		assertEquals("a1", attributeSelector.getName());
 		assertEquals("=", attributeSelector.getMatch().getSign());
 		assertEquals("123", attributeSelector.getValue());
@@ -177,25 +179,25 @@ class CSSellyTest {
 
 	@Test
 	void testPseudoClasses() {
-		CSSelly lexer = new CSSelly("div:first-child");
-		List<CssSelector> selectors = lexer.parse();
+		final CSSelly lexer = new CSSelly("div:first-child");
+		final List<CssSelector> selectors = lexer.parse();
 		assertEquals(1, selectors.size());
 		assertEquals("div:first-child", CSSelly.toString(selectors));
 
-		CssSelector cssSelector = selectors.get(0);
+		final CssSelector cssSelector = selectors.get(0);
 		assertEquals(1, cssSelector.selectorsCount());
-		PseudoClassSelector psc = (PseudoClassSelector) cssSelector.getSelector(0);
+		final PseudoClassSelector psc = (PseudoClassSelector) cssSelector.getSelector(0);
 		assertEquals("first-child", psc.getPseudoClass().getPseudoClassName());
 	}
 
 	@Test
 	void testPseudoFunctions() {
 		CSSelly lexer = new CSSelly("div:nth-child(2n+1)");
-		List<CssSelector> selectors = lexer.parse();
+		final List<CssSelector> selectors = lexer.parse();
 		assertEquals(1, selectors.size());
 		assertEquals("div:nth-child(2n+1)", CSSelly.toString(selectors));
 
-		CssSelector cssSelector = selectors.get(0);
+		final CssSelector cssSelector = selectors.get(0);
 		assertEquals(1, cssSelector.selectorsCount());
 		PseudoFunctionSelector pfns = (PseudoFunctionSelector) cssSelector.getSelector(0);
 		assertEquals("nth-child", pfns.getPseudoFunction().getPseudoFunctionName());
@@ -299,31 +301,31 @@ class CSSellyTest {
 	@Test
 	void testErrors() {
 		try {
-			CSSelly lexer = new CSSelly("div ^ b");
+			final CSSelly lexer = new CSSelly("div ^ b");
 			lexer.parse();
 			fail("error");
-		} catch (CSSellyException ex) {
+		} catch (final CSSellyException ex) {
 		}
 
 		try {
-			CSSelly lexer = new CSSelly("div:wrong-pseudo-class-name");
+			final CSSelly lexer = new CSSelly("div:wrong-pseudo-class-name");
 			lexer.parse();
 			fail("error");
-		} catch (CSSellyException ex) {
+		} catch (final CSSellyException ex) {
 		}
 
 		try {
-			CSSelly lexer = new CSSelly("div:nth-child(xxx)");
+			final CSSelly lexer = new CSSelly("div:nth-child(xxx)");
 			lexer.parse();
-		} catch (CSSellyException ex) {
+		} catch (final CSSellyException ex) {
 		}
 
 	}
 
 	@Test
 	void testUppercaseClassNames() {
-		CSSelly lexer = new CSSelly("div.fooBar");
-		List<CssSelector> selectorList = lexer.parse();
+		final CSSelly lexer = new CSSelly("div.fooBar");
+		final List<CssSelector> selectorList = lexer.parse();
 		assertEquals(1, selectorList.size());
 	}
 
@@ -349,9 +351,9 @@ class CSSellyTest {
 		cssSelector = selectors.get(0);
 
 		assertEquals("itunes:image", cssSelector.getElement());
-		Selector selector = cssSelector.getSelector(0);
+		final Selector selector = cssSelector.getSelector(0);
 
-		AttributeSelector attributeSelector = (AttributeSelector)selector;
+		final AttributeSelector attributeSelector = (AttributeSelector)selector;
 
 		assertEquals("foo:bar", attributeSelector.getValue());
 
@@ -365,7 +367,7 @@ class CSSellyTest {
 		assertEquals(1, selectors.size());
 		CssSelector cssSelector = selectors.get(0);
 
-		PseudoClassSelector pseudoClassSelector = (PseudoClassSelector) cssSelector.getSelector(0);
+		final PseudoClassSelector pseudoClassSelector = (PseudoClassSelector) cssSelector.getSelector(0);
 
 		assertEquals("image", pseudoClassSelector.getPseudoClass().getPseudoClassName());
 
@@ -376,7 +378,7 @@ class CSSellyTest {
 		assertEquals(1, selectors.size());
 		cssSelector = selectors.get(0);
 
-		PseudoFunctionSelector pseudoFunctionSelector = (PseudoFunctionSelector) cssSelector.getSelector(0);
+		final PseudoFunctionSelector pseudoFunctionSelector = (PseudoFunctionSelector) cssSelector.getSelector(0);
 
 		assertEquals("contains", pseudoFunctionSelector.getPseudoFunction().getPseudoFunctionName());
 
@@ -384,53 +386,53 @@ class CSSellyTest {
 
 	@Test
 	void test301() {
-		CSSelly lexerA = new CSSelly("input:not(':checked')");
-		CSSelly lexerB = new CSSelly("input:not(:checked)");
+		final CSSelly lexerA = new CSSelly("input:not(':checked')");
+		final CSSelly lexerB = new CSSelly("input:not(:checked)");
 
-		List<CssSelector> selectorsA = lexerA.parse();
-		List<CssSelector> selectorsB = lexerB.parse();
+		final List<CssSelector> selectorsA = lexerA.parse();
+		final List<CssSelector> selectorsB = lexerB.parse();
 
 		assertEquals(1, selectorsA.size());
 		assertEquals(1, selectorsB.size());
 
-		CssSelector cssSelectorA = selectorsA.get(0);
-		CssSelector cssSelectorB = selectorsB.get(0);
+		final CssSelector cssSelectorA = selectorsA.get(0);
+		final CssSelector cssSelectorB = selectorsB.get(0);
 
-		PseudoFunctionSelector pseudoFunctionSelectorA = (PseudoFunctionSelector) cssSelectorA.getSelector(0);
+		final PseudoFunctionSelector pseudoFunctionSelectorA = (PseudoFunctionSelector) cssSelectorA.getSelector(0);
 		assertEquals("':checked'", pseudoFunctionSelectorA.getExpression());
-		PseudoFunctionSelector pseudoFunctionSelectorB = (PseudoFunctionSelector) cssSelectorB.getSelector(0);
+		final PseudoFunctionSelector pseudoFunctionSelectorB = (PseudoFunctionSelector) cssSelectorB.getSelector(0);
 		assertEquals(":checked", pseudoFunctionSelectorB.getExpression());
 
-		List peA = (List) pseudoFunctionSelectorA.getParsedExpression();
+		final List peA = (List) pseudoFunctionSelectorA.getParsedExpression();
 		assertEquals(1, peA.size());
-		assertEquals(1, ((List)peA.get(0)).size());
-		List peB = (List) pseudoFunctionSelectorB.getParsedExpression();
+		assertEquals(1, ((List) peA.get(0)).size());
+		final List peB = (List) pseudoFunctionSelectorB.getParsedExpression();
 		assertEquals(1, peB.size());
-		assertEquals(1, ((List)peB.get(0)).size());
+		assertEquals(1, ((List) peB.get(0)).size());
 
-		CssSelector lastSelectorA = (CssSelector) ((List)peA.get(0)).get(0);
-		PseudoClassSelector pcsA = (PseudoClassSelector) lastSelectorA.selectors.get(0);
-		CssSelector lastSelectorB = (CssSelector) ((List)peB.get(0)).get(0);
-		PseudoClassSelector pcsB = (PseudoClassSelector) lastSelectorB.selectors.get(0);
+		final CssSelector lastSelectorA = (CssSelector) ((List) peA.get(0)).get(0);
+		final PseudoClassSelector pcsA = (PseudoClassSelector) lastSelectorA.selectors.get(0);
+		final CssSelector lastSelectorB = (CssSelector) ((List) peB.get(0)).get(0);
+		final PseudoClassSelector pcsB = (PseudoClassSelector) lastSelectorB.selectors.get(0);
 
-		assertEquals(PseudoClass.CHECKED.class.getSimpleName().toLowerCase(), pcsA.getPseudoClass().getPseudoClassName());
-		assertEquals(PseudoClass.CHECKED.class.getSimpleName().toLowerCase(), pcsB.getPseudoClass().getPseudoClassName());
+		assertEquals(PseudoClasses.CHECKED.class.getSimpleName().toLowerCase(), pcsA.getPseudoClass().getPseudoClassName());
+		assertEquals(PseudoClasses.CHECKED.class.getSimpleName().toLowerCase(), pcsB.getPseudoClass().getPseudoClassName());
 	}
 
 	@Test
 	void test407() {
-		CSSelly lexer = new CSSelly("div:nth-child(2) > div:nth-child(1)");
+		final CSSelly lexer = new CSSelly("div:nth-child(2) > div:nth-child(1)");
 
-		List<CssSelector> selectors = lexer.parse();
+		final List<CssSelector> selectors = lexer.parse();
 
 		assertEquals(2, selectors.size());
 
-		CssSelector s1 = selectors.get(0);
+		final CssSelector s1 = selectors.get(0);
 		assertEquals(1, s1.selectorsCount());
 		assertEquals(Selector.Type.PSEUDO_FUNCTION, s1.getSelector(0).getType());
 		assertEquals("nth-child", ((PseudoFunctionSelector)s1.getSelector(0)).getPseudoFunction().getPseudoFunctionName());
 
-		CssSelector s2 = selectors.get(0);
+		final CssSelector s2 = selectors.get(0);
 		assertEquals(1, s2.selectorsCount());
 		assertEquals(Selector.Type.PSEUDO_FUNCTION, s2.getSelector(0).getType());
 		assertEquals("nth-child", ((PseudoFunctionSelector)s2.getSelector(0)).getPseudoFunction().getPseudoFunctionName());
