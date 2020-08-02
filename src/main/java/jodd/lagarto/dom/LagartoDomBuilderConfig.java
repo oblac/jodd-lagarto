@@ -28,7 +28,6 @@ import jodd.lagarto.LagartoParserConfig;
 import jodd.lagarto.dom.render.LagartoHtmlRenderer;
 
 import java.util.Objects;
-import java.util.function.Consumer;
 
 /**
  * Additional configuration for {@link jodd.lagarto.dom.LagartoDOMBuilder}
@@ -50,11 +49,6 @@ public class LagartoDomBuilderConfig {
 	protected LagartoParserConfig parserConfig = new LagartoParserConfig();
 
 	protected boolean collectErrors;
-	protected boolean logErrors = true;
-	protected boolean logDebugs = false;
-	protected Consumer<String> errorLogger = System.out::println;
-	protected Consumer<String> debugLogger = c -> {
-	};
 
 	// ---------------------------------------------------------------- access
 
@@ -182,57 +176,5 @@ public class LagartoDomBuilderConfig {
 	public void setParserConfig(final LagartoParserConfig parserConfig) {
 		this.parserConfig = Objects.requireNonNull(parserConfig);
 	}
-
-
-	public Consumer<String> getErrorLogger() {
-		return errorLogger;
-	}
-
-	/**
-	 * Specifies the error logger.
-	 */
-	public LagartoDomBuilderConfig setErrorLogger(final Consumer<String> errorLogger) {
-		this.errorLogger = errorLogger;
-		return this;
-	}
-
-	/**
-	 * Specifies the debug logger.
-	 */
-	public LagartoDomBuilderConfig setDebugLogger(final Consumer<String> debugLogger) {
-		this.debugLogger = debugLogger;
-		return this;
-	}
-
-	public Consumer<String> getDebugLogger() {
-		return debugLogger;
-	}
-
-
-	public boolean isLogErrors() {
-		return logErrors;
-	}
-
-	/**
-	 * Enables error logging.
-	 *
-	 * @see #setErrorLogger(Consumer)
-	 */
-	public void setLogErrors(final boolean logErrors) {
-		this.logErrors = logErrors;
-	}
-
-	public boolean isLogDebugs() {
-		return logDebugs;
-	}
-
-	/**
-	 * Enables debug logging.
-	 *
-	 * @see #setDebugLogger(Consumer)
-	 */
-	public LagartoDomBuilderConfig setLogDebugs(final boolean logDebugs) {
-		this.logDebugs = logDebugs;
-		return this;
-	}
+	
 }

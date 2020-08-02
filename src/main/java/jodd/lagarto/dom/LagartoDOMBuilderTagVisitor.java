@@ -30,6 +30,8 @@ import jodd.lagarto.TagType;
 import jodd.lagarto.TagVisitor;
 import jodd.util.CharSequenceUtil;
 import jodd.util.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Lagarto tag visitor that builds a DOM tree.
@@ -41,6 +43,8 @@ import jodd.util.Util;
  * be weird, too :)
  */
 public class LagartoDOMBuilderTagVisitor implements TagVisitor {
+
+	private static final Logger log = LoggerFactory.getLogger(LagartoDOMBuilderTagVisitor.class);
 
 	protected final LagartoDOMBuilder domBuilder;
 	protected final HtmlImplicitClosingRules implRules = new HtmlImplicitClosingRules();
@@ -124,8 +128,8 @@ public class LagartoDOMBuilderTagVisitor implements TagVisitor {
 		// elapsed
 		rootNode.end();
 
-		if (debugEnabled()) {
-			debug("LagartoDom tree created in " + rootNode.getElapsedTime() + " ms");
+		if (log.isDebugEnabled()) {
+			log.debug("LagartoDom tree created in " + rootNode.getElapsedTime() + " ms");
 		}
 	}
 
@@ -184,8 +188,8 @@ public class LagartoDOMBuilderTagVisitor implements TagVisitor {
 						}
 						parentNode = parentNode.getParentNode();
 
-						if (debugEnabled()) {
-							debug("Implicitly closed tag <" + node.getNodeName() + "> ");
+						if (log.isDebugEnabled()) {
+							log.debug("Implicitly closed tag <" + node.getNodeName() + "> ");
 						}
 					}
 				}
@@ -225,8 +229,8 @@ public class LagartoDOMBuilderTagVisitor implements TagVisitor {
 					while (implRules.implicitlyCloseParentTagOnTagEnd(parentNode.getNodeName(), tagName)) {
 						parentNode = parentNode.getParentNode();
 
-						if (debugEnabled()) {
-							debug("Implicitly closed tag <" + tagName + ">");
+						if (log.isDebugEnabled()) {
+							log.debug("Implicitly closed tag <" + tagName + ">");
 						}
 
 						if (parentNode == matchingParent) {
@@ -506,23 +510,13 @@ public class LagartoDOMBuilderTagVisitor implements TagVisitor {
 	 * Returns {@code true} if error logging or collecting is enabled.
 	 */
 	protected boolean errorEnabled() {
-		return domBuilder.config.collectErrors || domBuilder.config.logErrors;
-	}
-
-	/**
-	 * Returns {@code true} if debug logging is enabled.
-	 */
-	protected boolean debugEnabled() {
-		return domBuilder.config.logDebugs;
+		return domBuilder.config.collectErrors || log.isErrorEnabled();
 	}
 
 	@Override
 	public void error(final String message) {
 		rootNode.addError(message);
-		domBuilder.getConfig().getErrorLogger().accept(message);
+		log.error(message);
 	}
 
-	protected void debug(final String stringSupplier) {
-		domBuilder.getConfig().getErrorLogger().accept(stringSupplier);
-	}
 }
