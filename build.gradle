@@ -135,7 +135,7 @@ publishing {
 			pom {
 				name = 'Jodd Lagarto'
 				description = 'Java HTML/XML parsers suite'
-				url = 'https://https://www.joddlagarto.com'
+				url = 'https://lagarto.jodd.org'
 				licenses {
 					license {
 						name = 'BSD-2-Clause'
