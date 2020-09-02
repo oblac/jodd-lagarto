@@ -48,7 +48,7 @@ public class PseudoFunctionExpression {
 			final int nndx = expression.indexOf('n');
 			if (nndx != -1) {
 				final String aVal = expression.substring(0, nndx).trim();
-				if (aVal.length() == 0) {
+				if (aVal.isEmpty()) {
 					a = 1;
 				} else {
 					if (aVal.equals(DASH)) {
@@ -58,7 +58,7 @@ public class PseudoFunctionExpression {
 					}
 				}
 				final String bVal = expression.substring(nndx + 1);
-				if (bVal.length() == 0) {
+				if (bVal.isEmpty()) {
 					b = 0;
 				} else {
 					b = parseInt(bVal);

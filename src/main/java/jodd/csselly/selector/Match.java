@@ -116,7 +116,7 @@ public enum Match {
 	PREFIX("^=") {
 		@Override
 		public boolean compare(final String attr, final String val) {
-			if (val.length() == 0) {
+			if (val.isEmpty()) {
 				return false;
 			}
 			return attr.startsWith(val);
@@ -130,7 +130,7 @@ public enum Match {
 	SUFFIX("$=") {
 		@Override
 		public boolean compare(final String attr, final String val) {
-			if (val.length() == 0) {
+			if (val.isEmpty()) {
 				return false;
 			}
 			return attr.endsWith(val);
@@ -144,7 +144,7 @@ public enum Match {
 	SUBSTRING("*=") {
 		@Override
 		public boolean compare(final String attr, final String val) {
-			if (val.length() == 0) {
+			if (val.isEmpty()) {
 				return false;
 			}
 			return attr.contains(val);
