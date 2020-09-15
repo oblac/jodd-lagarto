@@ -113,7 +113,7 @@ jacocoTestReport {
 	}
 }
 
-heck.dependsOn jacocoTestReport
+check.dependsOn jacocoTestReport
 
 //
 // PUBLISH
