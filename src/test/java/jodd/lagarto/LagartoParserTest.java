@@ -203,7 +203,7 @@ class LagartoParserTest {
 			public void text(final CharSequence text) {
 				String t = text.toString();
 				t = StringUtil.removeChars(t, "\r\n\t\b");
-				if (t.length() != 0) {
+				if (!t.isEmpty()) {
 					result.append("txt:[").append(t).append(']').append(NEWLINE);
 				}
 			}
