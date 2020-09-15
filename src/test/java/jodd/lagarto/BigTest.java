@@ -23,7 +23,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package jodd.lagarto;
 
-import jodd.io.StreamUtil;
+import jodd.io.IOUtil;
 import jodd.util.NaturalOrderComparator;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -71,7 +71,7 @@ class BigTest {
 					continue;
 				}
 				final String html = new String(
-						StreamUtil.readChars(zipFile.getInputStream(entry), StandardCharsets.UTF_8.name()));
+						IOUtil.readChars(zipFile.getInputStream(entry), StandardCharsets.UTF_8));
 
 				try {
 					new LagartoParser(html).parse(new EmptyTagVisitor());

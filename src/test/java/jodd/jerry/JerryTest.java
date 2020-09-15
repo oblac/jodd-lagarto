@@ -25,8 +25,8 @@
 package jodd.jerry;
 
 import jodd.io.FileUtil;
-import jodd.system.SystemUtil;
 import jodd.util.StringUtil;
+import jodd.util.SystemUtil;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;

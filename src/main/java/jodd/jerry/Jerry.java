@@ -31,7 +31,6 @@ import jodd.lagarto.dom.NodeSelector;
 import jodd.lagarto.dom.NodeUtil;
 import jodd.lagarto.dom.Text;
 import jodd.util.ArraysUtil;
-import jodd.util.Format;
 import jodd.util.StringUtil;
 
 import java.util.ArrayList;
@@ -687,7 +686,7 @@ public class Jerry implements Iterable<Jerry> {
 			return null;
 		}
 
-		propertyName = Format.fromCamelCase(propertyName, '-');
+		propertyName = StringUtil.fromCamelCase(propertyName, '-');
 
 		final String styleAttrValue = nodes[0].getAttribute("style");
 		if (styleAttrValue == null) {
@@ -705,7 +704,7 @@ public class Jerry implements Iterable<Jerry> {
 	 * that property will be reset to previous value if existed.
 	 */
 	public Jerry css(String propertyName, final String value) {
-		propertyName = Format.fromCamelCase(propertyName, '-');
+		propertyName = StringUtil.fromCamelCase(propertyName, '-');
 
 		if (nodes.length == 0) {
 			return this;
@@ -738,7 +737,7 @@ public class Jerry implements Iterable<Jerry> {
 
 			for (int i = 0; i < css.length; i += 2) {
 				String propertyName = css[i];
-				propertyName = Format.fromCamelCase(propertyName, '-');
+				propertyName = StringUtil.fromCamelCase(propertyName, '-');
 				final String value = css[i + 1];
 				if (value.length() == 0) {
 					styles.remove(propertyName);

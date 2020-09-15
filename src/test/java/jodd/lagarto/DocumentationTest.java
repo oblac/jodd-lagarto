@@ -7,8 +7,9 @@ import jodd.lagarto.dom.LagartoDOMBuilder;
 import jodd.lagarto.dom.Node;
 import jodd.lagarto.dom.Text;
 import jodd.lagarto.visitor.TagWriter;
-import jodd.mutable.MutableInteger;
 import org.junit.jupiter.api.Test;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -22,7 +23,7 @@ class DocumentationTest {
 
 	@Test
 	void test_1_1() {
-		final MutableInteger count = MutableInteger.of(0);
+		final AtomicInteger count = new AtomicInteger(0);
 		final LagartoParser lagartoParser = new LagartoParser("<html><h1>Hello</h1></html>");
 
 		final TagVisitor tagVisitor = new EmptyTagVisitor() {
@@ -30,20 +31,20 @@ class DocumentationTest {
 			public void tag(final Tag tag) {
 				if (tag.nameEquals("h1")) {
 					System.out.println(tag.getName());
-					count.value++;
+					count.incrementAndGet();
 				}
 			}
 
 			@Override
 			public void text(final CharSequence text) {
 				System.out.println(text);
-				count.value++;
+				count.incrementAndGet();
 			}
 		};
 
 		lagartoParser.parse(tagVisitor);
 
-		assertEquals(3, count.value);
+		assertEquals(3, count.intValue());
 	}
 
 	@Test

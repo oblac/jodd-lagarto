@@ -24,7 +24,7 @@
 
 package jodd.lagarto;
 
-import jodd.io.StreamUtil;
+import jodd.io.IOUtil;
 import jodd.jerry.Jerry;
 import jodd.jerry.JerryParser;
 import org.junit.jupiter.api.Test;
@@ -48,7 +48,7 @@ class StuckTest {
 		final File file = new File(testDataRoot, "stuck.html.gz");
 		final InputStream in = new GZIPInputStream(new FileInputStream(file));
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
-		StreamUtil.copy(in, out);
+		IOUtil.copy(in, out);
 		in.close();
 
 		final JerryParser jerryParser = new JerryParser();

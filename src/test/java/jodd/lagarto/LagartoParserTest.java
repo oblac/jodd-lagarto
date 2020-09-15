@@ -25,14 +25,19 @@
 package jodd.lagarto;
 
 import jodd.io.FileUtil;
-import jodd.io.findfile.FindFile;
-import jodd.io.findfile.WildcardFindFile;
 import jodd.lagarto.visitor.TagWriter;
 import jodd.util.StringUtil;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.List;
 
 import static jodd.util.StringPool.NEWLINE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -54,14 +59,25 @@ class LagartoParserTest {
 	}
 
 	private void _testHtmls(final String root) throws IOException {
-		final FindFile ff = new WildcardFindFile().include("**/*.*ml");
+		final List<File> files = new ArrayList<>();
+
+		Files.walkFileTree(FileUtil.file(root).toPath(), new SimpleFileVisitor<Path>() {
+			@Override
+			public FileVisitResult visitFile(final Path file,
+			                                 final BasicFileAttributes attrs) throws IOException {
+				if (file.toString().endsWith("ml")) {
+					files.add(file.toFile());
+				}
+				return FileVisitResult.CONTINUE;
+			}
+		});
+
 		long reps = 1;
 
 		boolean processed = false;
+
 		while (reps-- > 0) {
-			ff.searchPath(root);
-			File file;
-			while ((file = ff.nextFile()) != null) {
+			for (final File file : files) {
 				processed = true;
 				System.out.println('+' + file.getName());
 
@@ -97,8 +113,8 @@ class LagartoParserTest {
 				}
 			}
 		}
-		assertTrue(processed);
 
+		assertTrue(processed);
 	}
 
 	private String[] _parse(final String content, final boolean isXml) {

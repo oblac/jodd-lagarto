@@ -30,12 +30,12 @@ import jodd.jerry.JerryParser;
 import jodd.lagarto.dom.Document;
 import jodd.lagarto.dom.Element;
 import jodd.lagarto.dom.LagartoDOMBuilder;
-import jodd.mutable.MutableInteger;
 import jodd.util.StringUtil;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -326,7 +326,7 @@ class ParsingProblemsTest {
 						"</html>";
 
 		final StringBuilder sb = new StringBuilder();
-		final MutableInteger errorCount = MutableInteger.of(0);
+		final AtomicInteger errorCount = new AtomicInteger(0);
 
 		new LagartoParser(html).configure(cfg -> {
 			cfg.setEnableConditionalComments(true);
@@ -343,35 +343,36 @@ class ParsingProblemsTest {
 
 			@Override
 			public void error(final String message) {
-				errorCount.value++;
+				errorCount.incrementAndGet();
 			}
 		});
 
-		assertEquals(0, errorCount.value);
+		assertEquals(0, errorCount.intValue());
 		assertEquals(
 				"C:if lte IE 9-true\n" +
-				"C:endif-false\n" +
-				"R:[if gt IE 9><!\n" +
-				"R:<![endif]\n",
+						"C:endif-false\n" +
+						"R:[if gt IE 9><!\n" +
+						"R:<![endif]\n",
 				sb.toString());
 	}
 
 	@Test
 	void testShortComment() {
 		final StringBuilder sb = new StringBuilder();
-		final MutableInteger errorCount = MutableInteger.of(0);
+		final AtomicInteger errorCount = new AtomicInteger(0);
 
 		new LagartoParser("<!---->").parse(new EmptyTagVisitor() {
 			@Override
 			public void comment(final CharSequence comment) {
 				sb.append(comment);
 			}
+
 			@Override
 			public void error(final String message) {
-				errorCount.value++;
+				errorCount.incrementAndGet();
 			}
 		});
-		assertEquals(0, errorCount.value);
+		assertEquals(0, errorCount.intValue());
 		assertEquals("", sb.toString());
 
 		// err
@@ -381,19 +382,20 @@ class ParsingProblemsTest {
 			public void comment(final CharSequence comment) {
 				sb.append(comment);
 			}
+
 			@Override
 			public void error(final String message) {
-				errorCount.value++;
+				errorCount.incrementAndGet();
 			}
 		});
-		assertEquals(2, errorCount.value);
+		assertEquals(2, errorCount.intValue());
 		assertEquals("-", sb.toString());
 	}
 
 	@Test
 	void testShortComment2() {
 		final StringBuilder sb = new StringBuilder();
-		final MutableInteger errorCount = MutableInteger.of(0);
+		final AtomicInteger errorCount = new AtomicInteger(0);
 
 		new LagartoParser("<html>\n" +
 				"<body>\n" +
@@ -405,12 +407,13 @@ class ParsingProblemsTest {
 			public void comment(final CharSequence comment) {
 				sb.append(comment);
 			}
+
 			@Override
 			public void error(final String message) {
-				errorCount.value++;
+				errorCount.incrementAndGet();
 			}
 		});
-		assertEquals(1, errorCount.value);
+		assertEquals(1, errorCount.intValue());
 		assertEquals("-", sb.toString());
 	}
 
