@@ -712,7 +712,7 @@ public class Jerry implements Iterable<Jerry> {
 		for (final Node node : nodes) {
 			String styleAttrValue = node.getAttribute("style");
 			final Map<String, String> styles = createPropertiesMap(styleAttrValue, ';', ':');
-			if (value.length() == 0) {
+			if (value.isEmpty()) {
 				styles.remove(propertyName);
 			} else {
 				styles.put(propertyName, value);
@@ -739,7 +739,7 @@ public class Jerry implements Iterable<Jerry> {
 				String propertyName = css[i];
 				propertyName = StringUtil.fromCamelCase(propertyName, '-');
 				final String value = css[i + 1];
-				if (value.length() == 0) {
+				if (value.isEmpty()) {
 					styles.remove(propertyName);
 				} else {
 					styles.put(propertyName, value);

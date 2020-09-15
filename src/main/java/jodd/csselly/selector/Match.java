@@ -68,24 +68,23 @@ public enum Match {
 	        boolean inClass = false;
 	        int start = 0;
 	        for (int i = 0; i < attrLength; i ++) {
-	            char c = attr.charAt(i);
-				if ((c == ' ') || (c == '\t')) {
-	                if (inClass) {
-	                    // the white space ends a class name
-	                    // compare it with the requested one
-	                    if ((i - start == valLength) && attr.regionMatches(start, val, 0, valLength)) {
-	                        return true;
-	                    }
-	                    inClass = false;
-	                }
-	            }
-	            else {
-	                if (!inClass) {
-	                    // we're in a class name : keep the start of the substring
-	                    inClass = true;
-	                    start = i;
-	                }
-	            }
+		        final char c = attr.charAt(i);
+		        if ((c == ' ') || (c == '\t')) {
+			        if (inClass) {
+				        // the white space ends a class name
+				        // compare it with the requested one
+				        if ((i - start == valLength) && attr.regionMatches(start, val, 0, valLength)) {
+					        return true;
+				        }
+				        inClass = false;
+			        }
+		        } else {
+			        if (!inClass) {
+				        // we're in a class name : keep the start of the substring
+				        inClass = true;
+				        start = i;
+			        }
+		        }
 	        }
 	        
 	        // the attribute may not end by a white space
@@ -116,7 +115,7 @@ public enum Match {
 	PREFIX("^=") {
 		@Override
 		public boolean compare(final String attr, final String val) {
-			if (val.length() == 0) {
+			if (val.isEmpty()) {
 				return false;
 			}
 			return attr.startsWith(val);
@@ -130,7 +129,7 @@ public enum Match {
 	SUFFIX("$=") {
 		@Override
 		public boolean compare(final String attr, final String val) {
-			if (val.length() == 0) {
+			if (val.isEmpty()) {
 				return false;
 			}
 			return attr.endsWith(val);
@@ -144,7 +143,7 @@ public enum Match {
 	SUBSTRING("*=") {
 		@Override
 		public boolean compare(final String attr, final String val) {
-			if (val.length() == 0) {
+			if (val.isEmpty()) {
 				return false;
 			}
 			return attr.contains(val);
@@ -175,8 +174,8 @@ public enum Match {
 	 * Resolves match type from the sign.
 	 */
 	public static Match valueOfSign(final String sign) {
-		Match[] values = Match.values();
-		for (Match match : values) {
+		final Match[] values = Match.values();
+		for (final Match match : values) {
 			if (match.getSign().equals(sign)) {
 				return match;
 			}
@@ -189,9 +188,9 @@ public enum Match {
 	 * It is assumed that the second character is '='.
 	 */
 	public static Match valueOfFirstChar(final char firstChar) {
-		Match[] values = Match.values();
-		for (Match match : values) {
-			String matchSign = match.getSign();
+		final Match[] values = Match.values();
+		for (final Match match : values) {
+			final String matchSign = match.getSign();
 			if (matchSign.length() > 1) {
 				if (firstChar == matchSign.charAt(0)) {
 					return match;
