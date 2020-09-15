@@ -106,12 +106,14 @@ test {
 }
 
 jacocoTestReport {
-    reports {
-		xml.enabled false
+	reports {
+		xml.enabled true
 		csv.enabled false
 		html.enabled true
 	}
 }
+
+heck.dependsOn jacocoTestReport
 
 //
 // PUBLISH
