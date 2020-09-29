@@ -26,8 +26,10 @@ package jodd.lagarto.dom;
 
 import jodd.lagarto.LagartoParserConfig;
 import jodd.lagarto.dom.render.LagartoHtmlRenderer;
+import org.slf4j.Logger;
 
 import java.util.Objects;
+import java.util.function.BiConsumer;
 
 /**
  * Additional configuration for {@link jodd.lagarto.dom.LagartoDOMBuilder}
@@ -41,6 +43,7 @@ public class LagartoDomBuilderConfig {
 	protected float condCommentIEVersion = 10;
 	protected boolean enabledVoidTags = true;
 	protected boolean impliedEndTags;
+	protected BiConsumer<Logger, String> parsingErrorLogConsumer = Logger::error;
 
 	protected boolean useFosterRules;
 	protected boolean unclosedTagAsOrphanCheck;
@@ -176,5 +179,12 @@ public class LagartoDomBuilderConfig {
 	public void setParserConfig(final LagartoParserConfig parserConfig) {
 		this.parserConfig = Objects.requireNonNull(parserConfig);
 	}
-	
+
+	public BiConsumer<Logger, String> getParsingErrorLogConsumer() {
+		return parsingErrorLogConsumer;
+	}
+
+	public void setParsingErrorLogConsumer(final BiConsumer<Logger, String> parsingErrorLogConsumer) {
+		this.parsingErrorLogConsumer = parsingErrorLogConsumer;
+	}
 }

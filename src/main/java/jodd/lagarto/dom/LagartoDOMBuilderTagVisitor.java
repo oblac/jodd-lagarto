@@ -510,13 +510,13 @@ public class LagartoDOMBuilderTagVisitor implements TagVisitor {
 	 * Returns {@code true} if error logging or collecting is enabled.
 	 */
 	protected boolean errorEnabled() {
-		return domBuilder.config.collectErrors || log.isErrorEnabled();
+		return domBuilder.config.collectErrors;
 	}
 
 	@Override
 	public void error(final String message) {
 		rootNode.addError(message);
-		log.error(message);
+		domBuilder.config.getParsingErrorLogConsumer().accept(log, message);
 	}
 
 }
