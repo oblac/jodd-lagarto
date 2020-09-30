@@ -43,7 +43,6 @@ public class LagartoDomBuilderConfig {
 	protected float condCommentIEVersion = 10;
 	protected boolean enabledVoidTags = true;
 	protected boolean impliedEndTags;
-	protected BiConsumer<Logger, String> parsingErrorLogConsumer = Logger::error;
 
 	protected boolean useFosterRules;
 	protected boolean unclosedTagAsOrphanCheck;
@@ -52,6 +51,9 @@ public class LagartoDomBuilderConfig {
 	protected LagartoParserConfig parserConfig = new LagartoParserConfig();
 
 	protected boolean collectErrors;
+	protected boolean errorLogEnabled = true;
+	protected BiConsumer<Logger, String> errorLogConsumer = Logger::error;
+
 
 	// ---------------------------------------------------------------- access
 
@@ -180,11 +182,19 @@ public class LagartoDomBuilderConfig {
 		this.parserConfig = Objects.requireNonNull(parserConfig);
 	}
 
-	public BiConsumer<Logger, String> getParsingErrorLogConsumer() {
-		return parsingErrorLogConsumer;
+	public boolean isErrorLogEnabled() {
+		return errorLogEnabled;
 	}
 
-	public void setParsingErrorLogConsumer(final BiConsumer<Logger, String> parsingErrorLogConsumer) {
-		this.parsingErrorLogConsumer = parsingErrorLogConsumer;
+	public void setErrorLogEnabled(final boolean errorLogEnabled) {
+		this.errorLogEnabled = errorLogEnabled;
+	}
+
+	public BiConsumer<Logger, String> getErrorLogConsumer() {
+		return errorLogConsumer;
+	}
+
+	public void setErrorLogConsumer(final BiConsumer<Logger, String> errorLogConsumer) {
+		this.errorLogConsumer = errorLogConsumer;
 	}
 }
