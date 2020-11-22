@@ -507,4 +507,30 @@ class ParsingProblemsTest {
 				"tag: html END\n", sb.toString());
 	}
 
+	@Test
+	void testPInTitle() {
+		final StringBuilder sb = new StringBuilder();
+		final EmptyTagVisitor visitor = new EmptyTagVisitor() {
+
+			@Override
+			public void tag(final Tag tag) {
+				sb.append("tag: " + tag.getName() + " " + tag.getType() + "\n");
+			}
+
+			@Override
+			public void text(final CharSequence text) {
+				sb.append("text: " + text + "\n");
+			}
+
+		};
+		final LagartoParser parser = new LagartoParser("<html><head><title>one<p>two</p>three</title></html>");
+		parser.parse(visitor);
+		assertEquals("tag: html START\n" +
+				"tag: head START\n" +
+				"tag: title START\n" +
+				"text: one<p>two</p>three\n" +
+				"tag: title END\n" +
+				"tag: html END\n", sb.toString());
+	}
+
 }
