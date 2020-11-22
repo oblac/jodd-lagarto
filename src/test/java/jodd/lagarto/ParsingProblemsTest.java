@@ -480,4 +480,31 @@ class ParsingProblemsTest {
 				"tag: html END\n", sb.toString());
 	}
 
+	@Test
+	void testAInTextArea() {
+		final StringBuilder sb = new StringBuilder();
+		final EmptyTagVisitor visitor = new EmptyTagVisitor() {
+
+			@Override
+			public void tag(final Tag tag) {
+				sb.append("tag: " + tag.getName() + " " + tag.getType() + "\n");
+			}
+
+			@Override
+			public void text(final CharSequence text) {
+				sb.append("text: " + text + "\n");
+			}
+
+		};
+		final LagartoParser parser = new LagartoParser("<html><body><textarea><a>Foo</a></textarea></body></html>");
+		parser.parse(visitor);
+		assertEquals("tag: html START\n" +
+				"tag: body START\n" +
+				"tag: textarea START\n" +
+				"text: <a>Foo</a>\n" +
+				"tag: textarea END\n" +
+				"tag: body END\n" +
+				"tag: html END\n", sb.toString());
+	}
+
 }
