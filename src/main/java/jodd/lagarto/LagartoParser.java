@@ -1238,6 +1238,7 @@ public class LagartoParser {
 						tag.setName(in.subSequence(rcdataEndTagNameStartNdx, in.ndx));
 						tag.setType(TagType.END);
 					} else {
+						textEmitChars(rcdataEndTagNameStartNdx - 2, in.ndx + 1);
 						state = RCDATA;
 					}
 					return;
@@ -1252,6 +1253,7 @@ public class LagartoParser {
 						tag.setName(in.subSequence(rcdataEndTagNameStartNdx, in.ndx));
 						tag.setType(TagType.SELF_CLOSING);
 					} else {
+						textEmitChars(rcdataEndTagNameStartNdx - 2, in.ndx + 1);
 						state = RCDATA;
 					}
 					return;
@@ -1268,6 +1270,7 @@ public class LagartoParser {
 						tag.end(in.ndx);
 						emitTag();
 					} else {
+						textEmitChars(rcdataEndTagNameStartNdx - 2, in.ndx + 1);
 						state = RCDATA;
 					}
 					return;

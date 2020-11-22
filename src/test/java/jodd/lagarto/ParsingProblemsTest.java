@@ -438,4 +438,46 @@ class ParsingProblemsTest {
 		assertEquals(" ------- IDENTIFICATION DEBUT ------- //", sb.toString());
 	}
 
+	@Test
+	void testWithSelfClosingTitle() {
+		final StringBuilder sb = new StringBuilder();
+
+		final EmptyTagVisitor visitor = new EmptyTagVisitor() {
+			@Override
+			public void tag(final Tag tag) {
+				sb.append("tag: " + tag.getName() + " " + tag.getType() + "\n");
+			}
+
+			@Override
+			public void text(final CharSequence text) {
+				sb.append("text: " + text + "\n");
+			}
+
+		};
+
+		// note the odd self-closing title: <title />
+		LagartoParser parser = new LagartoParser("<html><head><title /></head><body>hello world!</body></html>");
+		parser.parse(visitor);
+		assertEquals("" +
+				"tag: html START\n" +
+				"tag: head START\n" +
+				"tag: title SELF_CLOSING\n" +
+				"text: </head><body>hello world!</body></html>\n", sb.toString());
+
+		// note the correct title: <title></title>
+		sb.setLength(0);
+		parser = new LagartoParser("<html><head><title></title></head><body>hello world!</body></html>");
+		parser.parse(visitor);
+		assertEquals("" +
+				"tag: html START\n" +
+				"tag: head START\n" +
+				"tag: title START\n" +
+				"tag: title END\n" +
+				"tag: head END\n" +
+				"tag: body START\n" +
+				"text: hello world!\n" +
+				"tag: body END\n" +
+				"tag: html END\n", sb.toString());
+	}
+
 }

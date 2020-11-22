@@ -14,3 +14,9 @@ indent_size = 2
 
 [*.gradle]
 indent_style = tab
+
+[src/test/resources/**.txt]
+insert_final_newline = false
+
+[src/test/resources/**.htm]
+insert_final_newline = false
