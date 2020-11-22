@@ -229,8 +229,8 @@ public class LagartoParser {
 				// only a sequence of alphanumeric chars ending with semicolon
 				// gives na error
 				errorCharReference();
-				textEmitChar('&');
 				in.ndx = unconsumeNdx;
+				textEmitChar('&');
 				return;
 			}
 
@@ -294,6 +294,7 @@ public class LagartoParser {
 
 		if (in.isEOF()) {
 			in.ndx = unconsumeNdx;
+			textEmitChar('&');
 			return;
 		}
 
@@ -350,6 +351,7 @@ public class LagartoParser {
 			// no character matches the range
 			errorCharReference();
 			in.ndx = unconsumeNdx;
+			textEmitChar('&');
 			return;
 		}
 
