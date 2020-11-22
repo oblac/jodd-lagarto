@@ -26,8 +26,10 @@ package jodd.lagarto.dom;
 
 import jodd.lagarto.LagartoParserConfig;
 import jodd.lagarto.dom.render.LagartoHtmlRenderer;
+import org.slf4j.Logger;
 
 import java.util.Objects;
+import java.util.function.BiConsumer;
 
 /**
  * Additional configuration for {@link jodd.lagarto.dom.LagartoDOMBuilder}
@@ -49,6 +51,9 @@ public class LagartoDomBuilderConfig {
 	protected LagartoParserConfig parserConfig = new LagartoParserConfig();
 
 	protected boolean collectErrors;
+	protected boolean errorLogEnabled = true;
+	protected BiConsumer<Logger, String> errorLogConsumer = Logger::error;
+
 
 	// ---------------------------------------------------------------- access
 
@@ -176,5 +181,20 @@ public class LagartoDomBuilderConfig {
 	public void setParserConfig(final LagartoParserConfig parserConfig) {
 		this.parserConfig = Objects.requireNonNull(parserConfig);
 	}
-	
+
+	public boolean isErrorLogEnabled() {
+		return errorLogEnabled;
+	}
+
+	public void setErrorLogEnabled(final boolean errorLogEnabled) {
+		this.errorLogEnabled = errorLogEnabled;
+	}
+
+	public BiConsumer<Logger, String> getErrorLogConsumer() {
+		return errorLogConsumer;
+	}
+
+	public void setErrorLogConsumer(final BiConsumer<Logger, String> errorLogConsumer) {
+		this.errorLogConsumer = errorLogConsumer;
+	}
 }
