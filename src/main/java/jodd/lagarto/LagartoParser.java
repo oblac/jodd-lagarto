@@ -412,15 +412,18 @@ public class LagartoParser {
 			return;
 		}
 
-		c = (char) value;
-
-		textEmitChar(c);
+		if (value <= Character.MAX_VALUE) {
+			c = (char) value;
+			textEmitChar(c);
+		} else {
+			textEmitChars(Character.toChars(value));
+		}
 
 		if (
-			((c >= 0x0001) && (c <= 0x0008)) ||
-			((c >= 0x000D) && (c <= 0x001F)) ||
-			((c >= 0x007F) && (c <= 0x009F)) ||
-			((c >= 0xFDD0) && (c <= 0xFDEF))
+				((c >= 0x0001) && (c <= 0x0008)) ||
+						((c >= 0x000D) && (c <= 0x001F)) ||
+						((c >= 0x007F) && (c <= 0x009F)) ||
+						((c >= 0xFDD0) && (c <= 0xFDEF))
 		) {
 			errorCharReference();
 			return;
