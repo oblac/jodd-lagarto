@@ -417,4 +417,25 @@ class ParsingProblemsTest {
 		assertEquals("-", sb.toString());
 	}
 
+	@Test
+	void testComment() {
+		final StringBuilder sb = new StringBuilder();
+		final AtomicInteger errorCount = new AtomicInteger(0);
+
+		new LagartoParser("<!-- ------- IDENTIFICATION DEBUT ------- //-->").parse(new EmptyTagVisitor() {
+			@Override
+			public void comment(final CharSequence comment) {
+				sb.append(comment);
+			}
+
+			@Override
+			public void error(final String message) {
+				errorCount.incrementAndGet();
+			}
+		});
+
+		assertEquals(0, errorCount.intValue());
+		assertEquals(" ------- IDENTIFICATION DEBUT ------- //", sb.toString());
+	}
+
 }

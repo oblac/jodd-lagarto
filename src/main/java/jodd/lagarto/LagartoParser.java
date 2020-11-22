@@ -1413,15 +1413,13 @@ public class LagartoParser {
 			}
 
 			if (c == '!') {
-				errorInvalidToken();
 				state = COMMENT_END_BANG;
 				return;
 			}
 
 			if (c == '-') {
-				errorInvalidToken();
+				// append a U+002D HYPHEN-MINUS character (-) to the comment token’s data
 			} else {
-				errorInvalidToken();
 				state = COMMENT;
 			}
 		}
