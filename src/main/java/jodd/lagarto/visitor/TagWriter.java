@@ -27,8 +27,10 @@ package jodd.lagarto.visitor;
 import jodd.lagarto.Doctype;
 import jodd.lagarto.LagartoException;
 import jodd.lagarto.Tag;
+import jodd.lagarto.TagType;
 import jodd.lagarto.TagVisitor;
 import jodd.net.HtmlEncoder;
+import jodd.util.StringUtil;
 
 import java.io.IOException;
 
@@ -73,10 +75,12 @@ public class TagWriter implements TagVisitor {
 	public void script(final Tag tag, final CharSequence body) {
 		try {
 			tag.writeTo(appendable);
-			if (body != null) {
+			if (StringUtil.isNotEmpty(body)) {
 				appendable.append(body);
 			}
-			appendable.append("</script>");
+			if (tag.getType() == TagType.START) {
+				appendable.append("</script>");
+			}
 		} catch (final IOException ioex) {
 			throw new LagartoException(ioex);
 		}
