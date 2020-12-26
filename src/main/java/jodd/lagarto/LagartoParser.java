@@ -882,7 +882,7 @@ public class LagartoParser {
 			final char c = in.charAtNdx();
 
 			if (c == '>') {
-				tag.setType(TagType.SELF_CLOSING);
+				switchTypeToSelfClosing();
 				state = DATA_STATE;
 				emitTag();
 				return;
@@ -1105,7 +1105,7 @@ public class LagartoParser {
 						state = SELF_CLOSING_START_TAG;
 						tag.start(rawTextEnd);
 						tag.setName(in.subSequence(rawtextEndTagNameStartNdx, in.ndx));
-						tag.setType(TagType.SELF_CLOSING);
+						switchTypeToSelfClosing();
 					} else {
 						state = RAWTEXT;
 					}
@@ -1256,7 +1256,7 @@ public class LagartoParser {
 						state = SELF_CLOSING_START_TAG;
 						tag.start(rcdataTagStart);
 						tag.setName(in.subSequence(rcdataEndTagNameStartNdx, in.ndx));
-						tag.setType(TagType.SELF_CLOSING);
+						switchTypeToSelfClosing();
 					} else {
 						textEmitChars(rcdataEndTagNameStartNdx - 2, in.ndx + 1);
 						state = RCDATA;
@@ -3146,6 +3146,14 @@ public class LagartoParser {
 		}
 
 		return true;
+	}
+
+	private void switchTypeToSelfClosing() {
+		if (tag.getType() == TagType.END) {
+			_error("End tag can't be self-closing");
+		} else {
+			tag.setType(TagType.SELF_CLOSING);
+		}
 	}
 
 	// ---------------------------------------------------------------- state

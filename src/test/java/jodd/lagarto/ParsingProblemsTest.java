@@ -582,4 +582,87 @@ class ParsingProblemsTest {
 				"tag: html END\n", sb.toString());
 	}
 
+	@Test
+	void testStrangeIncorrectTitle() {
+		final StringBuilder sb = new StringBuilder();
+		final EmptyTagVisitor visitor = new EmptyTagVisitor() {
+
+			@Override
+			public void tag(final Tag tag) {
+				sb.append("tag: " + tag.getName() + " " + tag.getType() + "\n");
+			}
+
+			@Override
+			public void text(final CharSequence text) {
+				sb.append("text: " + text + "\n");
+			}
+
+		};
+		// note the incorrect syntax: </title <meta
+		final String html = "<html><head><title>Hello World</title <meta content=\"text/html; charset=UTF-8\" http-equiv=\"content-type\" /><meta content=\"Description\" lang=\"en-US\" name=\"description\" /></head><body></body>hello world</html>";
+		final LagartoParser parser = new LagartoParser(html);
+		parser.parse(visitor);
+		assertEquals("tag: html START\n" +
+				"tag: head START\n" +
+				"tag: title START\n" +
+				"text: Hello World\n" +
+				"tag: title END\n" +
+				"tag: meta SELF_CLOSING\n" +
+				"tag: head END\n" +
+				"tag: body START\n" +
+				"tag: body END\n" +
+				"text: hello world\n" +
+				"tag: html END\n", sb.toString());
+	}
+
+
+	@Test
+	void testAttributesInEndTag() {
+		final StringBuilder sb = new StringBuilder();
+		final EmptyTagVisitor visitor = new EmptyTagVisitor() {
+
+			@Override
+			public void tag(final Tag tag) {
+				sb.append("tag: " + tag.getName() + " " + tag.getType() + tag.getAttributeCount() + "\n");
+			}
+
+			@Override
+			public void text(final CharSequence text) {
+				sb.append("text: " + text + "\n");
+			}
+
+		};
+		final String html = "<html>123</html lang='en'>";
+		final LagartoParser parser = new LagartoParser(html);
+		parser.parse(visitor);
+		assertEquals("tag: html START0\n" +
+				"text: 123\n" +
+				"tag: html END0\n", sb.toString());
+	}
+
+
+	@Test
+	void testClosingAndSelfClosing() {
+		final StringBuilder sb = new StringBuilder();
+		final EmptyTagVisitor visitor = new EmptyTagVisitor() {
+
+			@Override
+			public void tag(final Tag tag) {
+				sb.append("tag: " + tag.getName() + " " + tag.getType() + "\n");
+			}
+
+			@Override
+			public void text(final CharSequence text) {
+				sb.append("text: " + text + "\n");
+			}
+
+		};
+		final String html = "<div>123</div/>";
+		final LagartoParser parser = new LagartoParser(html);
+		parser.parse(visitor);
+		assertEquals("tag: div START\n" +
+				"text: 123\n" +
+				"tag: div END\n", sb.toString());
+	}
+
 }
