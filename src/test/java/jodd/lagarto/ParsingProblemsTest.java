@@ -30,6 +30,7 @@ import jodd.jerry.JerryParser;
 import jodd.lagarto.dom.Document;
 import jodd.lagarto.dom.Element;
 import jodd.lagarto.dom.LagartoDOMBuilder;
+import jodd.lagarto.visitor.TagWriter;
 import jodd.util.StringUtil;
 import org.junit.jupiter.api.Test;
 
@@ -663,6 +664,46 @@ class ParsingProblemsTest {
 		assertEquals("tag: div START\n" +
 				"text: 123\n" +
 				"tag: div END\n", sb.toString());
+	}
+
+	@Test
+	void testSelfClosingScriptTag() {
+		final StringBuilder sb = new StringBuilder();
+		final EmptyTagVisitor visitor = new EmptyTagVisitor() {
+
+			@Override
+			public void tag(final Tag tag) {
+				sb.append("tag: " + tag.getName() + " " + tag.getType() + "\n");
+			}
+
+			@Override
+			public void script(final Tag tag, final CharSequence body) {
+				sb.append("script: " + tag.getType() + "\n");
+				sb.append("stext: " + body + "\n");
+			}
+
+			@Override
+			public void text(final CharSequence text) {
+				sb.append("text: " + text + "\n");
+			}
+
+		};
+		final String html = "<script src=\"a.js\"/>\n" +
+				"<link href=\"b.html\">\n" +
+				"<script src=\"c.js\"></script>";
+		LagartoParser parser = new LagartoParser(html);
+		parser.parse(visitor);
+		assertEquals("script: SELF_CLOSING\n" +
+				"stext: \n" +
+				"<link href=\"b.html\">\n" +
+				"<script src=\"c.js\">\n", sb.toString());
+
+		parser = new LagartoParser(html);
+		final TagWriter tv = new TagWriter();
+		parser.parse(tv);
+		assertEquals("<script src=\"a.js\">\n" +
+				"<link href=\"b.html\">\n" +
+				"<script src=\"c.js\"></script>", tv.getOutput().toString());
 	}
 
 }

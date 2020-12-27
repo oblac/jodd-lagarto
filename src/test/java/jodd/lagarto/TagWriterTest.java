@@ -16,7 +16,7 @@ class TagWriterTest {
 		final TagVisitor vistor = new TagWriter(stringBuilder);
 		parser.parse(vistor);
 
-		assertEquals("<script src=\"abc.js\"/>", stringBuilder.toString());
+		assertEquals("<script src=\"abc.js\"></script>", stringBuilder.toString());
 	}
 
 	@Test

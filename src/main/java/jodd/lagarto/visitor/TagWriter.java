@@ -74,13 +74,12 @@ public class TagWriter implements TagVisitor {
 	@Override
 	public void script(final Tag tag, final CharSequence body) {
 		try {
+			tag.setType(TagType.START);
 			tag.writeTo(appendable);
 			if (StringUtil.isNotEmpty(body)) {
 				appendable.append(body);
 			}
-			if (tag.getType() == TagType.START) {
-				appendable.append("</script>");
-			}
+			appendable.append("</script>");
 		} catch (final IOException ioex) {
 			throw new LagartoException(ioex);
 		}
