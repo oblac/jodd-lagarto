@@ -66,9 +66,12 @@ public class TagWriter implements TagVisitor {
 	public void end() {
 	}
 
+	private boolean isRawTag;
+
 	@Override
 	public void tag(final Tag tag) {
 		tag.writeTo(appendable);
+		isRawTag = tag.isRawTag();
 	}
 
 	@Override
@@ -97,7 +100,11 @@ public class TagWriter implements TagVisitor {
 	@Override
 	public void text(final CharSequence text) {
 		try {
-			appendable.append(HtmlEncoder.text(text));
+			if (isRawTag) {
+				appendable.append(text);
+			} else {
+				appendable.append(HtmlEncoder.text(text));
+			}
 		} catch (final IOException ioex) {
 			throw new LagartoException(ioex);
 		}

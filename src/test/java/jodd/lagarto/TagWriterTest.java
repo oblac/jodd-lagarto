@@ -44,4 +44,25 @@ class TagWriterTest {
 		assertEquals("<script src=\"abc.js\">var s;</script>", stringBuilder.toString());
 	}
 
+	@Test
+	void testStyle() {
+		final String html = "<style>\n" +
+				"    /* -------------------------------------\n" +
+				"        BODY & CONTAINER <do not escape>;\n" +
+				"    ------------------------------------- */\n" +
+				"    .btn > tbody > tr > td {\n" +
+				"        padding-bottom: 15px; \n" +
+				"    }\n" +
+				"</style>";
+
+		final LagartoParser parser = new LagartoParser(html);
+
+		final StringBuilder stringBuilder = new StringBuilder();
+		final TagVisitor vistor = new TagWriter(stringBuilder);
+		parser.parse(vistor);
+
+		assertEquals(html, stringBuilder.toString());
+
+	}
+
 }
