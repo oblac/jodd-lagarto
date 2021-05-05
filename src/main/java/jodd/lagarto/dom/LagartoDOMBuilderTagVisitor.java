@@ -519,7 +519,9 @@ public class LagartoDOMBuilderTagVisitor implements TagVisitor {
 	@Override
 	public void error(final String message) {
 		rootNode.addError(message);
-		domBuilder.config.getErrorLogConsumer().accept(log, message);
+		if (domBuilder.config.errorLogEnabled) {
+			domBuilder.config.getErrorLogConsumer().accept(log, message);
+		}
 	}
 
 }
