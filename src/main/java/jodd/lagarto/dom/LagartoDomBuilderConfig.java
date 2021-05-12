@@ -170,31 +170,35 @@ public class LagartoDomBuilderConfig {
 	/**
 	 * Specifies new HTML rendered.
 	 */
-	public void setHtmlRenderer(final LagartoHtmlRenderer htmlRenderer) {
+	public LagartoDomBuilderConfig setHtmlRenderer(final LagartoHtmlRenderer htmlRenderer) {
 		this.htmlRenderer = Objects.requireNonNull(htmlRenderer);
+		return this;
 	}
 
 	public LagartoParserConfig getParserConfig() {
 		return parserConfig;
 	}
 
-	public void setParserConfig(final LagartoParserConfig parserConfig) {
+	public LagartoDomBuilderConfig setParserConfig(final LagartoParserConfig parserConfig) {
 		this.parserConfig = Objects.requireNonNull(parserConfig);
+		return this;
 	}
 
 	public boolean isErrorLogEnabled() {
 		return errorLogEnabled;
 	}
 
-	public void setErrorLogEnabled(final boolean errorLogEnabled) {
+	public LagartoDomBuilderConfig setErrorLogEnabled(final boolean errorLogEnabled) {
 		this.errorLogEnabled = errorLogEnabled;
+		return this;
 	}
 
 	public BiConsumer<Logger, String> getErrorLogConsumer() {
 		return errorLogConsumer;
 	}
 
-	public void setErrorLogConsumer(final BiConsumer<Logger, String> errorLogConsumer) {
+	public LagartoDomBuilderConfig setErrorLogConsumer(final BiConsumer<Logger, String> errorLogConsumer) {
 		this.errorLogConsumer = errorLogConsumer;
+		return this;
 	}
 }
