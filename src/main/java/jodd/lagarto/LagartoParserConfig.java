@@ -35,6 +35,7 @@ public class LagartoParserConfig {
 	protected boolean calculatePosition = false;
 	protected boolean enableRawTextModes = true;
 	protected int textBufferSize = 1024;
+	protected boolean decodeHtmlEntities = true;
 
 	/**
 	 * @see #setEnableConditionalComments(boolean)
@@ -129,5 +130,20 @@ public class LagartoParserConfig {
 	 */
 	public void setTextBufferSize(final int textBufferSize) {
 		this.textBufferSize = textBufferSize;
+	}
+
+	/**
+	 * @see #setDecodeHtmlEntities(boolean)
+	 */
+	public boolean isDecodeHtmlEntities() {
+		return decodeHtmlEntities;
+	}
+
+	/**
+	 * Decodes HTML entities. By default, entities are decoded.
+	 */
+	public LagartoParserConfig setDecodeHtmlEntities(final boolean decodeHtmlEntities) {
+		this.decodeHtmlEntities = decodeHtmlEntities;
+		return this;
 	}
 }

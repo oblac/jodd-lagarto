@@ -171,7 +171,7 @@ public class LagartoParser {
 					return;
 				}
 
-				if (c == '&') {
+				if ((c == '&') && config.isDecodeHtmlEntities()) {
 					consumeCharacterReference();
 					continue;
 				}
@@ -1162,7 +1162,7 @@ public class LagartoParser {
 					return;
 				}
 
-				if (c == '&') {
+				if ((c == '&') && config.isDecodeHtmlEntities()) {
 					consumeCharacterReference();
 					continue;
 				}
