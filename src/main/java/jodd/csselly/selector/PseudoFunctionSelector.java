@@ -56,6 +56,7 @@ public class PseudoFunctionSelector<E> extends Selector implements NodeFilter, N
 		registerPseudoFunction(PseudoFunctions.LT.class);
 		registerPseudoFunction(PseudoFunctions.CONTAINS.class);
 		registerPseudoFunction(PseudoFunctions.CONTAINS_OWN.class);
+		registerPseudoFunction(PseudoFunctions.MATCHES.class);
 
 		registerPseudoFunction(PseudoFunctions.HAS.class);
 		registerPseudoFunction(PseudoFunctions.NOT.class);
