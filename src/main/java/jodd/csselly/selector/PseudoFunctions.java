@@ -1,6 +1,7 @@
 package jodd.csselly.selector;
 
 import jodd.csselly.CSSelly;
+import jodd.csselly.CSSellyException;
 import jodd.csselly.CssSelector;
 import jodd.lagarto.dom.Node;
 import jodd.lagarto.dom.NodeMatcher;
@@ -8,6 +9,8 @@ import jodd.lagarto.dom.NodeSelector;
 import jodd.util.StringUtil;
 
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public interface PseudoFunctions {
 	/**
@@ -190,6 +193,86 @@ public interface PseudoFunctions {
 		}
 	}
 
+	/**
+	 * jsoup extension: selects elements that directly contain the specified text, ignoring case
+	 * and with normalized whitespace. The text of children elements is not considered.
+	 */
+	class CONTAINS_OWN extends PseudoFunction<String> {
+
+		@Override
+		public String parseExpression(final String expression) {
+			// like jsoup, the expression is taken as is, quotes included
+			final String text = ElementText.unescape(expression);
+			if (text.isEmpty()) {
+				throw new CSSellyException(":containsOwn(text) query must not be empty");
+			}
+			return ElementText.lowerCase(ElementText.normaliseWhitespace(text));
+		}
+
+		@Override
+		public boolean match(final Node node, final String expression) {
+			return ElementText.lowerCase(ElementText.ownText(node)).contains(expression);
+		}
+
+		@Override
+		public String getPseudoFunctionName() {
+			return "containsOwn";
+		}
+	}
+
+	/**
+	 * jsoup extension: selects elements whose text, including the text of their descendants and with
+	 * normalized whitespace, matches the specified regular expression.
+	 */
+	class MATCHES extends PseudoFunction<Pattern> {
+
+		@Override
+		public Pattern parseExpression(final String expression) {
+			return compileRegex(getPseudoFunctionName(), expression);
+		}
+
+		@Override
+		public boolean match(final Node node, final Pattern pattern) {
+			return pattern.matcher(ElementText.text(node)).find();
+		}
+	}
+
+	/**
+	 * jsoup extension: selects elements whose own text, without the text of their children elements and with
+	 * normalized whitespace, matches the specified regular expression.
+	 */
+	class MATCHES_OWN extends PseudoFunction<Pattern> {
+
+		@Override
+		public Pattern parseExpression(final String expression) {
+			return compileRegex(getPseudoFunctionName(), expression);
+		}
+
+		@Override
+		public boolean match(final Node node, final Pattern pattern) {
+			return pattern.matcher(ElementText.ownText(node)).find();
+		}
+
+		@Override
+		public String getPseudoFunctionName() {
+			return "matchesOwn";
+		}
+	}
+
+	/**
+	 * Compiles the regular expression of a pseudo function. Like jsoup, the expression is taken as is.
+	 */
+	static Pattern compileRegex(final String pseudoFunctionName, final String regex) {
+		if (regex.isEmpty()) {
+			throw new CSSellyException(":" + pseudoFunctionName + "(regex) query must not be empty");
+		}
+		try {
+			return Pattern.compile(regex);
+		} catch (final PatternSyntaxException ex) {
+			throw new CSSellyException(ex);
+		}
+	}
+
 	// ---------------------------------------------------------------- advanced
 
 	/**
@@ -202,7 +285,15 @@ public interface PseudoFunctions {
 			if (StringUtil.startsWithChar(expression, '\'') || StringUtil.startsWithChar(expression, '"')) {
 				expression = expression.substring(1, expression.length() - 1);
 			}
-			return CSSelly.parse(expression);
+			final List<List<CssSelector>> selectors = CSSelly.parse(expression);
+			for (final List<CssSelector> selector : selectors) {
+				// relative selectors are anchored at the tested element, but an explicit :scope still represents
+				// the scoping root of the whole selection, which is not available here
+				if (selector != null && selector.get(0).isScope() && !selector.get(0).isRelative()) {
+					throw new CSSellyException(":scope is not supported in :has()");
+				}
+			}
+			return selectors;
 		}
 
 		@Override
@@ -214,22 +305,58 @@ public interface PseudoFunctions {
 	}
 
 	/**
-	 * Selects all elements that do not match the given selector.
+	 * Base class for pseudo functions that match an element against a list of (non-relative) selectors.
 	 */
-	class NOT extends PseudoFunction<List<List<CssSelector>>> {
+	abstract class SelectorListPseudoFunction extends PseudoFunction<List<List<CssSelector>>> {
 
 		@Override
 		public List<List<CssSelector>> parseExpression(String expression) {
 			if (StringUtil.startsWithChar(expression, '\'') || StringUtil.startsWithChar(expression, '"')) {
 				expression = expression.substring(1, expression.length() - 1);
 			}
-			return CSSelly.parse(expression);
+			final List<List<CssSelector>> selectors = CSSelly.parse(expression);
+			for (final List<CssSelector> selector : selectors) {
+				if (selector == null) {
+					throw new CSSellyException("Empty selector in :" + getPseudoFunctionName() + "()");
+				}
+				if (selector.get(0).isScope()) {
+					throw new CSSellyException("Relative selectors are not supported in :" + getPseudoFunctionName() + "()");
+				}
+			}
+			return selectors;
 		}
+
+		protected boolean matchAny(final Node node, final List<List<CssSelector>> selectors) {
+			return new NodeMatcher(node).match(selectors);
+		}
+	}
+
+	/**
+	 * Selects all elements that do not match any of the given selectors.
+	 */
+	class NOT extends SelectorListPseudoFunction {
 
 		@Override
 		public boolean match(final Node node, final List<List<CssSelector>> selectors) {
-			return !new NodeMatcher(node).match(selectors);
+			return !matchAny(node, selectors);
 		}
+	}
+
+	/**
+	 * Selects all elements that match any of the given selectors.
+	 */
+	class IS extends SelectorListPseudoFunction {
+
+		@Override
+		public boolean match(final Node node, final List<List<CssSelector>> selectors) {
+			return matchAny(node, selectors);
+		}
+	}
+
+	/**
+	 * Same as {@link IS}, specificity doesn't apply here.
+	 */
+	class WHERE extends IS {
 	}
 
 }
