@@ -55,18 +55,20 @@ public class CssSelector implements NodeFilter {
 	protected Combinator combinator = Combinator.DESCENDANT;
 	protected List<Selector> selectors;
 	protected boolean scope;
+	protected boolean relative;
 
 	public CssSelector() {
 		this(null);
 	}
 
 	/**
-	 * Creates a selector that represents the scoping root, i.e. the node the selection is performed on.
-	 * Such selector is implicitly created for relative selectors that start with a combinator, eg: {@code > p}.
+	 * Creates a selector that represents the anchor of a relative selector, i.e. a selector that starts with a combinator,
+	 * eg: {@code > p}. The anchor is the node the selection is performed on, eg the element tested by {@code :has()}.
 	 */
 	public static CssSelector scope() {
 		final CssSelector cssSelector = new CssSelector();
 		cssSelector.scope = true;
+		cssSelector.relative = true;
 		return cssSelector;
 	}
 
@@ -129,6 +131,14 @@ public class CssSelector implements NodeFilter {
 	 */
 	public boolean isScope() {
 		return scope;
+	}
+
+	/**
+	 * Returns {@code true} if this selector is the implied anchor of a relative selector, eg: {@code > p},
+	 * {@code false} if it's an explicit {@code :scope}.
+	 */
+	public boolean isRelative() {
+		return relative;
 	}
 
 	/**
