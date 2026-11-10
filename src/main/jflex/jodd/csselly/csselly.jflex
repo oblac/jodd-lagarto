@@ -51,6 +51,24 @@ import java.nio.CharBuffer;
 	ArrayList<CssSelector> selectors = new ArrayList<CssSelector>();
 	CssSelector cssSelector;
 	String pseudoFnName;
+	// pseudo function expression, may contain nested parentheses and strings
+	final StringBuilder pseudoFnExpression = new StringBuilder();
+	int pseudoFnDepth;
+
+	private void startPseudoFn(String name) {
+		pseudoFnName = name;
+		pseudoFnExpression.setLength(0);
+		pseudoFnDepth = 0;
+		statePseudoFn();
+	}
+
+	private void startRelativeSelector() {
+		if (!selectors.isEmpty()) {
+			throw new CSSellyException("Invalid combinator <"+ yytext() +">.", yystate(), line(), column());
+		}
+		cssSelector = CssSelector.scope();
+		selectors.add(cssSelector);
+	}
 %}
 
 // macros
@@ -66,8 +84,7 @@ num       =[0-9]+|[0-9]*\.[0-9]+
 string    ={string1}|{string2}
 string1   =\"([^\n\r\f\"]|\\{nl}|{nonascii}|{escape})*\"
 string2   =\'([^\n\r\f\']|\\{nl}|{nonascii}|{escape})*\'
-string_bracket   =([^\n\r\f\)]|\\{nl}|{nonascii}|{escape})*
-nl        =\n|\r\n|\r|\f
+nl       =\n|\r\n|\r|\f
 whitespace=[ \t\r\n\f]
 w         ={whitespace}*
 ww        ={whitespace}+
@@ -82,7 +99,8 @@ dimension ={num}{ident}
 
 <YYINITIAL> {
 	{ww}			{ /* ignore whitespaces */ }
-	{ident}			{ cssSelector = new CssSelector(yytext()); selectors.add(cssSelector); stateSelector(); }
+	[>+~]			{ startRelativeSelector(); yypushback(1); stateSelector(); }
+	{ident}		{ cssSelector = new CssSelector(yytext()); selectors.add(cssSelector); stateSelector(); }
 	"*"				{ cssSelector = new CssSelector(); selectors.add(cssSelector); stateSelector(); }
 	.				{ cssSelector = new CssSelector(); selectors.add(cssSelector); yypushback(1); stateSelector(); }
 }
@@ -91,7 +109,7 @@ dimension ={num}{ident}
 	"["				{ stateAttr(); }
 	"#"{name}		{ cssSelector.addIdSelector(yytext(1)); }
 	"."{ident}		{ cssSelector.addClassSelector(yytext(1)); }
-	":"(":")?{ident}"("		{ pseudoFnName = yytext(yycharat(1) == ':' ? 2 : 1,1); statePseudoFn(); }
+	":"(":")?{ident}"("		{ startPseudoFn(yytext(yycharat(1) == ':' ? 2 : 1,1)); }
 	":"(":")?{ident}		{ cssSelector.addPseudoClassSelector(yytext( yycharat(1) == ':' ? 2 : 1 )); }
 	.				{ yypushback(1); stateCombinator(); }
 }
@@ -101,7 +119,7 @@ dimension ={num}{ident}
 	(
 		("=" | "~=" | "|=" | "^=" | "$=" | "*=" )
 		{w}
-		({ident} | {string})
+		({ident} {ww} [is] | {string} {w} [is] | {ident} | {string})
 		{w}
 	)?				{ cssSelector.addAttributeSelector(yytext()); }
 	"]"				{ stateSelector(); }
@@ -116,11 +134,20 @@ dimension ={num}{ident}
 }
 
 <PSEUDO_FN> {
-	(
-		{w}
-		(( "+" | "-" | {dimension} | {num} | {string} | {string_bracket} | {ident} )+ {w})+
-	)
-	")"				{ cssSelector.addPseudoFunctionSelector(pseudoFnName, yytext(0, 1)); stateSelector(); }
+	{string}		{ pseudoFnExpression.append(xxtext()); }
+	"("				{ pseudoFnDepth++; pseudoFnExpression.append('('); }
+	")"				{
+						if (pseudoFnDepth == 0) {
+							cssSelector.addPseudoFunctionSelector(pseudoFnName, pseudoFnExpression.toString());
+							stateSelector();
+						} else {
+							pseudoFnDepth--;
+							pseudoFnExpression.append(')');
+						}
+					}
+	[^\(\)\"\'\\\n\r\f]+	{ pseudoFnExpression.append(xxtext()); }
+	{escape}		{ pseudoFnExpression.append(xxtext()); }
+	<<EOF>>			{ throw new CSSellyException("Unclosed pseudo function <" + pseudoFnName + ">.", yystate(), line(), column()); }
 }
 
 

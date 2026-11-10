@@ -25,8 +25,11 @@
 package jodd.csselly.selector;
 
 import jodd.csselly.Selector;
+import jodd.csselly.CSSellyException;
 import jodd.lagarto.dom.Node;
 import jodd.lagarto.dom.NodeFilter;
+
+import java.util.Locale;
 
 /**
  * Attribute selector.
@@ -39,6 +42,7 @@ public class AttributeSelector extends Selector implements NodeFilter {
 	protected final String value;
 	protected final Match match;
 	protected char quoteChar;
+	protected boolean caseInsensitive;
 
 	public AttributeSelector(final String name, final String sign, final String value) {
 		super(Type.ATTRIBUTE);
@@ -69,10 +73,52 @@ public class AttributeSelector extends Selector implements NodeFilter {
 		final int signLen = this.match.getSign().length();
 		index -= (signLen - 1);
 		this.name = attr.substring(0, index).trim();
-		this.value = extractValue(attr.substring(index + signLen));
+		this.value = extractValueAndFlag(attr.substring(index + signLen));
+	}
+
+	/**
+	 * Extracts the value of an attribute selector, with an optional
+	 * case-sensitivity flag ({@code i} or {@code s}), eg: {@code 'value' i}.
+	 */
+	protected String extractValueAndFlag(String value) {
+		value = value.trim();
+		if (value.isEmpty()) {
+			throw new CSSellyException("Missing attribute value");
+		}
+		final char first = value.charAt(0);
+		final String flag;
+		if (first == '"' || first == '\'') {
+			quoteChar = first;
+			final int end = value.lastIndexOf(first);
+			if (end == 0) {
+				throw new CSSellyException("Unclosed attribute value: " + value);
+			}
+			flag = value.substring(end + 1).trim();
+			value = value.substring(1, end);
+		} else {
+			quoteChar = 0;
+			int ws = value.length() - 1;
+			while (ws >= 0 && !Character.isWhitespace(value.charAt(ws))) {
+				ws--;
+			}
+			if (ws == -1) {
+				flag = "";
+			} else {
+				flag = value.substring(ws + 1);
+				value = value.substring(0, ws).trim();
+			}
+		}
+		if (flag.equalsIgnoreCase("i")) {
+			caseInsensitive = true;
+		} else if (!flag.isEmpty() && !flag.equalsIgnoreCase("s")) {
+			throw new CSSellyException("Invalid attribute selector flag: " + flag);
+		}
+		return value;
 	}
 
 	protected String extractValue(String value) {
+		// whitespace is allowed around the value, but not trimmed inside quotes
+		value = value.trim();
 		quoteChar = value.charAt(0);
 		if (quoteChar != '"' && quoteChar != '\'') {
 			quoteChar = 0;
@@ -81,7 +127,7 @@ public class AttributeSelector extends Selector implements NodeFilter {
 		if (quoteChar != 0) {
 			value = value.substring(1, value.length() - 1);
 		}
-		return value.trim();
+		return value;
 	}
 
 	// ---------------------------------------------------------------- getters
@@ -114,6 +160,13 @@ public class AttributeSelector extends Selector implements NodeFilter {
 		return quoteChar;
 	}
 
+	/**
+	 * Returns {@code true} if the value is compared case-insensitively ({@code i} flag).
+	 */
+	public boolean isCaseInsensitive() {
+		return caseInsensitive;
+	}
+
 	// ---------------------------------------------------------------- match
 
 	@Override
@@ -132,6 +185,9 @@ public class AttributeSelector extends Selector implements NodeFilter {
 			return false;
 		}
 
+		if (caseInsensitive) {
+			return match.compare(nodeValue.toLowerCase(Locale.ROOT), value.toLowerCase(Locale.ROOT));
+		}
 		return match.compare(nodeValue, value);
 	}
 }
