@@ -77,12 +77,29 @@ public interface PseudoClasses {
 	}
 
 	/**
-	 * Represents an element that has no children at all.
+	 * Represents an element that has no children, except comments, processing instructions and empty texts.
 	 */
 	class EMPTY extends PseudoClass {
 		@Override
 		public boolean match(final Node node) {
-			return node.getChildNodesCount() == 0;
+			// only elements and non-empty texts affect emptiness, not comments, processing instructions...
+			final int childCount = node.getChildNodesCount();
+			for (int i = 0; i < childCount; i++) {
+				final Node child = node.getChild(i);
+				switch (child.getNodeType()) {
+					case ELEMENT:
+						return false;
+					case TEXT:
+					case CDATA:
+						final String value = child.getNodeValue();
+						if (value != null && !value.isEmpty()) {
+							return false;
+						}
+						break;
+					default:
+				}
+			}
+			return true;
 		}
 	}
 
