@@ -165,6 +165,36 @@ class NodeSelectorComplexSelectorsTest {
 		assertEquals("main", select("[lang|=EN i]"));
 	}
 
+	private static final String TEXTS =
+		"<div id='d1'>Hello   <b id='b1'>World</b>  again</div><div id='d2'>line<br>break</div><pre id='pre'>a   b</pre>" +
+		"<p id='p1'>non&nbsp;breaking</p><p id='p2'>'quoted' a(b)c</p><script id='s1'>var hello = 1;</script>" +
+		"<p id='p3'>Hello <span id='sp'>World</span></p>";
+
+	@Test
+	void testContainsOwn() {
+		// same results as jsoup 1.24.1
+		final Document doc = new LagartoDOMBuilder().parse(TEXTS);
+		assertEquals("d1", select(doc, "div:containsOwn(hello again)"));
+		assertEquals("d1", select(doc, "div:containsOwn(HELLO   AGAIN)"));
+		assertEquals("", select(doc, "div:containsOwn(world)"));
+		assertEquals("b1", select(doc, "b:containsOwn(world)"));
+		assertEquals("d2", select(doc, "div:containsOwn(line break)"));
+		// whitespace is preserved in pre, while the searched text is normalized
+		assertEquals("", select(doc, "pre:containsOwn(a   b)"));
+		assertEquals("", select(doc, "pre:containsOwn(a b)"));
+		assertEquals("p1", select(doc, "p:containsOwn(non breaking)"));
+		// the expression is taken as is, quotes included
+		assertEquals("p2", select(doc, "p:containsOwn('quoted')"));
+		assertEquals("p2", select(doc, "p:containsOwn(a\\(b\\)c)"));
+		// script content is data, not text
+		assertEquals("", select(doc, "script:containsOwn(hello)"));
+		assertEquals("d1,p3", select(doc, "*:containsOwn(hello)"));
+		assertEquals("", select(doc, "p:containsOwn(hello world)"));
+		assertThrows(CSSellyException.class, () -> select(doc, "p:containsOwn()"));
+		// pseudo function names are case-insensitive
+		assertEquals("d1,p3", select(doc, "*:containsown(hello)"));
+	}
+
 	@Test
 	void testSelectorsGroupInDocumentOrder() {
 		assertEquals("p1,li3", select("li.x + li, p:first-child"));

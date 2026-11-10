@@ -33,6 +33,7 @@ import jodd.util.ClassUtil;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -54,6 +55,7 @@ public class PseudoFunctionSelector<E> extends Selector implements NodeFilter, N
 		registerPseudoFunction(PseudoFunctions.GT.class);
 		registerPseudoFunction(PseudoFunctions.LT.class);
 		registerPseudoFunction(PseudoFunctions.CONTAINS.class);
+		registerPseudoFunction(PseudoFunctions.CONTAINS_OWN.class);
 
 		registerPseudoFunction(PseudoFunctions.HAS.class);
 		registerPseudoFunction(PseudoFunctions.NOT.class);
@@ -71,14 +73,15 @@ public class PseudoFunctionSelector<E> extends Selector implements NodeFilter, N
 		} catch (final Exception ex) {
 			throw new CSSellyException(ex);
 		}
-		PSEUDO_FUNCTION_MAP.put(pseudoFunction.getPseudoFunctionName(), pseudoFunction);
+		// pseudo function names are case-insensitive
+		PSEUDO_FUNCTION_MAP.put(pseudoFunction.getPseudoFunctionName().toLowerCase(Locale.ROOT), pseudoFunction);
 	}
 
 	/**
 	 * Lookups pseudo function for given pseudo function name.
 	 */
 	public static PseudoFunction<?> lookupPseudoFunction(final String pseudoFunctionName) {
-		final PseudoFunction pseudoFunction = PSEUDO_FUNCTION_MAP.get(pseudoFunctionName);
+		final PseudoFunction pseudoFunction = PSEUDO_FUNCTION_MAP.get(pseudoFunctionName.toLowerCase(Locale.ROOT));
 		if (pseudoFunction == null) {
 			throw new CSSellyException("Unsupported pseudo function: " + pseudoFunctionName);
 		}
