@@ -233,6 +233,8 @@ public class CssSelector implements NodeFilter {
 							}
 							if (attrSelector.isCaseInsensitive()) {
 								out.append(" i");
+							} else if (attrSelector.isCaseSensitive()) {
+								out.append(" s");
 							}
 						}
 						out.append(']');
