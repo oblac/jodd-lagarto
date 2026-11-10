@@ -398,6 +398,19 @@ class NodeSelectorTest {
 		assertEquals(0, nodeSelector.select("lineargradient").size());
 	}
 
+	@Test
+	void testEmpty() {
+		NodeSelector nodeSelector = new NodeSelector(new LagartoDOMBuilder().parse(
+			"<p id='p1'></p><p id='p2'><!-- comment --></p><p id='p3'> </p><p id='p4'>text</p><p id='p5'><b></b></p>"));
+
+		List<Node> nodes = nodeSelector.select("p:empty");
+
+		// comments don't affect emptiness, whitespace does
+		assertEquals(2, nodes.size());
+		assertEquals("p1", nodes.get(0).getAttribute("id"));
+		assertEquals("p2", nodes.get(1).getAttribute("id"));
+	}
+
 	// ---------------------------------------------------------------- utils
 
 	private NodeSelector createNodeFilter() throws IOException {
