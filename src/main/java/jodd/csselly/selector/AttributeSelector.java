@@ -73,6 +73,8 @@ public class AttributeSelector extends Selector implements NodeFilter {
 	}
 
 	protected String extractValue(String value) {
+		// whitespace is allowed around the value, but not trimmed inside quotes
+		value = value.trim();
 		quoteChar = value.charAt(0);
 		if (quoteChar != '"' && quoteChar != '\'') {
 			quoteChar = 0;
@@ -81,7 +83,7 @@ public class AttributeSelector extends Selector implements NodeFilter {
 		if (quoteChar != 0) {
 			value = value.substring(1, value.length() - 1);
 		}
-		return value.trim();
+		return value;
 	}
 
 	// ---------------------------------------------------------------- getters
