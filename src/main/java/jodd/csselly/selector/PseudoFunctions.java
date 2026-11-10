@@ -228,6 +228,33 @@ public interface PseudoFunctions {
 		}
 	}
 
+	/**
+	 * jsoup extension: selects elements that directly contain the specified text, ignoring case
+	 * and with normalized whitespace. The text of children elements is not considered.
+	 */
+	class CONTAINS_OWN extends PseudoFunction<String> {
+
+		@Override
+		public String parseExpression(final String expression) {
+			// like jsoup, the expression is taken as is, quotes included
+			final String text = ElementText.unescape(expression);
+			if (text.isEmpty()) {
+				throw new CSSellyException(":containsOwn(text) query must not be empty");
+			}
+			return ElementText.lowerCase(ElementText.normaliseWhitespace(text));
+		}
+
+		@Override
+		public boolean match(final Node node, final String expression) {
+			return ElementText.lowerCase(ElementText.ownText(node)).contains(expression);
+		}
+
+		@Override
+		public String getPseudoFunctionName() {
+			return "containsOwn";
+		}
+	}
+
 	// ---------------------------------------------------------------- advanced
 
 	/**
