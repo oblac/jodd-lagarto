@@ -43,17 +43,66 @@ public class NodeMatcher {
 		return match(selectorsCollection);
 	}
 
+	/**
+	 * Returns {@code true} if the node matches any of the selectors of the group.
+	 * Each selector is matched from right to left, honoring the combinators.
+	 */
 	public boolean match(final Collection<List<CssSelector>> selectorsCollection) {
 		for (List<CssSelector> selectors : selectorsCollection) {
-			// iterate all selectors
-			for (CssSelector cssSelector : selectors) {
-				if (!cssSelector.accept(rootNode)) {
-					return false;
-				}
+			if (match(rootNode, selectors, selectors.size() - 1)) {
+				return true;
 			}
 		}
 
-		return true;
+		return false;
+	}
+
+	/**
+	 * Matches the node against the selector at given index and,
+	 * recursively, its ancestors or previous siblings against the previous selectors.
+	 */
+	protected boolean match(final Node node, final List<CssSelector> selectors, final int index) {
+		final CssSelector cssSelector = selectors.get(index);
+		if (!cssSelector.accept(node)) {
+			return false;
+		}
+		if (index == 0) {
+			return true;
+		}
+
+		final int prevIndex = index - 1;
+		switch (selectors.get(prevIndex).getCombinator()) {
+			case CHILD: {
+				final Node parent = node.getParentNode();
+				return parent != null && match(parent, selectors, prevIndex);
+			}
+			case DESCENDANT: {
+				Node ancestor = node.getParentNode();
+				while (ancestor != null) {
+					if (match(ancestor, selectors, prevIndex)) {
+						return true;
+					}
+					ancestor = ancestor.getParentNode();
+				}
+				return false;
+			}
+			case ADJACENT_SIBLING: {
+				final Node sibling = node.getPreviousSiblingElement();
+				return sibling != null && match(sibling, selectors, prevIndex);
+			}
+			case GENERAL_SIBLING: {
+				Node sibling = node.getPreviousSiblingElement();
+				while (sibling != null) {
+					if (match(sibling, selectors, prevIndex)) {
+						return true;
+					}
+					sibling = sibling.getPreviousSiblingElement();
+				}
+				return false;
+			}
+			default:
+				return false;
+		}
 	}
 
 
