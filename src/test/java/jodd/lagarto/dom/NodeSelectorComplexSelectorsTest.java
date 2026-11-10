@@ -195,6 +195,38 @@ class NodeSelectorComplexSelectorsTest {
 		assertEquals("d1,p3", select(doc, "*:containsown(hello)"));
 	}
 
+	private static final String MORE_TEXTS = TEXTS +
+		"<ul id='ul'><li id='li1'>one</li><li id='li2'>two</li></ul><span id='sp2'>in<div id='d3'>block</div>line</span>" +
+		"<p id='p4'>x<input id='in'>y</p><table id='t'><tr id='tr'><td id='td1'>12</td><td id='td2'>34</td></tr></table>";
+
+	@Test
+	void testMatches() {
+		// same results as jsoup 1.24.1
+		final Document doc = new LagartoDOMBuilder().parse("<html><body id='body'>" + MORE_TEXTS + "</body></html>");
+		assertEquals("d1", select(doc, "div:matches(Hello World again)"));
+		assertEquals("d1", select(doc, "div:matches((?i)hello\\s+world)"));
+		assertEquals("d2", select(doc, "*:matches(^line break$)"));
+		// whitespace is preserved in pre
+		assertEquals("pre", select(doc, "pre:matches(a   b)"));
+		assertEquals("", select(doc, "pre:matches(^a b$)"));
+		// a space separates blocks and boundaries such as inputs
+		assertEquals("ul", select(doc, "ul:matches(^one two$)"));
+		assertEquals("sp2", select(doc, "span:matches(in block line)"));
+		assertEquals("", select(doc, "p:matches(xy)"));
+		assertEquals("p4", select(doc, "p:matches(x y)"));
+		assertEquals("t", select(doc, "table:matches(^12 34$)"));
+		assertEquals("td1,td2", select(doc, "td:matches(\\d+)"));
+		// the expression is taken as is
+		assertEquals("p2", select(doc, "p:matches('quoted')"));
+		assertEquals("p2", select(doc, "p:matches(a\\(b\\)c)"));
+		// script content is data, not text
+		assertEquals("", select(doc, "script:matches(hello)"));
+		assertEquals("p1", select(doc, "p:matches(non breaking)"));
+		assertEquals("body", select(doc, "body:matches(World again line break)"));
+		assertThrows(CSSellyException.class, () -> select(doc, "p:matches([)"));
+		assertThrows(CSSellyException.class, () -> select(doc, "p:matches()"));
+	}
+
 	@Test
 	void testSelectorsGroupInDocumentOrder() {
 		assertEquals("p1,li3", select("li.x + li, p:first-child"));

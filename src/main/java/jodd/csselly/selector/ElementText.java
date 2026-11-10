@@ -33,7 +33,8 @@ import java.util.Set;
 
 /**
  * Element texts for the pseudo functions born in jsoup ({@code :containsOwn()}...), computed like jsoup 1.24
- * ({@code Element#ownText()}): whitespace is normalized, except in elements that preserve it, such as {@code pre}.
+ * ({@code Element#text()} and {@code Element#ownText()}): whitespace is normalized, except in elements that preserve it,
+ * such as {@code pre}, and a space separates block elements.
  * <p>
  * Ported from <a href="https://jsoup.org">jsoup</a>, Copyright (c) 2009-2025 Jonathan Hedley, MIT License.
  */
@@ -45,9 +46,114 @@ final class ElementText {
 	// jsoup's org.jsoup.parser.TagSet
 	private static final Set<String> PRESERVE_WHITESPACE_TAGS = set("pre", "listing", "plaintext", "title", "textarea", "script");
 	private static final Set<String> DATA_TAGS = set("iframe", "noembed", "noframes", "script", "style", "xmp");
+	private static final Set<String> BLOCK_TAGS = set(
+		"html", "head", "body", "frameset", "script", "noscript", "style", "meta", "link", "title", "frame",
+		"noframes", "section", "nav", "aside", "hgroup", "header", "footer", "p", "h1", "h2", "h3", "h4", "h5",
+		"h6", "dialog", "search",
+		"ul", "ol", "pre", "div", "blockquote", "hr", "address", "figure", "figcaption", "form", "fieldset",
+		"dl", "dt", "dd", "li", "table", "caption", "thead", "tfoot", "tbody", "colgroup", "col", "tr", "th",
+		"td", "details", "menu", "plaintext", "template", "article", "main",
+		"center",
+		"dir", "applet", "marquee", "listing",
+		// MathML and SVG
+		"math", "svg", "femerge", "femergenode");
+	// text() readability hint for controls, widgets, and embedded objects
+	private static final Set<String> TEXT_BOUNDARY_TAGS = set(
+		"button", "input", "select", "textarea", "option", "output", "progress", "meter",
+		"img", "picture", "audio", "video", "canvas", "object", "embed", "iframe");
 
 	private static Set<String> set(final String... values) {
 		return new HashSet<>(Arrays.asList(values));
+	}
+
+	/**
+	 * Returns the text of the element and of its descendants, whitespace normalized and trimmed.
+	 */
+	static String text(final Node element) {
+		final StringBuilder accum = new StringBuilder();
+		appendText(accum, element);
+		return accum.toString().trim();
+	}
+
+	private static void appendText(final StringBuilder accum, final Node node) {
+		if (isText(node)) {
+			appendNormalisedText(accum, node);
+			return;
+		}
+		if (node.getNodeType() != Node.NodeType.ELEMENT) {
+			return;
+		}
+		// add a space before leading blocks and readable boundaries when text would otherwise run together
+		if (accum.length() > 0 && needsLeadingTextSeparator(node) && !lastCharIsWhitespace(accum)) {
+			accum.append(' ');
+		}
+		final int childCount = node.getChildNodesCount();
+		for (int i = 0; i < childCount; i++) {
+			appendText(accum, node.getChild(i));
+		}
+		// make sure there is a space between block or readable-boundary elements and immediately following texts or inline elements
+		final Node next = node.getNextSibling();
+		if (needsTrailingTextSeparator(node)
+			&& next != null && (isText(next) || next.getNodeType() == Node.NodeType.ELEMENT && !isBlock(next))
+			&& !lastCharIsWhitespace(accum)) {
+			accum.append(' ');
+		}
+	}
+
+	private static boolean needsLeadingTextSeparator(final Node element) {
+		return isBlock(element)
+			|| isElement(element, "br")
+			|| isTextBoundary(element) && element.getChildNodesCount() > 0 && hasText(element);
+	}
+
+	private static boolean needsTrailingTextSeparator(final Node element) {
+		return isTextBoundary(element) || isBlock(element) || hasBlockChild(element);
+	}
+
+	private static boolean hasBlockChild(final Node element) {
+		final int childCount = element.getChildNodesCount();
+		for (int i = 0; i < childCount; i++) {
+			final Node child = element.getChild(i);
+			if (child.getNodeType() == Node.NodeType.ELEMENT && isBlock(child)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Returns {@code true} if the element contains a non-blank text.
+	 */
+	private static boolean hasText(final Node node) {
+		final int childCount = node.getChildNodesCount();
+		for (int i = 0; i < childCount; i++) {
+			final Node child = node.getChild(i);
+			if (isText(child) ? !isBlank(child.getNodeValue()) : hasText(child)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static boolean isBlank(final String value) {
+		if (value == null) {
+			return true;
+		}
+		for (int i = 0; i < value.length(); i++) {
+			final char c = value.charAt(i);
+			if (c != ' ' && c != '\t' && c != '\n' && c != '\f' && c != '\r') {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private static boolean isBlock(final Node element) {
+		return BLOCK_TAGS.contains(lowerCase(element.getNodeName()));
+	}
+
+	private static boolean isTextBoundary(final Node element) {
+		return TEXT_BOUNDARY_TAGS.contains(lowerCase(element.getNodeName()));
 	}
 
 	/**
