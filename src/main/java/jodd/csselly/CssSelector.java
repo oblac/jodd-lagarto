@@ -45,6 +45,7 @@ public class CssSelector implements NodeFilter {
 	private static final String ID = "id";
 	private static final String CLASS = "class";
 	private static final String STAR = "*";
+	private static final String SCOPE = "scope";
 
 	protected CssSelector prevCssSelector;
 	protected CssSelector nextCssSelector;
@@ -53,9 +54,20 @@ public class CssSelector implements NodeFilter {
 
 	protected Combinator combinator = Combinator.DESCENDANT;
 	protected List<Selector> selectors;
+	protected boolean scope;
 
 	public CssSelector() {
 		this(null);
+	}
+
+	/**
+	 * Creates a selector that represents the scoping root, i.e. the node the selection is performed on.
+	 * Such selector is implicitly created for relative selectors that start with a combinator, eg: {@code > p}.
+	 */
+	public static CssSelector scope() {
+		final CssSelector cssSelector = new CssSelector();
+		cssSelector.scope = true;
+		return cssSelector;
 	}
 
 	public CssSelector(String element) {
@@ -111,6 +123,21 @@ public class CssSelector implements NodeFilter {
 		return selectors.size();
 	}
 
+	/**
+	 * Returns {@code true} if this selector represents the scoping root,
+	 * either explicitly with {@code :scope} or implicitly when the selector starts with a combinator.
+	 */
+	public boolean isScope() {
+		return scope;
+	}
+
+	/**
+	 * Returns {@code true} if this selector has conditions besides representing the scoping root.
+	 */
+	public boolean hasConditions() {
+		return !element.equals(STAR) || !selectors.isEmpty();
+	}
+
 	// ---------------------------------------------------------------- combinator
 
 	/**
@@ -147,6 +174,10 @@ public class CssSelector implements NodeFilter {
 	// ---------------------------------------------------------------- pseudo class
 
 	public void addPseudoClassSelector(final String pseudoClass) {
+		if (SCOPE.equalsIgnoreCase(pseudoClass.trim())) {
+			scope = true;
+			return;
+		}
 		selectors.add(new PseudoClassSelector(pseudoClass));
 	}
 
@@ -163,6 +194,9 @@ public class CssSelector implements NodeFilter {
 	public String toString() {
 		final StringBuilder out = new StringBuilder();
 		out.append(element);
+		if (scope) {
+			out.append(':').append(SCOPE);
+		}
 
 		for (final Selector selector : selectors) {
 			switch (selector.getType()) {
@@ -185,6 +219,9 @@ public class CssSelector implements NodeFilter {
 							out.append(value);
 							if (quote != 0) {
 								out.append(quote);
+							}
+							if (attrSelector.isCaseInsensitive()) {
+								out.append(" i");
 							}
 						}
 						out.append(']');

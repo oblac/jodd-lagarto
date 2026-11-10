@@ -30,8 +30,10 @@ import jodd.csselly.CssSelector;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Node selector selects DOM nodes using {@link CSSelly CSS3 selectors}.
@@ -56,15 +58,55 @@ public class NodeSelector {
 	}
 
 	/**
-	 * Selected nodes using pre-parsed CSS selectors. Take in consideration
-	 * collection type for results grouping order.
+	 * Selected nodes using pre-parsed CSS selectors.
+	 * When there's more than one selector, results are returned in document order.
 	 */
 	public List<Node> select(final Collection<List<CssSelector>> selectorsCollection) {
 		List<Node> results = new ArrayList<>();
 		for (List<CssSelector> selectors : selectorsCollection) {
 			processSelectors(results, selectors);
 		}
+		if (selectorsCollection.size() > 1) {
+			sortInDocumentOrder(results);
+		}
 		return results;
+	}
+
+	/**
+	 * Sorts nodes in document order.
+	 */
+	protected void sortInDocumentOrder(final List<Node> nodes) {
+		if (nodes.size() < 2) {
+			return;
+		}
+		final Map<Node, int[]> paths = new IdentityHashMap<>(nodes.size());
+		for (Node node : nodes) {
+			paths.put(node, documentPath(node));
+		}
+		nodes.sort((n1, n2) -> {
+			final int[] p1 = paths.get(n1);
+			final int[] p2 = paths.get(n2);
+			final int length = Math.min(p1.length, p2.length);
+			for (int i = 0; i < length; i++) {
+				if (p1[i] != p2[i]) {
+					return Integer.compare(p1[i], p2[i]);
+				}
+			}
+			// ancestors come first
+			return Integer.compare(p1.length, p2.length);
+		});
+	}
+
+	private static int[] documentPath(Node node) {
+		int depth = 0;
+		for (Node n = node; n.getParentNode() != null; n = n.getParentNode()) {
+			depth++;
+		}
+		final int[] path = new int[depth];
+		for (Node n = node; n.getParentNode() != null; n = n.getParentNode()) {
+			path[--depth] = n.getSiblingIndex();
+		}
+		return path;
 	}
 
 	/**
@@ -130,8 +172,19 @@ public class NodeSelector {
 		List<Node> nodes = new ArrayList<>();
 		nodes.add(rootNode);
 
+		// a leading scope selector, explicit (:scope) or implicit (relative selector, eg "> p"), is the root node itself
+		int start = 0;
+		final CssSelector first = selectors.get(0);
+		if (first.isScope()) {
+			if (first.hasConditions() && !first.accept(rootNode)) {
+				return new ArrayList<>();
+			}
+			start = 1;
+		}
+
 		// iterate all selectors
-		for (CssSelector cssSelector : selectors) {
+		for (int i = start; i < selectors.size(); i++) {
+			final CssSelector cssSelector = selectors.get(i);
 
 			// create new set of results for current css selector
 			List<Node> selectedNodes = new ArrayList<>();
