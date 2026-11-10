@@ -26,10 +26,13 @@ package jodd.csselly.selector;
 
 import jodd.csselly.Selector;
 import jodd.csselly.CSSellyException;
+import jodd.lagarto.dom.Document;
 import jodd.lagarto.dom.Node;
 import jodd.lagarto.dom.NodeFilter;
 
-import java.util.Locale;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Attribute selector.
@@ -43,6 +46,19 @@ public class AttributeSelector extends Selector implements NodeFilter {
 	protected final Match match;
 	protected char quoteChar;
 	protected boolean caseInsensitive;
+	protected boolean caseSensitive;
+
+	/**
+	 * Attributes whose values are matched ASCII case-insensitively on HTML elements in HTML documents, unless the
+	 * {@code s} flag is used.
+	 * See <a href="https://html.spec.whatwg.org/multipage/semantics-other.html#case-sensitivity-of-selectors">HTML</a>.
+	 */
+	private static final Set<String> HTML_CASE_INSENSITIVE_ATTRIBUTES = new HashSet<>(Arrays.asList(
+		"accept", "accept-charset", "align", "alink", "axis", "bgcolor", "charset", "checked", "clear", "codetype",
+		"color", "compact", "declare", "defer", "dir", "direction", "disabled", "enctype", "face", "frame",
+		"hreflang", "http-equiv", "lang", "language", "link", "media", "method", "multiple", "nohref", "noresize",
+		"noshade", "nowrap", "readonly", "rel", "rev", "rules", "scope", "scrolling", "selected", "shape",
+		"target", "text", "type", "valign", "valuetype", "vlink"));
 
 	public AttributeSelector(final String name, final String sign, final String value) {
 		super(Type.ATTRIBUTE);
@@ -110,7 +126,9 @@ public class AttributeSelector extends Selector implements NodeFilter {
 		}
 		if (flag.equalsIgnoreCase("i")) {
 			caseInsensitive = true;
-		} else if (!flag.isEmpty() && !flag.equalsIgnoreCase("s")) {
+		} else if (flag.equalsIgnoreCase("s")) {
+			caseSensitive = true;
+		} else if (!flag.isEmpty()) {
 			throw new CSSellyException("Invalid attribute selector flag: " + flag);
 		}
 		return value;
@@ -167,6 +185,14 @@ public class AttributeSelector extends Selector implements NodeFilter {
 		return caseInsensitive;
 	}
 
+	/**
+	 * Returns {@code true} if the value is compared case-sensitively ({@code s} flag),
+	 * even for the attributes that HTML matches case-insensitively.
+	 */
+	public boolean isCaseSensitive() {
+		return caseSensitive;
+	}
+
 	// ---------------------------------------------------------------- match
 
 	@Override
@@ -185,9 +211,30 @@ public class AttributeSelector extends Selector implements NodeFilter {
 			return false;
 		}
 
-		if (caseInsensitive) {
-			return match.compare(nodeValue.toLowerCase(Locale.ROOT), value.toLowerCase(Locale.ROOT));
+		if (caseInsensitive || (!caseSensitive && isHtmlCaseInsensitive(node))) {
+			return match.compare(asciiLowerCase(nodeValue), asciiLowerCase(value));
 		}
 		return match.compare(nodeValue, value);
+	}
+
+	private boolean isHtmlCaseInsensitive(final Node node) {
+		final Document document = node.getOwnerDocument();
+		return document != null
+			&& !document.getConfig().getParserConfig().isCaseSensitive()
+			&& HTML_CASE_INSENSITIVE_ATTRIBUTES.contains(asciiLowerCase(name));
+	}
+
+	private static String asciiLowerCase(final String value) {
+		char[] chars = null;
+		for (int i = 0; i < value.length(); i++) {
+			final char c = value.charAt(i);
+			if (c >= 'A' && c <= 'Z') {
+				if (chars == null) {
+					chars = value.toCharArray();
+				}
+				chars[i] = (char) (c + ('a' - 'A'));
+			}
+		}
+		return chars == null ? value : new String(chars);
 	}
 }

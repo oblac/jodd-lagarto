@@ -166,6 +166,30 @@ class NodeSelectorComplexSelectorsTest {
 	}
 
 	@Test
+	void testHtmlCaseInsensitiveAttributeValues() {
+		final String html = "<input id='i1' type='TEXT'><a id='a1' rel='NoFollow' title='Foo' hreflang='EN'>link</a>";
+		final Document doc = new LagartoDOMBuilder().parse(html);
+
+		// HTML lists attributes whose values are case-insensitive, like browsers
+		assertEquals("i1", select(doc, "[type=text]"));
+		assertEquals("i1", select(doc, "[TYPE=text]"));
+		assertEquals("a1", select(doc, "[rel=nofollow]"));
+		assertEquals("a1", select(doc, "[hreflang|=en]"));
+		assertEquals("a1", select(doc, "[rel^=no]"));
+		// unless the s flag is used
+		assertEquals("", select(doc, "[type=text s]"));
+		assertEquals("i1", select(doc, "[type=TEXT s]"));
+		// other attributes are case-sensitive
+		assertEquals("", select(doc, "[title=foo]"));
+		assertEquals("a1", select(doc, "[title=foo i]"));
+
+		// XML is case-sensitive
+		final Document xml = new LagartoDOMBuilder().enableXmlMode().parse(html);
+		assertEquals("", select(xml, "[type=text]"));
+		assertEquals("i1", select(xml, "[type=text i]"));
+	}
+
+	@Test
 	void testSelectorsGroupInDocumentOrder() {
 		assertEquals("p1,li3", select("li.x + li, p:first-child"));
 		assertEquals("main,ul,li1", select("li:first-child, ul, div"));
