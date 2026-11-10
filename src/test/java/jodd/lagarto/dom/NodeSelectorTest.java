@@ -366,6 +366,15 @@ class NodeSelectorTest {
 		assertEquals("body", nodes.get(0).nodeName);
 	}
 
+	@Test
+	void testContainsWithEscapes() {
+		NodeSelector nodeSelector = new NodeSelector(new LagartoDOMBuilder().parse("<p id='p1'>Hello (there)</p><p id='p2'>it's</p>"));
+
+		assertEquals("p1", nodeSelector.selectFirst("p:contains(Hello \\(there\\))").getAttribute("id"));
+		assertEquals("p1", nodeSelector.selectFirst("p:contains(Hello \\28 there\\29)").getAttribute("id"));
+		assertEquals("p2", nodeSelector.selectFirst("p:contains('it\\'s')").getAttribute("id"));
+		assertEquals(0, nodeSelector.select("p:contains(Hello \\(here\\))").size());
+	}
 
 	// ---------------------------------------------------------------- utils
 
