@@ -366,6 +366,19 @@ class NodeSelectorTest {
 		assertEquals("body", nodes.get(0).nodeName);
 	}
 
+	@Test
+	void testAttributeValueWhitespaces() {
+		NodeSelector nodeSelector = new NodeSelector(new LagartoDOMBuilder().parse("<p id='p1' title='Foo Bar'></p><p id='p2' title=' Foo Bar '></p>"));
+
+		// whitespace around the value is ignored
+		assertEquals("p1", nodeSelector.selectFirst("[title= 'Foo Bar' ]").getAttribute("id"));
+
+		// whitespace inside quotes is significant
+		List<Node> nodes = nodeSelector.select("[title=' Foo Bar ']");
+		assertEquals(1, nodes.size());
+		assertEquals("p2", nodes.get(0).getAttribute("id"));
+		assertEquals(0, nodeSelector.select("[title='Foo Bar ']").size());
+	}
 
 	// ---------------------------------------------------------------- utils
 
