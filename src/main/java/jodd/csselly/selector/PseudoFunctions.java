@@ -9,6 +9,8 @@ import jodd.lagarto.dom.NodeSelector;
 import jodd.util.StringUtil;
 
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public interface PseudoFunctions {
 	/**
@@ -252,6 +254,37 @@ public interface PseudoFunctions {
 		@Override
 		public String getPseudoFunctionName() {
 			return "containsOwn";
+		}
+	}
+
+	/**
+	 * jsoup extension: selects elements whose text, including the text of their descendants and with
+	 * normalized whitespace, matches the specified regular expression.
+	 */
+	class MATCHES extends PseudoFunction<Pattern> {
+
+		@Override
+		public Pattern parseExpression(final String expression) {
+			return compileRegex(getPseudoFunctionName(), expression);
+		}
+
+		@Override
+		public boolean match(final Node node, final Pattern pattern) {
+			return pattern.matcher(ElementText.text(node)).find();
+		}
+	}
+
+	/**
+	 * Compiles the regular expression of a pseudo function. Like jsoup, the expression is taken as is.
+	 */
+	static Pattern compileRegex(final String pseudoFunctionName, final String regex) {
+		if (regex.isEmpty()) {
+			throw new CSSellyException(":" + pseudoFunctionName + "(regex) query must not be empty");
+		}
+		try {
+			return Pattern.compile(regex);
+		} catch (final PatternSyntaxException ex) {
+			throw new CSSellyException(ex);
 		}
 	}
 
