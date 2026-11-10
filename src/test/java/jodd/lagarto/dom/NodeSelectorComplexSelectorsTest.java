@@ -190,6 +190,23 @@ class NodeSelectorComplexSelectorsTest {
 	}
 
 	@Test
+	void testAttributeNotEquals() {
+		// same results as jQuery 3.7.1
+		final Document doc = new LagartoDOMBuilder().parse(
+			"<a id='a1' rel='nofollow'>1</a><a id='a2' rel='me'>2</a><a id='a3'>3</a><a id='a4' rel='NoFollow'>4</a><a id='a5' rel=''>5</a>" +
+			"<input id='i1' type='TEXT'><input id='i2' type='text'>");
+		assertEquals("a2,a3,a4,a5", select(doc, "a[rel!=nofollow]"));
+		assertEquals("a2,a3,a4,a5", select(doc, "a[rel!='nofollow']"));
+		assertEquals("a1,a2,a3,a4", select(doc, "a[rel!='']"));
+		assertEquals("a2,a4,a5", select(doc, "a[rel!=nofollow][rel]"));
+		// always case-sensitive, even for the attributes HTML matches case-insensitively
+		assertEquals("i1", select(doc, "input[type!=text]"));
+		assertEquals("a2,a3,a5", select(doc, "a:not([rel=nofollow])"));
+		// no flags
+		assertThrows(CSSellyException.class, () -> select(doc, "a[rel!=nofollow i]"));
+	}
+
+	@Test
 	void testSelectorsGroupInDocumentOrder() {
 		assertEquals("p1,li3", select("li.x + li, p:first-child"));
 		assertEquals("main,ul,li1", select("li:first-child, ul, div"));

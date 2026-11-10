@@ -90,6 +90,10 @@ public class AttributeSelector extends Selector implements NodeFilter {
 		index -= (signLen - 1);
 		this.name = attr.substring(0, index).trim();
 		this.value = extractValueAndFlag(attr.substring(index + signLen));
+		if (match == Match.NOT_EQUALS && (caseInsensitive || caseSensitive)) {
+			// like jQuery
+			throw new CSSellyException("Attribute selector flags are not supported with " + match.getSign());
+		}
 	}
 
 	/**
@@ -197,6 +201,15 @@ public class AttributeSelector extends Selector implements NodeFilter {
 
 	@Override
 	public boolean accept(final Node node) {
+		if (match == Match.NOT_EQUALS) {
+			// like jQuery: also matches elements without the attribute, always case-sensitive
+			if (!node.hasAttribute(name)) {
+				return true;
+			}
+			final String nodeValue = node.getAttribute(name);
+			return match.compare(nodeValue == null ? "" : nodeValue, value);
+		}
+
 		if (!node.hasAttribute(name)) {
 			return false;
 		}
