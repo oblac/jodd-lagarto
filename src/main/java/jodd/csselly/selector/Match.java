@@ -148,6 +148,17 @@ public enum Match {
 			}
 			return attr.contains(val);
 		}
+	},
+
+	/**
+	 * jQuery extension: represents an element without the "att" attribute, or whose "att" attribute value
+	 * is not exactly "val". It's always case-sensitive.
+	 */
+	NOT_EQUALS("!=") {
+		@Override
+		public boolean compare(final String attr, final String val) {
+			return !val.equals(attr);
+		}
 	};
 
 	private final String sign;

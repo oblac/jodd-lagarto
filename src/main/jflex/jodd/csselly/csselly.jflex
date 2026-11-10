@@ -117,7 +117,7 @@ dimension ={num}{ident}
 <ATTR> {
     {w}{ident}{w}
 	(
-		("=" | "~=" | "|=" | "^=" | "$=" | "*=" )
+		("=" | "~=" | "|=" | "^=" | "$=" | "*=" | "!=" )
 		{w}
 		({ident} {ww} [is] | {string} {w} [is] | {ident} | {string})
 		{w}
