@@ -170,16 +170,27 @@ public class NodeSelector {
 
 		// start with the root node
 		List<Node> nodes = new ArrayList<>();
-		nodes.add(rootNode);
 
-		// a leading scope selector, explicit (:scope) or implicit (relative selector, eg "> p"), is the root node itself
+		// a leading scope selector, explicit (:scope) or implicit (relative selector, eg "> p"), is the scoping root:
+		// the root node itself, or the root element when selecting from a document, like :root
 		int start = 0;
 		final CssSelector first = selectors.get(0);
 		if (first.isScope()) {
-			if (first.hasConditions() && !first.accept(rootNode)) {
+			final Node scopeNode = rootNode.getNodeType() == Node.NodeType.DOCUMENT ? rootNode.getFirstChildElement() : rootNode;
+			if (scopeNode == null || (first.hasConditions() && !first.accept(scopeNode))) {
 				return new ArrayList<>();
 			}
+			if (selectors.size() == 1) {
+				// only the descendants of the root node are selected
+				if (scopeNode != rootNode) {
+					nodes.add(scopeNode);
+				}
+				return nodes;
+			}
+			nodes.add(scopeNode);
 			start = 1;
+		} else {
+			nodes.add(rootNode);
 		}
 
 		// iterate all selectors

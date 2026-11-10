@@ -203,7 +203,15 @@ public interface PseudoFunctions {
 			if (StringUtil.startsWithChar(expression, '\'') || StringUtil.startsWithChar(expression, '"')) {
 				expression = expression.substring(1, expression.length() - 1);
 			}
-			return CSSelly.parse(expression);
+			final List<List<CssSelector>> selectors = CSSelly.parse(expression);
+			for (final List<CssSelector> selector : selectors) {
+				// relative selectors are anchored at the tested element, but an explicit :scope still represents
+				// the scoping root of the whole selection, which is not available here
+				if (selector != null && selector.get(0).isScope() && !selector.get(0).isRelative()) {
+					throw new CSSellyException(":scope is not supported in :has()");
+				}
+			}
+			return selectors;
 		}
 
 		@Override

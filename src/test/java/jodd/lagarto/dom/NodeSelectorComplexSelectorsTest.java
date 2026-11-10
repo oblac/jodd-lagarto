@@ -116,7 +116,12 @@ class NodeSelectorComplexSelectorsTest {
 		assertEquals("li1", select("li:has(+ li.x)"));
 		assertEquals("li1", select("li:has(~ li.x)"));
 		assertEquals("p1", select("p:has(> b):not(.x)"));
-		assertEquals("main", select("div:has(:scope > span)"));
+	}
+
+	@Test
+	void testExplicitScopeNotSupportedInHas() {
+		// :scope in :has() is the scoping root of the whole selection, not the element tested by :has()
+		assertThrows(CSSellyException.class, () -> select("div:has(:scope > span)"));
 	}
 
 	@Test
@@ -133,9 +138,20 @@ class NodeSelectorComplexSelectorsTest {
 		assertEquals("p2", select(main, "> p + p"));
 		assertEquals("p1,p2,s1", select(main, "div:scope > *"));
 		assertEquals("", select(main, "ul:scope > *"));
-		// a relative selector from the document only matches its direct children
-		assertEquals("", select("> p"));
+		// only the descendants of the element are selected
+		assertEquals("", select(main, ":scope"));
 		assertThrows(CSSellyException.class, () -> select("div :scope"));
+	}
+
+	@Test
+	void testScopeFromDocument() {
+		// when selecting from a document, :scope is the root element, like in browsers
+		final Document doc = new LagartoDOMBuilder().parse("<html id='html'><body id='body'><p id='p'>p</p></body></html>");
+		assertEquals("html", select(doc, ":scope"));
+		assertEquals("body", select(doc, ":scope > body"));
+		assertEquals("", select(doc, ":scope > p"));
+		assertEquals("body", select(doc, "> body"));
+		assertEquals("p", select(doc, ":scope p"));
 	}
 
 	@Test
