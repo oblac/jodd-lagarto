@@ -24,8 +24,6 @@
 
 package jodd.csselly;
 
-import jodd.util.StringUtil;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,6 +69,9 @@ public class CSSelly {
 			CssSelector prevCssSelector = null;
 			for (final CssSelector cssSelector : lexer.selectors) {
 				if (prevCssSelector != null) {
+					if (cssSelector.isScope()) {
+						throw new CSSellyException(":scope is only supported at the beginning of a selector");
+					}
 					cssSelector.setPrevCssSelector(prevCssSelector);
 				}
 				prevCssSelector = cssSelector;
@@ -87,14 +88,47 @@ public class CSSelly {
 	 * list of {@link CssSelector} lists in the same order.
 	 */
 	public static List<List<CssSelector>> parse(final String query) {
-		final String[] singleQueries = StringUtil.splitc(query, ',');
-		final List<List<CssSelector>> selectors = new ArrayList<>(singleQueries.length);
+		final List<String> singleQueries = splitSelectorsGroup(query);
+		final List<List<CssSelector>> selectors = new ArrayList<>(singleQueries.size());
 
 		for (final String singleQuery: singleQueries) {
 			selectors.add(new CSSelly(singleQuery).parse());
 		}
 
 		return selectors;
+	}
+
+	/**
+	 * Splits a group of selectors on the commas that are not inside
+	 * strings, attribute selectors or pseudo function expressions.
+	 */
+	static List<String> splitSelectorsGroup(final String query) {
+		final List<String> singleQueries = new ArrayList<>();
+		char quote = 0;
+		int depth = 0;
+		int start = 0;
+		final int length = query.length();
+		for (int i = 0; i < length; i++) {
+			final char c = query.charAt(i);
+			if (c == '\\') {
+				i++;
+			} else if (quote != 0) {
+				if (c == quote) {
+					quote = 0;
+				}
+			} else if (c == '"' || c == '\'') {
+				quote = c;
+			} else if (c == '(' || c == '[') {
+				depth++;
+			} else if ((c == ')' || c == ']') && depth > 0) {
+				depth--;
+			} else if (c == ',' && depth == 0) {
+				singleQueries.add(query.substring(start, i));
+				start = i + 1;
+			}
+		}
+		singleQueries.add(query.substring(start));
+		return singleQueries;
 	}
 
 	// ---------------------------------------------------------------- toString
