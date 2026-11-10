@@ -228,6 +228,28 @@ class NodeSelectorComplexSelectorsTest {
 	}
 
 	@Test
+	void testMatchesOwn() {
+		// same results as jsoup 1.24.1
+		final Document doc = new LagartoDOMBuilder().parse("<html><body id='body'>" + MORE_TEXTS + "</body></html>");
+		assertEquals("d1", select(doc, "div:matchesOwn(^Hello again$)"));
+		assertEquals("", select(doc, "div:matchesOwn(World)"));
+		assertEquals("b1", select(doc, "b:matchesOwn(World)"));
+		assertEquals("d2", select(doc, "*:matchesOwn(^line break$)"));
+		assertEquals("pre", select(doc, "pre:matchesOwn(a   b)"));
+		// no separator for children elements in the own text
+		assertEquals("", select(doc, "span:matchesOwn(^in line$)"));
+		assertEquals("sp2", select(doc, "span:matchesOwn(^inline$)"));
+		assertEquals("", select(doc, "span:matchesOwn(block)"));
+		assertEquals("", select(doc, "p:matchesOwn(^x y$)"));
+		assertEquals("p4", select(doc, "p:matchesOwn(^xy$)"));
+		assertEquals("td1,td2", select(doc, "td:matchesOwn(\\d+)"));
+		assertEquals("", select(doc, "tr:matchesOwn(\\d+)"));
+		assertEquals("", select(doc, "script:matchesOwn(hello)"));
+		assertEquals("p3", select(doc, "p:matchesOwn((?i)^HELLO$)"));
+		assertThrows(CSSellyException.class, () -> select(doc, "p:matchesOwn()"));
+	}
+
+	@Test
 	void testSelectorsGroupInDocumentOrder() {
 		assertEquals("p1,li3", select("li.x + li, p:first-child"));
 		assertEquals("main,ul,li1", select("li:first-child, ul, div"));
