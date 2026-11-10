@@ -27,6 +27,7 @@ package jodd.csselly;
 import jodd.csselly.selector.AttributeSelector;
 import jodd.csselly.selector.PseudoClassSelector;
 import jodd.csselly.selector.PseudoFunctionSelector;
+import jodd.lagarto.dom.Document;
 import jodd.lagarto.dom.Node;
 import jodd.lagarto.dom.NodeFilter;
 import jodd.util.StringUtil;
@@ -262,8 +263,16 @@ public class CssSelector implements NodeFilter {
 			return false;
 		}
 		final String element = getElement();
+		if (element.equals(STAR)) {
+			return true;
+		}
 		final String nodeName = node.getNodeName();
-		return element.equals(STAR) || element.equals(nodeName);
+		// in case-insensitive documents (HTML), node names are lower-cased, so must be the type selector
+		final Document document = node.getOwnerDocument();
+		if (document != null && !document.getConfig().getParserConfig().isCaseSensitive()) {
+			return element.equalsIgnoreCase(nodeName);
+		}
+		return element.equals(nodeName);
 	}
 
 
