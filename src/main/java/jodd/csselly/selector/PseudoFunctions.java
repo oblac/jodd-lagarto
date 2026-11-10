@@ -275,6 +275,28 @@ public interface PseudoFunctions {
 	}
 
 	/**
+	 * jsoup extension: selects elements whose own text, without the text of their children elements and with
+	 * normalized whitespace, matches the specified regular expression.
+	 */
+	class MATCHES_OWN extends PseudoFunction<Pattern> {
+
+		@Override
+		public Pattern parseExpression(final String expression) {
+			return compileRegex(getPseudoFunctionName(), expression);
+		}
+
+		@Override
+		public boolean match(final Node node, final Pattern pattern) {
+			return pattern.matcher(ElementText.ownText(node)).find();
+		}
+
+		@Override
+		public String getPseudoFunctionName() {
+			return "matchesOwn";
+		}
+	}
+
+	/**
 	 * Compiles the regular expression of a pseudo function. Like jsoup, the expression is taken as is.
 	 */
 	static Pattern compileRegex(final String pseudoFunctionName, final String regex) {
