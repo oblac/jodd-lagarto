@@ -380,6 +380,24 @@ class NodeSelectorTest {
 		assertEquals(0, nodeSelector.select("[title='Foo Bar ']").size());
 	}
 
+	@Test
+	void testTypeSelectorCase() {
+		final String html = "<div id='d1'></div><DIV id='d2'></DIV><svg><linearGradient id='g1'/></svg>";
+
+		// HTML: type selectors are matched case-insensitively
+		NodeSelector nodeSelector = new NodeSelector(new LagartoDOMBuilder().parse(html));
+		assertEquals(2, nodeSelector.select("DIV").size());
+		assertEquals(2, nodeSelector.select("div").size());
+		assertEquals(2, nodeSelector.select("Div").size());
+
+		// XML: type selectors are matched case-sensitively
+		nodeSelector = new NodeSelector(new LagartoDOMBuilder().enableXmlMode().parse(html));
+		assertEquals(1, nodeSelector.select("DIV").size());
+		assertEquals("d2", nodeSelector.select("DIV").get(0).getAttribute("id"));
+		assertEquals(1, nodeSelector.select("linearGradient").size());
+		assertEquals(0, nodeSelector.select("lineargradient").size());
+	}
+
 	// ---------------------------------------------------------------- utils
 
 	private NodeSelector createNodeFilter() throws IOException {
