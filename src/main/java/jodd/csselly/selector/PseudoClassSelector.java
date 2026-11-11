@@ -55,7 +55,7 @@ public class PseudoClassSelector extends Selector implements NodeFilter, NodeLis
 	protected static final Map<String, PseudoClass> PSEUDO_CLASS_MAP;
 
 	static {
-		PSEUDO_CLASS_MAP = new HashMap<>(26);
+		PSEUDO_CLASS_MAP = new HashMap<>(64);
 
 		registerPseudoClass(PseudoClasses.EMPTY.class);
 		registerPseudoClass(PseudoClasses.FIRST_CHILD.class);
@@ -84,6 +84,15 @@ public class PseudoClassSelector extends Selector implements NodeFilter, NodeLis
 		registerPseudoClass(PseudoClasses.TEXT.class);
 		registerPseudoClass(PseudoClasses.EVEN.class);
 		registerPseudoClass(PseudoClasses.ODD.class);
+
+		registerPseudoClass(PseudoClasses.ENABLED.class);
+		registerPseudoClass(PseudoClasses.DISABLED.class);
+		registerPseudoClass(PseudoClasses.REQUIRED.class);
+		registerPseudoClass(PseudoClasses.OPTIONAL.class);
+		registerPseudoClass(PseudoClasses.READ_WRITE.class);
+		registerPseudoClass(PseudoClasses.READ_ONLY.class);
+		registerPseudoClass(PseudoClasses.LINK.class);
+		registerPseudoClass(PseudoClasses.ANY_LINK.class);
 	}
 
 	/**

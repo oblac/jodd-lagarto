@@ -411,4 +411,85 @@ public interface PseudoClasses {
 
 	// ---------------------------------------------------------------- interface
 
+	// ---------------------------------------------------------------- HTML form controls and links
+
+	/**
+	 * Selects the form controls, options and fieldsets that are not disabled.
+	 */
+	class ENABLED extends PseudoClass {
+		@Override
+		public boolean match(final Node node) {
+			return FormControls.canBeDisabled(node) && !FormControls.isDisabled(node);
+		}
+	}
+
+	/**
+	 * Selects the form controls, options and fieldsets that are disabled,
+	 * including the ones in a disabled fieldset or option group.
+	 */
+	class DISABLED extends PseudoClass {
+		@Override
+		public boolean match(final Node node) {
+			return FormControls.isDisabled(node);
+		}
+	}
+
+	/**
+	 * Selects the inputs, selects and text areas that are required.
+	 */
+	class REQUIRED extends PseudoClass {
+		@Override
+		public boolean match(final Node node) {
+			return FormControls.canBeRequired(node) && node.hasAttribute("required");
+		}
+	}
+
+	/**
+	 * Selects the buttons, inputs, selects and text areas that are not required.
+	 * Like in browsers, this includes the buttons and inputs the required attribute doesn't apply to.
+	 */
+	class OPTIONAL extends PseudoClass {
+		@Override
+		public boolean match(final Node node) {
+			return FormControls.isSubmittable(node) && !(FormControls.canBeRequired(node) && node.hasAttribute("required"));
+		}
+	}
+
+	/**
+	 * Selects the text fields that are neither read-only nor disabled, and the editable elements.
+	 */
+	class READ_WRITE extends PseudoClass {
+		@Override
+		public boolean match(final Node node) {
+			return FormControls.isReadWrite(node);
+		}
+	}
+
+	/**
+	 * Selects all elements that don't match {@code :read-write}.
+	 */
+	class READ_ONLY extends PseudoClass {
+		@Override
+		public boolean match(final Node node) {
+			return !FormControls.isReadWrite(node);
+		}
+	}
+
+	/**
+	 * Selects the hyperlinks, i.e. the {@code a} and {@code area} elements with an {@code href} attribute.
+	 * As there is no browsing history, all links are unvisited.
+	 */
+	class LINK extends PseudoClass {
+		@Override
+		public boolean match(final Node node) {
+			return FormControls.isLink(node);
+		}
+	}
+
+	/**
+	 * Selects the hyperlinks, visited or not.
+	 */
+	class ANY_LINK extends LINK {
+	}
+
 }
