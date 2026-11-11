@@ -24,6 +24,7 @@
 
 package jodd.csselly.selector;
 
+import jodd.csselly.CSSelly;
 import jodd.csselly.Selector;
 import jodd.csselly.CSSellyException;
 import jodd.lagarto.dom.Document;
@@ -96,7 +97,7 @@ public class AttributeSelector extends Selector implements NodeFilter {
 		super(Type.ATTRIBUTE);
 		int index = attr.indexOf('=');
 		if (index == -1) {
-			this.name = attr.trim();
+			this.name = CSSelly.unescape(attr.trim());
 			this.match = null;
 			this.value = null;
 			return;
@@ -106,8 +107,8 @@ public class AttributeSelector extends Selector implements NodeFilter {
 
 		final int signLen = this.match.getSign().length();
 		index -= (signLen - 1);
-		this.name = attr.substring(0, index).trim();
-		this.value = extractValueAndFlag(attr.substring(index + signLen));
+		this.name = CSSelly.unescape(attr.substring(0, index).trim());
+		this.value = CSSelly.unescape(extractValueAndFlag(attr.substring(index + signLen)));
 		if (match == Match.NOT_EQUALS && (caseInsensitive || caseSensitive)) {
 			// like jQuery
 			throw new CSSellyException("Attribute selector flags are not supported with " + match.getSign());
@@ -141,14 +142,11 @@ public class AttributeSelector extends Selector implements NodeFilter {
 			value = value.substring(1, end);
 		} else {
 			quoteChar = 0;
-			int ws = value.length() - 1;
-			while (ws >= 0 && !Character.isWhitespace(value.charAt(ws))) {
-				ws--;
-			}
+			final int ws = flagSeparator(value);
 			if (ws == -1) {
 				flag = "";
 			} else {
-				flag = value.substring(ws + 1);
+				flag = value.substring(ws + 1).trim();
 				value = value.substring(0, ws).trim();
 			}
 		}
@@ -160,6 +158,28 @@ public class AttributeSelector extends Selector implements NodeFilter {
 			throw new CSSellyException("Invalid attribute selector flag: " + flag);
 		}
 		return value;
+	}
+
+	/**
+	 * Returns the index of the whitespace that separates an unquoted value from its flag, or {@code -1}.
+	 * The whitespace that terminates a hex escape belongs to the value, eg: {@code foo\20 bar}.
+	 */
+	private static int flagSeparator(final String value) {
+		final int length = value.length();
+		for (int i = 0; i < length; i++) {
+			final char c = value.charAt(i);
+			if (c == '\\') {
+				int hexEnd = i + 1;
+				while (hexEnd < length && hexEnd - i <= 6 && Character.digit(value.charAt(hexEnd), 16) != -1) {
+					hexEnd++;
+				}
+				// skips the escaped character, or the whitespace after the hex digits
+				i = hexEnd > i + 1 ? hexEnd : i + 1;
+			} else if (Character.isWhitespace(c)) {
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	protected String extractValue(String value) {

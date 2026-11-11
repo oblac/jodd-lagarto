@@ -184,50 +184,13 @@ public interface PseudoFunctions {
 			if (StringUtil.startsWithChar(expression, '\'') || StringUtil.startsWithChar(expression, '"')) {
 				expression = expression.substring(1, expression.length() - 1);
 			}
-			return unescape(expression);
+			return CSSelly.unescape(expression);
 		}
 
 		@Override
 		public boolean match(final Node node, final String expression) {
 			final String text = node.getTextContent();
 			return text.contains(expression);
-		}
-
-		/**
-		 * Resolves CSS escapes, eg: {@code \(} or {@code \28 }, like jQuery does.
-		 */
-		static String unescape(final String value) {
-			if (value.indexOf('\\') == -1) {
-				return value;
-			}
-			final StringBuilder out = new StringBuilder(value.length());
-			final int length = value.length();
-			int i = 0;
-			while (i < length) {
-				final char c = value.charAt(i++);
-				if (c != '\\') {
-					out.append(c);
-				} else if (i < length) {
-					int hexEnd = i;
-					while (hexEnd < length && hexEnd - i < 6 && Character.digit(value.charAt(hexEnd), 16) != -1) {
-						hexEnd++;
-					}
-					if (hexEnd > i) {
-						final int codePoint = Integer.parseInt(value.substring(i, hexEnd), 16);
-						final boolean valid = codePoint != 0 && codePoint <= Character.MAX_CODE_POINT
-							&& (codePoint < Character.MIN_SURROGATE || codePoint > Character.MAX_SURROGATE);
-						out.appendCodePoint(valid ? codePoint : 0xFFFD);
-						i = hexEnd;
-						// a single whitespace terminates a hex escape
-						if (i < length && Character.isWhitespace(value.charAt(i))) {
-							i++;
-						}
-					} else {
-						out.append(value.charAt(i++));
-					}
-				}
-			}
-			return out.toString();
 		}
 	}
 

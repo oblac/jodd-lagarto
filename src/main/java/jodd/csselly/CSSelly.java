@@ -151,6 +151,70 @@ public class CSSelly {
 		return -1;
 	}
 
+	// ---------------------------------------------------------------- escapes
+
+	/**
+	 * Resolves the CSS escapes of an identifier or a string, eg: {@code \:}, {@code \31 } or {@code \0000e9}.
+	 * See <a href="https://www.w3.org/TR/css-syntax-3/#consume-escaped-code-point">CSS Syntax</a>.
+	 */
+	public static String unescape(final String value) {
+		if (value.indexOf('\\') == -1) {
+			return value;
+		}
+		final StringBuilder out = new StringBuilder(value.length());
+		final int length = value.length();
+		int i = 0;
+		while (i < length) {
+			final char c = value.charAt(i++);
+			if (c != '\\') {
+				out.append(c);
+			} else if (i < length) {
+				int hexEnd = i;
+				while (hexEnd < length && hexEnd - i < 6 && Character.digit(value.charAt(hexEnd), 16) != -1) {
+					hexEnd++;
+				}
+				if (hexEnd > i) {
+					final int codePoint = Integer.parseInt(value.substring(i, hexEnd), 16);
+					final boolean valid = codePoint != 0 && codePoint <= Character.MAX_CODE_POINT
+						&& (codePoint < Character.MIN_SURROGATE || codePoint > Character.MAX_SURROGATE);
+					out.appendCodePoint(valid ? codePoint : 0xFFFD);
+					// a single whitespace terminates a hex escape
+					i = skipNewline(value, hexEnd);
+					if (i == hexEnd && i < length && isWhitespace(value.charAt(i))) {
+						i++;
+					}
+				} else {
+					final int next = skipNewline(value, i);
+					if (next == i) {
+						out.append(value.charAt(i++));
+					} else {
+						// an escaped newline continues a string on the next line
+						i = next;
+					}
+				}
+			}
+		}
+		return out.toString();
+	}
+
+	private static boolean isWhitespace(final char c) {
+		return c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f';
+	}
+
+	/**
+	 * Returns the index after the newline at given index, or the index itself if there is no newline.
+	 */
+	private static int skipNewline(final String value, final int index) {
+		if (index >= value.length()) {
+			return index;
+		}
+		final char c = value.charAt(index);
+		if (c == '\r' && index + 1 < value.length() && value.charAt(index + 1) == '\n') {
+			return index + 2;
+		}
+		return c == '\n' || c == '\r' || c == '\f' ? index + 1 : index;
+	}
+
 	// ---------------------------------------------------------------- toString
 
 	/**

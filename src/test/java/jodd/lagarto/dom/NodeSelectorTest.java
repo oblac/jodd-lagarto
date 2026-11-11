@@ -421,6 +421,34 @@ class NodeSelectorTest {
 		assertEquals(0, nodeSelector.select("p:contains(Hello \\(here\\))").size());
 	}
 
+	@Test
+	void testHexEscapes() {
+		NodeSelector nodeSelector = new NodeSelector(new LagartoDOMBuilder().parse(
+			"<p id='1st' class='123'>a</p><p class='c:d' data-u='café' data-sp='foo bar' data-q=\"it's\">b</p><p class='a\\b'>c</p>"));
+
+		// ids and classes that start with a digit, as copied from the browser dev tools
+		assertEquals("1st", nodeSelector.selectFirst("#\\31 st").getAttribute("id"));
+		assertEquals("1st", nodeSelector.selectFirst(".\\31 23").getAttribute("id"));
+		assertEquals("1st", nodeSelector.selectFirst(".\\00003123").getAttribute("id"));
+		assertEquals("1st", nodeSelector.selectFirst("[class=\\31 23]").getAttribute("id"));
+		assertEquals(1, nodeSelector.select(".c\\:d").size());
+		assertEquals(1, nodeSelector.select(".c\\3a d").size());
+		assertEquals(1, nodeSelector.select(".c\\3A d").size());
+		assertEquals(1, nodeSelector.select("[data-u=\"caf\\e9\"]").size());
+		assertEquals(1, nodeSelector.select("[data-u='caf\\0000e9']").size());
+		// the whitespace after a hex escape belongs to the escape, so this is the value "caf\u00e9i", not a flag
+		assertEquals(0, nodeSelector.select("[data-u=caf\\e9 i]").size());
+		assertEquals(1, nodeSelector.select("[data-u=CAF\\e9  i]").size());
+		assertEquals(1, nodeSelector.select("[data-sp=\"foo\\20 bar\"]").size());
+		assertEquals(1, nodeSelector.select("[data-sp=foo\\20 bar]").size());
+		assertEquals(1, nodeSelector.select("[data-sp=foo\\ bar]").size());
+		assertEquals(1, nodeSelector.select("[data-q='it\\'s']").size());
+		assertEquals(1, nodeSelector.select("[data-q=it\\'s]").size());
+		// an escaped backslash
+		assertEquals(1, nodeSelector.select(".a\\\\b").size());
+		assertEquals(0, nodeSelector.select(".ab").size());
+	}
+
 	// ---------------------------------------------------------------- utils
 
 	private NodeSelector createNodeFilter() throws IOException {
