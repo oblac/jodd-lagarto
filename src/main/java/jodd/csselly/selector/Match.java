@@ -51,49 +51,27 @@ public enum Match {
 		public boolean compare(final String attr, final String val) {
 			final int valLength = val.length();
 			final int attrLength = attr.length();
-			
-			//  value or attribute is empty or the requested value is 'too' long
-			if (attrLength == 0 || valLength == 0 || attrLength < valLength) {
+
+			// value is empty or contains whitespace, or the requested value is 'too' long
+			if (valLength == 0 || attrLength < valLength || containsWhitespace(val)) {
 				return false;
 			}
-			
-	        // if both length are equals, just compare the value with the attribute
-			// no need to split
-	        if (valLength == attrLength) {
-	            return val.equals(attr);
-	        }
-	        
-	        // manually split the attribute
-	        // DO NOT allocate the string but use regionMatches and length comparison to make the check
-	        boolean inClass = false;
-	        int start = 0;
-	        for (int i = 0; i < attrLength; i ++) {
-		        final char c = attr.charAt(i);
-		        if ((c == ' ') || (c == '\t')) {
-			        if (inClass) {
-				        // the white space ends a class name
-				        // compare it with the requested one
-				        if ((i - start == valLength) && attr.regionMatches(start, val, 0, valLength)) {
-					        return true;
-				        }
-				        inClass = false;
-			        }
-		        } else {
-			        if (!inClass) {
-				        // we're in a class name : keep the start of the substring
-				        inClass = true;
-				        start = i;
-			        }
-		        }
-	        }
-	        
-	        // the attribute may not end by a white space
-	        // check the current class name
-	        if (inClass && (attrLength - start == valLength)) {
-	            return attr.regionMatches(start, val, 0, valLength);  
-	        }
-	        
-	        return false;
+
+			// manually split the attribute on HTML whitespace, which includes newlines
+			// DO NOT allocate the string but use regionMatches and length comparison to make the check
+			int start = -1;
+			for (int i = 0; i <= attrLength; i++) {
+				if (i == attrLength || isWhitespace(attr.charAt(i))) {
+					// the white space, or the end of the attribute, ends a word: compare it with the requested one
+					if (start != -1 && i - start == valLength && attr.regionMatches(start, val, 0, valLength)) {
+						return true;
+					}
+					start = -1;
+				} else if (start == -1) {
+					start = i;
+				}
+			}
+			return false;
 		}
 	},
 
@@ -160,6 +138,22 @@ public enum Match {
 			return !val.equals(attr);
 		}
 	};
+
+	/**
+	 * ASCII whitespace, see <a href="https://infra.spec.whatwg.org/#ascii-whitespace">Infra</a>.
+	 */
+	private static boolean isWhitespace(final char c) {
+		return c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f';
+	}
+
+	private static boolean containsWhitespace(final String value) {
+		for (int i = 0; i < value.length(); i++) {
+			if (isWhitespace(value.charAt(i))) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	private final String sign;
 

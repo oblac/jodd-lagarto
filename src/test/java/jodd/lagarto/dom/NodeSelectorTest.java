@@ -422,6 +422,17 @@ class NodeSelectorTest {
 	}
 
 	@Test
+	void testClassesOnSeveralLines() {
+		NodeSelector nodeSelector = new NodeSelector(new LagartoDOMBuilder().parse("<p class='a\nb'>x</p><p class='c\r\n\td'>y</p>"));
+
+		assertEquals(1, nodeSelector.select(".a").size());
+		assertEquals(1, nodeSelector.select(".b").size());
+		assertEquals(1, nodeSelector.select(".a.b").size());
+		assertEquals(1, nodeSelector.select(".c.d").size());
+		assertEquals(0, nodeSelector.select("[class~='a b']").size());
+	}
+
+	@Test
 	void testHexEscapes() {
 		NodeSelector nodeSelector = new NodeSelector(new LagartoDOMBuilder().parse(
 			"<p id='1st' class='123'>a</p><p class='c:d' data-u='café' data-sp='foo bar' data-q=\"it's\">b</p><p class='a\\b'>c</p>"));
