@@ -422,6 +422,20 @@ class NodeSelectorTest {
 	}
 
 	@Test
+	void testCaseInsensitivePseudoClasses() {
+		NodeSelector nodeSelector = new NodeSelector(new LagartoDOMBuilder().parse("<ul><li>1</li><li>2</li><li>3</li></ul>"));
+
+		assertEquals(1, nodeSelector.select("li:FIRST-CHILD").size());
+		assertEquals(1, nodeSelector.select("li:Last-Child").size());
+		assertEquals(1, nodeSelector.select("UL:Has(> LI:First-Child)").size());
+		assertEquals(2, nodeSelector.select("li:nth-child(ODD)").size());
+		assertEquals(1, nodeSelector.select("li:nth-child(Even)").size());
+		assertEquals(3, nodeSelector.select("li:nth-child(N)").size());
+		assertEquals(2, nodeSelector.select("li:nth-child(2N+1)").size());
+		assertEquals(2, nodeSelector.select("li:nth-last-child(-N+2)").size());
+	}
+
+	@Test
 	void testClassesOnSeveralLines() {
 		NodeSelector nodeSelector = new NodeSelector(new LagartoDOMBuilder().parse("<p class='a\nb'>x</p><p class='c\r\n\td'>y</p>"));
 
