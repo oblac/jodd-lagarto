@@ -352,6 +352,20 @@ public class CssSelector implements NodeFilter {
 	// ---------------------------------------------------------------- post process
 
 	/**
+	 * Returns {@code true} if a pseudo-class or a pseudo-function of this selector depends on the position
+	 * of the node within current results, eg: {@code :first} or {@code :eq()}, like in jQuery.
+	 */
+	public boolean isRangeDependent() {
+		for (final Selector selector : selectors) {
+			if (selector instanceof PseudoClassSelector && ((PseudoClassSelector) selector).isRangeDependent()
+				|| selector instanceof PseudoFunctionSelector && ((PseudoFunctionSelector) selector).isRangeDependent()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * Accepts node within current results.
 	 */
 	public boolean accept(final List<Node> currentResults, final Node node, final int index) {

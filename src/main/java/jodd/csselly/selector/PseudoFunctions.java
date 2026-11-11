@@ -376,14 +376,8 @@ public interface PseudoFunctions {
 
 		@Override
 		public boolean match(final Node node, final List<List<CssSelector>> selectors) {
-			final NodeSelector nodeSelector = new NodeSelector(node);
-			// selectors one by one: stop at the first one that matches, and don't sort the results of the group
-			for (final List<CssSelector> selector : selectors) {
-				if (!nodeSelector.select(Collections.singletonList(selector)).isEmpty()) {
-					return true;
-				}
-			}
-			return false;
+			// stops at the first matching node
+			return new NodeSelector(node).hasMatch(selectors);
 		}
 	}
 

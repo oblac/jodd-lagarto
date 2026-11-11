@@ -130,10 +130,19 @@ public class PseudoClassSelector extends Selector implements NodeFilter, NodeLis
 	// ---------------------------------------------------------------- selector
 
 	protected final PseudoClass pseudoClass;
+	private final boolean rangeDependent;
 
 	public PseudoClassSelector(final String pseudoClassName) {
 		super(Type.PSEUDO_CLASS);
 		this.pseudoClass = lookupPseudoClass(pseudoClassName.trim());
+		this.rangeDependent = pseudoClass.isRangeDependent();
+	}
+
+	/**
+	 * Returns {@code true} if the selector depends on the position of the node within current results.
+	 */
+	public boolean isRangeDependent() {
+		return rangeDependent;
 	}
 
 	/**
