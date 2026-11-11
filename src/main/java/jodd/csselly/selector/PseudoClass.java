@@ -27,6 +27,7 @@ package jodd.csselly.selector;
 import jodd.lagarto.dom.Node;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Pseudo class definition.
@@ -63,7 +64,7 @@ public abstract class PseudoClass {
 	 * Returns pseudo-class name from simple class name.
 	 */
 	public String getPseudoClassName() {
-		String name = getClass().getSimpleName().toLowerCase();
+		String name = getClass().getSimpleName().toLowerCase(Locale.ROOT);
 		name = name.replace('_', '-');
 		return name;
 	}

@@ -26,6 +26,8 @@ package jodd.lagarto.dom;
 
 import jodd.util.StringUtil;
 
+import java.util.Locale;
+
 /**
  * HTML rules for implicitly closing tags.
  */
@@ -91,8 +93,8 @@ public class HtmlImplicitClosingRules {
 		if (parentNodeName == null) {
 			return false;
 		}
-		parentNodeName = parentNodeName.toLowerCase();
-		nodeName = nodeName.toLowerCase();
+		parentNodeName = parentNodeName.toLowerCase(Locale.ROOT);
+		nodeName = nodeName.toLowerCase(Locale.ROOT);
 
 		for (int i = 0; i < IMPLIED_ON_START.length; i+=2) {
 			if (StringUtil.equalsOne(parentNodeName, IMPLIED_ON_START[i]) != -1) {
@@ -142,8 +144,8 @@ public class HtmlImplicitClosingRules {
 			return false;
 		}
 
-		parentNodeName = parentNodeName.toLowerCase();
-		nodeName = nodeName.toLowerCase();
+		parentNodeName = parentNodeName.toLowerCase(Locale.ROOT);
+		nodeName = nodeName.toLowerCase(Locale.ROOT);
 
 		for (int i = 0; i < IMPLIED_ON_END.length; i += 2) {
 			if (StringUtil.equalsOne(nodeName, IMPLIED_ON_END[i]) != -1) {
@@ -170,7 +172,7 @@ public class HtmlImplicitClosingRules {
 			return false;
 		}
 
-		nodeName = nodeName.toLowerCase();
+		nodeName = nodeName.toLowerCase(Locale.ROOT);
 
 		return StringUtil.equalsOne(nodeName, CLOSED_ON_EOF) != -1;
 	}

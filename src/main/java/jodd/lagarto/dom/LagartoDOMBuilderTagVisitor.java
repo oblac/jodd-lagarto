@@ -33,6 +33,8 @@ import jodd.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Locale;
+
 /**
  * Lagarto tag visitor that builds a DOM tree.
  * It (still) does not build the tree <i>fully</i> by the HTML specs,
@@ -301,7 +303,7 @@ public class LagartoDOMBuilderTagVisitor implements TagVisitor {
 		Node parent = parentNode;
 
 		if (!rootNode.config.parserConfig.isCaseSensitive()) {
-			tagName = tagName.toLowerCase();
+			tagName = tagName.toLowerCase(Locale.ROOT);
 		}
 
 		while (parent != null) {
@@ -309,7 +311,7 @@ public class LagartoDOMBuilderTagVisitor implements TagVisitor {
 
 			if (parentNodeName != null) {
 				if (!rootNode.config.parserConfig.isCaseSensitive()) {
-					parentNodeName = parentNodeName.toLowerCase();
+					parentNodeName = parentNodeName.toLowerCase(Locale.ROOT);
 				}
 			}
 			
@@ -342,7 +344,7 @@ public class LagartoDOMBuilderTagVisitor implements TagVisitor {
 				// check if there is table or list between this node
 				// and matching parent
 				while (thisNode != matchingParent) {
-					final String thisNodeName = thisNode.getNodeName().toLowerCase();
+					final String thisNodeName = thisNode.getNodeName().toLowerCase(Locale.ROOT);
 
 					if (thisNodeName.equals("table") || thisNodeName.equals("ul") || thisNodeName.equals("ol")) {
 

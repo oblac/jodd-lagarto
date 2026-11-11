@@ -29,6 +29,7 @@ import jodd.lagarto.dom.render.LagartoHtmlRenderer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Predicate;
 
 /**
@@ -79,7 +80,7 @@ public abstract class Node implements Cloneable {
 		this.ownerDocument = document;
 		this.nodeRawName = nodeName;
 		if (nodeName != null) {
-			this.nodeName = ownerDocument.config.parserConfig.isCaseSensitive() ? nodeName : nodeName.toLowerCase();
+			this.nodeName = ownerDocument.config.parserConfig.isCaseSensitive() ? nodeName : nodeName.toLowerCase(Locale.ROOT);
 		} else {
 			this.nodeName = null;
 		}
@@ -387,7 +388,7 @@ public abstract class Node implements Cloneable {
 			return false;
 		}
 		if (!ownerDocument.config.parserConfig.isCaseSensitive()) {
-			name = name.toLowerCase();
+			name = name.toLowerCase(Locale.ROOT);
 		}
 		for (int i = 0, attributesSize = attributes.size(); i < attributesSize; i++) {
 			final Attribute attr = attributes.get(i);
@@ -417,7 +418,7 @@ public abstract class Node implements Cloneable {
 		}
 
 		if (!ownerDocument.config.parserConfig.isCaseSensitive()) {
-			name = name.toLowerCase();
+			name = name.toLowerCase(Locale.ROOT);
 		}
 
 		for (int i = 0, attributesSize = attributes.size(); i < attributesSize; i++) {
@@ -435,7 +436,7 @@ public abstract class Node implements Cloneable {
 		}
 
 		if (!ownerDocument.config.parserConfig.isCaseSensitive()) {
-			name = name.toLowerCase();
+			name = name.toLowerCase(Locale.ROOT);
 		}
 
 		for (int i = 0, attributesSize = attributes.size(); i < attributesSize; i++) {
@@ -464,7 +465,7 @@ public abstract class Node implements Cloneable {
 
 		final String rawAttributeName = name;
 		if (!ownerDocument.config.parserConfig.isCaseSensitive()) {
-			name = name.toLowerCase();
+			name = name.toLowerCase(Locale.ROOT);
 		}
 
 		// search if attribute with the same name exist

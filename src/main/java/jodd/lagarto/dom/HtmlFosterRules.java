@@ -27,6 +27,7 @@ package jodd.lagarto.dom;
 import jodd.util.StringUtil;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * Simplified HTML foster rules for tables.
@@ -45,7 +46,7 @@ public class HtmlFosterRules {
 	 * Returns {@code true} if provided element is one of the table-related elements.
 	 */
 	protected boolean isOneOfTableElements(final Element element) {
-		final String elementName = element.getNodeName().toLowerCase();
+		final String elementName = element.getNodeName().toLowerCase(Locale.ROOT);
 
 		return StringUtil.equalsOne(elementName, TABLE_ELEMENTS) != -1;
 	}
@@ -57,7 +58,7 @@ public class HtmlFosterRules {
 		if (node.getNodeType() != Node.NodeType.ELEMENT) {
 			return false;
 		}
-		final String elementName = node.getNodeName().toLowerCase();
+		final String elementName = node.getNodeName().toLowerCase(Locale.ROOT);
 
 		return elementName.equals("table");
 	}
@@ -72,7 +73,7 @@ public class HtmlFosterRules {
 		if (parentNode.getNodeName() == null) {
 			return false;
 		}
-		final String nodeName = parentNode.getNodeName().toLowerCase();
+		final String nodeName = parentNode.getNodeName().toLowerCase(Locale.ROOT);
 
 		return StringUtil.equalsOne(nodeName, FOSTER_TABLE_ELEMENTS) != -1;
 	}
@@ -85,7 +86,7 @@ public class HtmlFosterRules {
 
 		while (tableNode != null) {
 			if (tableNode.getNodeType() == Node.NodeType.ELEMENT) {
-				final String tableNodeName = tableNode.getNodeName().toLowerCase();
+				final String tableNodeName = tableNode.getNodeName().toLowerCase(Locale.ROOT);
 
 				if (tableNodeName.equals("table")) {
 					break;
@@ -152,7 +153,7 @@ public class HtmlFosterRules {
 							!isOneOfTableElements(element)
 							) {
 
-						final String elementNodeName = element.getNodeName().toLowerCase();
+						final String elementNodeName = element.getNodeName().toLowerCase(Locale.ROOT);
 						if (elementNodeName.equals("form")) {
 							if (element.getChildNodesCount() > 0) {
 								// if form element, take all its child nodes
