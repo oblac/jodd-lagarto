@@ -94,6 +94,13 @@ class NodeSelectorComplexSelectorsTest {
 	}
 
 	@Test
+	void testNewlinesBetweenSelectors() {
+		assertEquals("b1,i1", select("p\nb,\np\n>\ni\n"));
+		assertEquals("li2,o1", select("li.x\n,\noption:first-child"));
+		assertEquals("li2,li3,li4", select("li\r\n+\r\nli\n"));
+	}
+
+	@Test
 	void testUnclosedQuotesInPseudoFunctions() {
 		final Document doc = new LagartoDOMBuilder().parse("<p id='p1'>don't</p><p id='p2'>it's</p><p id='p3'>none</p>");
 		assertEquals("p1", select(doc, "p:contains(don't)"));

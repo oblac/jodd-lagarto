@@ -111,7 +111,8 @@ dimension ={num}{ident}
 	"."{ident}		{ cssSelector.addClassSelector(yytext(1)); }
 	":"(":")?{ident}"("		{ startPseudoFn(yytext(yycharat(1) == ':' ? 2 : 1,1)); }
 	":"(":")?{ident}		{ cssSelector.addPseudoClassSelector(yytext( yycharat(1) == ':' ? 2 : 1 )); }
-	.				{ yypushback(1); stateCombinator(); }
+	// any character, including newlines, which are combinators like other whitespaces
+	[^]				{ yypushback(1); stateCombinator(); }
 }
 
 <ATTR> {
