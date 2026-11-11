@@ -433,6 +433,21 @@ class NodeSelectorTest {
 	}
 
 	@Test
+	void testContainsNormalizesText() {
+		NodeSelector nodeSelector = new NodeSelector(new LagartoDOMBuilder().parse(
+			"<div id='d1'><p>Hello\n   World</p></div><ul id='u1'><li>a</li><li>b</li></ul>" +
+			"<div id='d2'><script>var secret;</script><style>.hidden {}</style>visible</div>"));
+
+		assertEquals(2, nodeSelector.select(":contains(hello world)").size());
+		assertEquals(1, nodeSelector.select("p:contains('Hello   World')").size());
+		assertEquals("u1", nodeSelector.selectFirst("ul:contains(a b)").getAttribute("id"));
+		assertEquals(0, nodeSelector.select("ul:contains(ab)").size());
+		assertEquals(0, nodeSelector.select("div:contains(secret)").size());
+		assertEquals(0, nodeSelector.select("div:contains(hidden)").size());
+		assertEquals("d2", nodeSelector.selectFirst("div:contains(visible)").getAttribute("id"));
+	}
+
+	@Test
 	void testChecked() {
 		NodeSelector nodeSelector = new NodeSelector(new LagartoDOMBuilder().parse(
 			"<input id='c1' type='checkbox' checked><input id='c2' type='checkbox'><input id='r1' type='RADIO' checked>" +
