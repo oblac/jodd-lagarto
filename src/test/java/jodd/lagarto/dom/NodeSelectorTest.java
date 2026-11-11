@@ -422,6 +422,21 @@ class NodeSelectorTest {
 	}
 
 	@Test
+	void testChecked() {
+		NodeSelector nodeSelector = new NodeSelector(new LagartoDOMBuilder().parse(
+			"<input id='c1' type='checkbox' checked><input id='c2' type='checkbox'><input id='r1' type='RADIO' checked>" +
+			"<input id='t1' type='text' checked><div id='d1' checked></div>" +
+			"<select><option id='o1'>a</option><option id='o2' selected>b</option></select>"));
+
+		List<Node> nodes = nodeSelector.select(":checked");
+		assertEquals(3, nodes.size());
+		assertEquals("c1", nodes.get(0).getAttribute("id"));
+		assertEquals("r1", nodes.get(1).getAttribute("id"));
+		assertEquals("o2", nodes.get(2).getAttribute("id"));
+		assertEquals("o2", nodeSelector.selectFirst("option:checked").getAttribute("id"));
+	}
+
+	@Test
 	void testCaseInsensitivePseudoClasses() {
 		NodeSelector nodeSelector = new NodeSelector(new LagartoDOMBuilder().parse("<ul><li>1</li><li>2</li><li>3</li></ul>"));
 

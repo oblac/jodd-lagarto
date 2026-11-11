@@ -334,12 +334,19 @@ public interface PseudoClasses {
 	}
 
 	/**
-	 * Selects all elements that are checked.
+	 * Selects the checkboxes and radio buttons that are checked, and the options that are selected,
+	 * like in browsers. As there is no user interaction, only the {@code checked} and {@code selected}
+	 * attributes are considered.
 	 */
 	class CHECKED extends PseudoClass {
 		@Override
 		public boolean match(final Node node) {
-			return node.hasAttribute("checked");
+			final String name = node.getNodeName();
+			if ("input".equalsIgnoreCase(name)) {
+				final String type = node.getAttribute("type");
+				return node.hasAttribute("checked") && ("checkbox".equalsIgnoreCase(type) || "radio".equalsIgnoreCase(type));
+			}
+			return "option".equalsIgnoreCase(name) && node.hasAttribute("selected");
 		}
 	}
 
