@@ -82,6 +82,17 @@ class MatchTest {
         
         result = Match.INCLUDES.compare("", "");
         assertFalse(result);
+
+        // words are separated by any HTML whitespace
+        assertTrue(Match.INCLUDES.compare("a\nb", "a"));
+        assertTrue(Match.INCLUDES.compare("a\nb", "b"));
+        assertTrue(Match.INCLUDES.compare("a\r\nb", "b"));
+        assertTrue(Match.INCLUDES.compare("\fa\f", "a"));
+
+        // a value with whitespace never matches
+        assertFalse(Match.INCLUDES.compare("a b", "a b"));
+        assertFalse(Match.INCLUDES.compare("x a b", "a b"));
+        assertFalse(Match.INCLUDES.compare("a\nb", "a\nb"));
 	}
 
 }
