@@ -27,12 +27,21 @@ package jodd.lagarto.dom;
 import jodd.csselly.CSSelly;
 import jodd.csselly.CssSelector;
 
+import java.util.BitSet;
 import java.util.Collection;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class NodeMatcher {
 
 	protected final Node rootNode;
+
+	/**
+	 * Nodes known not to match the selectors up to a given index, for the selector being matched.
+	 * Avoids exponential backtracking with several descendant or general sibling combinators.
+	 */
+	private Map<Node, BitSet> failures;
 
 	public NodeMatcher(final Node rootNode) {
 		this.rootNode = rootNode;
@@ -48,13 +57,19 @@ public class NodeMatcher {
 	 * Each selector is matched from right to left, honoring the combinators.
 	 */
 	public boolean match(final Collection<List<CssSelector>> selectorsCollection) {
-		for (List<CssSelector> selectors : selectorsCollection) {
-			if (match(rootNode, selectors, selectors.size() - 1)) {
-				return true;
+		try {
+			for (List<CssSelector> selectors : selectorsCollection) {
+				if (failures != null) {
+					failures.clear();
+				}
+				if (match(rootNode, selectors, selectors.size() - 1)) {
+					return true;
+				}
 			}
+			return false;
+		} finally {
+			failures = null;
 		}
-
-		return false;
 	}
 
 	/**
@@ -62,6 +77,12 @@ public class NodeMatcher {
 	 * recursively, its ancestors or previous siblings against the previous selectors.
 	 */
 	protected boolean match(final Node node, final List<CssSelector> selectors, final int index) {
+		if (failures != null) {
+			final BitSet nodeFailures = failures.get(node);
+			if (nodeFailures != null && nodeFailures.get(index)) {
+				return false;
+			}
+		}
 		final CssSelector cssSelector = selectors.get(index);
 		if (!cssSelector.accept(node)) {
 			return false;
@@ -69,8 +90,22 @@ public class NodeMatcher {
 		if (index == 0) {
 			return true;
 		}
+		if (matchPrevious(node, selectors, index - 1)) {
+			return true;
+		}
+		// the node matches the selector, but not its previous selectors: no need to try again
+		if (failures == null) {
+			failures = new IdentityHashMap<>();
+		}
+		failures.computeIfAbsent(node, n -> new BitSet(selectors.size())).set(index);
+		return false;
+	}
 
-		final int prevIndex = index - 1;
+	/**
+	 * Matches the ancestors or previous siblings of the node against the selector at given index,
+	 * depending on its combinator.
+	 */
+	private boolean matchPrevious(final Node node, final List<CssSelector> selectors, final int prevIndex) {
 		switch (selectors.get(prevIndex).getCombinator()) {
 			case CHILD: {
 				final Node parent = node.getParentNode();
