@@ -63,6 +63,19 @@ public class AttributeSelector extends Selector implements NodeFilter {
 		"noshade", "nowrap", "readonly", "rel", "rev", "rules", "scope", "scrolling", "selected", "shape",
 		"target", "text", "type", "valign", "valuetype", "vlink"));
 
+	/**
+	 * Elements that start SVG and MathML content, whose elements are not HTML elements.
+	 */
+	private static final Set<String> FOREIGN_ROOTS = new HashSet<>(Arrays.asList("svg", "math"));
+
+	/**
+	 * Foreign elements whose children are HTML elements again.
+	 * See <a href="https://html.spec.whatwg.org/multipage/parsing.html#html-integration-point">HTML integration point</a>
+	 * and <a href="https://html.spec.whatwg.org/multipage/parsing.html#mathml-text-integration-point">MathML text integration point</a>.
+	 */
+	private static final Set<String> HTML_INTEGRATION_POINTS = new HashSet<>(Arrays.asList(
+		"foreignobject", "desc", "title", "mi", "mo", "mn", "ms", "mtext"));
+
 	public AttributeSelector(final String name, final String sign, final String value) {
 		super(Type.ATTRIBUTE);
 		this.name = name.trim();
@@ -246,7 +259,41 @@ public class AttributeSelector extends Selector implements NodeFilter {
 			return false;
 		}
 		final Document document = node.getOwnerDocument();
-		return document != null && !document.getConfig().getParserConfig().isCaseSensitive();
+		return document != null
+			&& !document.getConfig().getParserConfig().isCaseSensitive()
+			&& !isForeignElement(node);
+	}
+
+	/**
+	 * Returns {@code true} if the element is an SVG or MathML element, not an HTML element.
+	 * Lagarto doesn't keep namespaces, so they're inferred from the ancestors, like the HTML parser does.
+	 */
+	private static boolean isForeignElement(final Node node) {
+		if (FOREIGN_ROOTS.contains(asciiLowerCase(node.getNodeName()))) {
+			return true;
+		}
+		for (Node ancestor = node.getParentNode(); ancestor != null; ancestor = ancestor.getParentNode()) {
+			if (ancestor.getNodeType() != Node.NodeType.ELEMENT) {
+				return false;
+			}
+			final String ancestorName = asciiLowerCase(ancestor.getNodeName());
+			if (FOREIGN_ROOTS.contains(ancestorName)) {
+				return true;
+			}
+			if (HTML_INTEGRATION_POINTS.contains(ancestorName) || isHtmlAnnotationXml(ancestor, ancestorName)) {
+				return false;
+			}
+		}
+		return false;
+	}
+
+	private static boolean isHtmlAnnotationXml(final Node element, final String name) {
+		if (!name.equals("annotation-xml")) {
+			return false;
+		}
+		final String encoding = element.getAttribute("encoding");
+		return encoding != null
+			&& (encoding.equalsIgnoreCase("text/html") || encoding.equalsIgnoreCase("application/xhtml+xml"));
 	}
 
 	private static String asciiLowerCase(final String value) {
