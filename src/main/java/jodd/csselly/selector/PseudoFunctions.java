@@ -286,11 +286,14 @@ public interface PseudoFunctions {
 			if (StringUtil.startsWithChar(expression, '\'') || StringUtil.startsWithChar(expression, '"')) {
 				expression = expression.substring(1, expression.length() - 1);
 			}
+			if (expression.trim().isEmpty()) {
+				throw new CSSellyException("Empty selector in :has()");
+			}
 			final List<List<CssSelector>> selectors = CSSelly.parse(expression);
 			for (final List<CssSelector> selector : selectors) {
 				// relative selectors are anchored at the tested element, but an explicit :scope still represents
 				// the scoping root of the whole selection, which is not available here
-				if (selector != null && selector.get(0).isScope() && !selector.get(0).isRelative()) {
+				if (selector.get(0).isScope() && !selector.get(0).isRelative()) {
 					throw new CSSellyException(":scope is not supported in :has()");
 				}
 			}
@@ -320,16 +323,27 @@ public interface PseudoFunctions {
 			if (StringUtil.startsWithChar(expression, '\'') || StringUtil.startsWithChar(expression, '"')) {
 				expression = expression.substring(1, expression.length() - 1);
 			}
+			if (expression.trim().isEmpty()) {
+				if (isForgiving()) {
+					// matches nothing, like in browsers
+					return Collections.emptyList();
+				}
+				throw new CSSellyException("Empty selector in :" + getPseudoFunctionName() + "()");
+			}
 			final List<List<CssSelector>> selectors = CSSelly.parse(expression);
 			for (final List<CssSelector> selector : selectors) {
-				if (selector == null) {
-					throw new CSSellyException("Empty selector in :" + getPseudoFunctionName() + "()");
-				}
 				if (selector.get(0).isScope()) {
 					throw new CSSellyException("Relative selectors are not supported in :" + getPseudoFunctionName() + "()");
 				}
 			}
 			return selectors;
+		}
+
+		/**
+		 * Returns {@code true} if an empty selector list is accepted, as with {@code :is()} and {@code :where()}.
+		 */
+		protected boolean isForgiving() {
+			return false;
 		}
 
 		protected boolean matchAny(final Node node, final List<List<CssSelector>> selectors) {
@@ -352,6 +366,11 @@ public interface PseudoFunctions {
 	 * Selects all elements that match any of the given selectors.
 	 */
 	class IS extends SelectorListPseudoFunction {
+
+		@Override
+		protected boolean isForgiving() {
+			return true;
+		}
 
 		@Override
 		public boolean match(final Node node, final List<List<CssSelector>> selectors) {

@@ -37,13 +37,16 @@ import java.util.List;
 public class CSSelly {
 
 	protected final CSSellyLexer lexer;
+	// the lexer can't read an empty input
+	private final boolean emptyInput;
 
 	public CSSelly(final String input) {
-		this.lexer = new CSSellyLexer(input.toCharArray());
+		this(input.toCharArray());
 	}
 
 	public CSSelly(final char[] input) {
 		this.lexer = new CSSellyLexer(input);
+		this.emptyInput = input.length == 0;
 	}
 
 	// ---------------------------------------------------------------- parse
@@ -53,6 +56,9 @@ public class CSSelly {
 	 * Returns {@code null} if no selector can be parsed.
 	 */
 	public List<CssSelector> parse() {
+		if (emptyInput) {
+			return null;
+		}
 		try {
 			lexer.yylex();
 			if (lexer.selectors.isEmpty()) {
@@ -86,13 +92,18 @@ public class CSSelly {
 	/**
 	 * Parses string of selectors (separated with <b>,</b>). Returns
 	 * list of {@link CssSelector} lists in the same order.
+	 * Throws {@link CSSellyException} if the query or one of its selectors is empty.
 	 */
 	public static List<List<CssSelector>> parse(final String query) {
 		final List<String> singleQueries = splitSelectorsGroup(query);
 		final List<List<CssSelector>> selectors = new ArrayList<>(singleQueries.size());
 
 		for (final String singleQuery: singleQueries) {
-			selectors.add(new CSSelly(singleQuery).parse());
+			final List<CssSelector> selector = new CSSelly(singleQuery).parse();
+			if (selector == null) {
+				throw new CSSellyException(singleQueries.size() == 1 ? "Empty selector" : "Empty selector in <" + query + ">");
+			}
+			selectors.add(selector);
 		}
 
 		return selectors;
