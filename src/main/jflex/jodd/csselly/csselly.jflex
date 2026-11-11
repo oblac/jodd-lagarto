@@ -57,7 +57,10 @@ import java.nio.CharBuffer;
 	// whether an attribute was parsed since the last '['
 	boolean attrParsed;
 
-	private void startPseudoFn(String name) {
+	private void startPseudoFn(String name, boolean doubleColon) {
+		if (doubleColon) {
+			cssSelector.checkPseudoElementFunction(name);
+		}
 		pseudoFnName = name;
 		pseudoFnExpression.setLength(0);
 		pseudoFnDepth = 0;
@@ -111,8 +114,10 @@ dimension ={num}{ident}
 	"["				{ attrParsed = false; stateAttr(); }
 	"#"{name}		{ cssSelector.addIdSelector(yytext(1)); }
 	"."{ident}		{ cssSelector.addClassSelector(yytext(1)); }
-	":"(":")?{ident}"("		{ startPseudoFn(yytext(yycharat(1) == ':' ? 2 : 1,1)); }
-	":"(":")?{ident}		{ cssSelector.addPseudoClassSelector(yytext( yycharat(1) == ':' ? 2 : 1 )); }
+	":"{ident}"("	{ startPseudoFn(yytext(1,1), false); }
+	"::"{ident}"("	{ startPseudoFn(yytext(2,1), true); }
+	":"{ident}		{ cssSelector.addPseudoClassSelector(yytext(1)); }
+	"::"{ident}		{ cssSelector.addPseudoElementSelector(yytext(2)); }
 	// any character, including newlines, which are combinators like other whitespaces
 	[^]				{ yypushback(1); stateCombinator(); }
 }

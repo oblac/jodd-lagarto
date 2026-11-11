@@ -110,6 +110,13 @@ public class PseudoClassSelector extends Selector implements NodeFilter, NodeLis
 	}
 
 	/**
+	 * Returns {@code true} if a pseudo class is registered with given name.
+	 */
+	public static boolean isPseudoClass(final String pseudoClassName) {
+		return PSEUDO_CLASS_MAP.containsKey(pseudoClassName.toLowerCase(Locale.ROOT));
+	}
+
+	/**
 	 * Lookups pseudo class for given pseudo class name.
 	 */
 	public static PseudoClass lookupPseudoClass(final String pseudoClassName) {

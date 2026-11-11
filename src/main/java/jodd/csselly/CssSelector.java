@@ -191,6 +191,31 @@ public class CssSelector implements NodeFilter {
 		selectors.add(new PseudoClassSelector(pseudoClass));
 	}
 
+	/**
+	 * Adds a pseudo-class written with a double colon, eg: {@code ::first-child}, which is accepted for
+	 * backward compatibility. Pseudo-elements, eg: {@code ::before}, can't be selected.
+	 */
+	public void addPseudoElementSelector(final String name) {
+		final String pseudoClass = name.trim();
+		if (!SCOPE.equalsIgnoreCase(pseudoClass) && !PseudoClassSelector.isPseudoClass(pseudoClass)) {
+			throw new CSSellyException(pseudoElementError("::" + pseudoClass));
+		}
+		addPseudoClassSelector(pseudoClass);
+	}
+
+	/**
+	 * Checks that a pseudo function written with a double colon, eg: {@code ::contains()}, is not a pseudo-element.
+	 */
+	public void checkPseudoElementFunction(final String name) {
+		if (!PseudoFunctionSelector.isPseudoFunction(name)) {
+			throw new CSSellyException(pseudoElementError("::" + name + "()"));
+		}
+	}
+
+	private static String pseudoElementError(final String pseudoElement) {
+		return "Pseudo-elements such as " + pseudoElement + " can't be selected, as they are not part of the document";
+	}
+
 	public void addPseudoFunctionSelector(final String pseudoFunction, final String expression) {
 		selectors.add(new PseudoFunctionSelector(pseudoFunction, expression));
 	}

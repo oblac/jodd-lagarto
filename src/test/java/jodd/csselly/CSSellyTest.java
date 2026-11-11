@@ -419,6 +419,14 @@ class CSSellyTest {
 
 		assertEquals("contains", pseudoFunctionSelector.getPseudoFunction().getPseudoFunctionName());
 
+		// pseudo-elements can't be selected
+		for (final String query : new String[] {"p::before", "p::FIRST-LINE", "::part(label)", "p::before, a"}) {
+			final CSSellyException ex = assertThrows(CSSellyException.class, () -> CSSelly.parse(query), query);
+			assertTrue(ex.getMessage().startsWith("Pseudo-elements such as ::"), ex.getMessage());
+		}
+		// unlike pseudo-classes written with a single colon
+		final CSSellyException ex = assertThrows(CSSellyException.class, () -> CSSelly.parse("p:before"));
+		assertEquals("Unsupported pseudo class: before", ex.getMessage());
 	}
 
 	@Test
