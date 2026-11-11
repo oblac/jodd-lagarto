@@ -10,10 +10,77 @@ import jodd.util.StringUtil;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 public interface PseudoFunctions {
+	/**
+	 * The expression of {@code :nth-child(an+b of S)} and {@code :nth-last-child(an+b of S)}:
+	 * only the siblings that match the selector list S are counted.
+	 */
+	class NthChildExpression extends PseudoFunctionExpression {
+
+		private static final Pattern OF = Pattern.compile("\\s+of\\s+", Pattern.CASE_INSENSITIVE);
+
+		protected final List<List<CssSelector>> selectors;
+
+		public NthChildExpression(final String expression, final List<List<CssSelector>> selectors) {
+			super(expression);
+			this.selectors = selectors;
+		}
+
+		/**
+		 * Parses {@code an+b}, optionally followed by {@code of S}.
+		 */
+		static PseudoFunctionExpression parse(final String expression) {
+			final Matcher matcher = OF.matcher(expression);
+			if (!matcher.find()) {
+				return new PseudoFunctionExpression(expression);
+			}
+			final String selectorList = expression.substring(matcher.end());
+			if (selectorList.trim().isEmpty()) {
+				throw new CSSellyException("Empty selector after 'of'");
+			}
+			final List<List<CssSelector>> selectors = CSSelly.parse(selectorList);
+			for (final List<CssSelector> selector : selectors) {
+				if (selector.get(0).isScope()) {
+					throw new CSSellyException("Relative selectors are not supported after 'of'");
+				}
+			}
+			return new NthChildExpression(expression.substring(0, matcher.start()), selectors);
+		}
+
+		/**
+		 * Returns the selector list S.
+		 */
+		public List<List<CssSelector>> getSelectors() {
+			return selectors;
+		}
+
+		/**
+		 * Matches if the node matches S and if its index among the siblings that match S matches {@code an+b}.
+		 */
+		boolean matchAmongSiblings(final Node node, final boolean fromEnd) {
+			if (!new NodeMatcher(node).match(selectors)) {
+				return false;
+			}
+			final Node parent = node.getParentNode();
+			final int childCount = parent.getChildNodesCount();
+			int index = 1;
+			for (int i = 0; i < childCount; i++) {
+				final Node sibling = parent.getChild(fromEnd ? childCount - 1 - i : i);
+				if (sibling == node) {
+					return match(index);
+				}
+				if (sibling.getNodeType() == Node.NodeType.ELEMENT && new NodeMatcher(sibling).match(selectors)) {
+					index++;
+				}
+			}
+			return false;
+		}
+	}
+
 	/**
 	 * The {@code :nth-child(an+b)} pseudo-class notation represents an element that has an+b-1
 	 * siblings before it in the document tree, for any positive integer or zero value of n,
@@ -28,11 +95,14 @@ public interface PseudoFunctions {
 
 		@Override
 		public PseudoFunctionExpression parseExpression(final String expression) {
-			return new PseudoFunctionExpression(expression);
+			return NthChildExpression.parse(expression);
 		}
 
 		@Override
 		public boolean match(final Node node, final PseudoFunctionExpression expression) {
+			if (expression instanceof NthChildExpression) {
+				return ((NthChildExpression) expression).matchAmongSiblings(node, false);
+			}
 			final int value = node.getSiblingElementIndex() + 1;
 
 			return expression.match(value);
@@ -48,11 +118,14 @@ public interface PseudoFunctions {
 
 		@Override
 		public PseudoFunctionExpression parseExpression(final String expression) {
-			return new PseudoFunctionExpression(expression);
+			return NthChildExpression.parse(expression);
 		}
 
 		@Override
 		public boolean match(final Node node, final PseudoFunctionExpression expression) {
+			if (expression instanceof NthChildExpression) {
+				return ((NthChildExpression) expression).matchAmongSiblings(node, true);
+			}
 			final int value = node.getParentNode().getChildElementsCount() - node.getSiblingElementIndex();
 
 			return expression.match(value);

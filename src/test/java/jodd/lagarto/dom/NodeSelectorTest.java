@@ -25,6 +25,7 @@
 package jodd.lagarto.dom;
 
 import jodd.csselly.CSSelly;
+import jodd.csselly.CSSellyException;
 import jodd.csselly.CssSelector;
 import jodd.io.FileUtil;
 import org.junit.jupiter.api.Test;
@@ -37,6 +38,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class NodeSelectorTest {
@@ -471,6 +473,29 @@ class NodeSelectorTest {
 		assertEquals("i2,i3,i8", ids(nodeSelector.select("input:read-only:not([type])")));
 		assertEquals("a1,r1", ids(nodeSelector.select(":link")));
 		assertEquals("a1,r1", ids(nodeSelector.select(":any-link")));
+	}
+
+	@Test
+	void testNthChildOfSelector() {
+		NodeSelector nodeSelector = new NodeSelector(new LagartoDOMBuilder().parse(
+			"<ul><li id='l1' class='a'>1</li><li id='l2'>2</li><li id='l3' class='a'>3</li><p id='p1' class='a'>p</p>" +
+			"<li id='l4' class='a b'>4</li><li id='l5'>5</li></ul>"));
+
+		// expected values are the ones of Chrome
+		assertEquals("l3", ids(nodeSelector.select("li:nth-child(2 of .a)")));
+		// keywords are case-insensitive in CSS, even if Chrome only accepts a lowercase 'of'
+		assertEquals("l3", ids(nodeSelector.select(":nth-child(2 OF li.a)")));
+		assertEquals("l1,l4", ids(nodeSelector.select(":nth-child(odd of li.a)")));
+		assertEquals("l2,l4", ids(nodeSelector.select(":nth-child(-n+2 of .b, li:not(.a))")));
+		assertEquals("p1", ids(nodeSelector.select(":nth-child(3 of .a)")));
+		assertEquals("l4", ids(nodeSelector.select(":nth-last-child(1 of .a)")));
+		assertEquals("l4", ids(nodeSelector.select(":nth-last-child(2 of .a, #l5)")));
+		// without 'of', all the children are counted
+		assertEquals("l2", ids(nodeSelector.select(":nth-child(2)")));
+
+		assertThrows(CSSellyException.class, () -> nodeSelector.select(":nth-child(2 of )"));
+		assertThrows(CSSellyException.class, () -> nodeSelector.select(":nth-child(2 of > li)"));
+		assertThrows(CSSellyException.class, () -> nodeSelector.select(":nth-of-type(2 of .a)"));
 	}
 
 	private static String ids(final List<Node> nodes) {
