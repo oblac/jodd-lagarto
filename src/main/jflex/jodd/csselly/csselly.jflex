@@ -145,8 +145,10 @@ dimension ={num}{ident}
 							pseudoFnExpression.append(')');
 						}
 					}
-	[^\(\)\"\'\\\n\r\f]+	{ pseudoFnExpression.append(xxtext()); }
+	[^\(\)\"\'\\]+	{ pseudoFnExpression.append(xxtext()); }
 	{escape}		{ pseudoFnExpression.append(xxtext()); }
+	// unclosed quote, eg: :contains(don't), or backslash that is not an escape
+	[\"\'\\]		{ pseudoFnExpression.append(xxtext()); }
 	<<EOF>>			{ throw new CSSellyException("Unclosed pseudo function <" + pseudoFnName + ">.", yystate(), line(), column()); }
 }
 
