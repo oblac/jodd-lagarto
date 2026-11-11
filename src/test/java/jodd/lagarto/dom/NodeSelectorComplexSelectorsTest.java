@@ -27,11 +27,13 @@ package jodd.lagarto.dom;
 import jodd.csselly.CSSellyException;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 
 /**
  * Selectors with nested selectors, relative selectors, selector lists and attribute flags.
@@ -112,6 +114,24 @@ class NodeSelectorComplexSelectorsTest {
 		assertEquals("b1", select("b:not(ul b)"));
 		assertEquals("p1,s1", select("#main > :not(p + p)"));
 		assertEquals("p1,p2", select("#main > :not(p ~ span)"));
+	}
+
+	@Test
+	void testNotWithDescendantCombinatorsInDeepDocument() {
+		final StringBuilder html = new StringBuilder();
+		for (int i = 0; i < 200; i++) {
+			html.append("<div>");
+		}
+		html.append("<p id='p'>x</p>");
+		for (int i = 0; i < 200; i++) {
+			html.append("</div>");
+		}
+		final Document doc = new LagartoDOMBuilder().parse(html.toString());
+		// without memoization, every combination of 5 ancestors among 200 would be tried
+		assertTimeoutPreemptively(Duration.ofSeconds(10), () -> {
+			assertEquals("p", select(doc, "p:not(span div div div div p)"));
+			assertEquals("", select(doc, "p:not(div div div div div p)"));
+		});
 	}
 
 	@Test
