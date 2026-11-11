@@ -279,6 +279,16 @@ class NodeSelectorComplexSelectorsTest {
 		assertEquals("", select(doc, "[title=foo]"));
 		assertEquals("a1", select(doc, "[title=foo i]"));
 
+		// only on HTML elements, not on SVG or MathML elements, except in HTML integration points
+		final Document foreign = new LagartoDOMBuilder().parse(
+			"<svg id='svg' type='Foo'><rect id='r' type='Foo'></rect>" +
+				"<foreignObject id='fo' type='Foo'><input id='i2' type='Foo'></foreignObject></svg>" +
+			"<math><mtext><input id='i3' type='Foo'></mtext>" +
+				"<annotation-xml encoding='text/html'><input id='i4' type='Foo'></annotation-xml>" +
+				"<annotation-xml encoding='application/x-foo'><input id='i5' type='Foo'></annotation-xml></math>");
+		assertEquals("i2,i3,i4", select(foreign, "[type=foo]"));
+		assertEquals("svg,r,fo,i2,i3,i4,i5", select(foreign, "[type=Foo]"));
+
 		// XML is case-sensitive
 		final Document xml = new LagartoDOMBuilder().enableXmlMode().parse(html);
 		assertEquals("", select(xml, "[type=text]"));
