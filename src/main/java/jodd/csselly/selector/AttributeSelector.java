@@ -47,6 +47,9 @@ public class AttributeSelector extends Selector implements NodeFilter {
 	protected char quoteChar;
 	protected boolean caseInsensitive;
 	protected boolean caseSensitive;
+	// precomputed for case-insensitive matching
+	private boolean htmlCaseInsensitiveAttribute;
+	private String lowerCaseValue;
 
 	/**
 	 * Attributes whose values are matched ASCII case-insensitively on HTML elements in HTML documents, unless the
@@ -65,6 +68,7 @@ public class AttributeSelector extends Selector implements NodeFilter {
 		this.name = name.trim();
 		this.value = extractValue(value);
 		this.match = Match.valueOf(sign);
+		initCaseFolding();
 	}
 
 	public AttributeSelector(final String name, final Match match, final String value) {
@@ -72,6 +76,7 @@ public class AttributeSelector extends Selector implements NodeFilter {
 		this.name = name.trim();
 		this.match = match;
 		this.value = extractValue(value);
+		initCaseFolding();
 	}
 
 	public AttributeSelector(final String attr) {
@@ -94,6 +99,12 @@ public class AttributeSelector extends Selector implements NodeFilter {
 			// like jQuery
 			throw new CSSellyException("Attribute selector flags are not supported with " + match.getSign());
 		}
+		initCaseFolding();
+	}
+
+	private void initCaseFolding() {
+		htmlCaseInsensitiveAttribute = HTML_CASE_INSENSITIVE_ATTRIBUTES.contains(asciiLowerCase(name));
+		lowerCaseValue = value == null ? null : asciiLowerCase(value);
 	}
 
 	/**
@@ -225,16 +236,17 @@ public class AttributeSelector extends Selector implements NodeFilter {
 		}
 
 		if (caseInsensitive || (!caseSensitive && isHtmlCaseInsensitive(node))) {
-			return match.compare(asciiLowerCase(nodeValue), asciiLowerCase(value));
+			return match.compare(asciiLowerCase(nodeValue), lowerCaseValue);
 		}
 		return match.compare(nodeValue, value);
 	}
 
 	private boolean isHtmlCaseInsensitive(final Node node) {
+		if (!htmlCaseInsensitiveAttribute) {
+			return false;
+		}
 		final Document document = node.getOwnerDocument();
-		return document != null
-			&& !document.getConfig().getParserConfig().isCaseSensitive()
-			&& HTML_CASE_INSENSITIVE_ATTRIBUTES.contains(asciiLowerCase(name));
+		return document != null && !document.getConfig().getParserConfig().isCaseSensitive();
 	}
 
 	private static String asciiLowerCase(final String value) {
