@@ -422,6 +422,17 @@ class NodeSelectorTest {
 	}
 
 	@Test
+	void testContainsIgnoresCase() {
+		NodeSelector nodeSelector = new NodeSelector(new LagartoDOMBuilder().parse("<p id='p1'>Hello <b>World</b></p><p id='p2'>other</p>"));
+
+		assertEquals("p1", nodeSelector.selectFirst("p:contains(hello world)").getAttribute("id"));
+		assertEquals("p1", nodeSelector.selectFirst("p:contains('HELLO')").getAttribute("id"));
+		assertEquals("p1", nodeSelector.selectFirst("p:contains(\\57 orld)").getAttribute("id"));
+		assertEquals(1, nodeSelector.select("p:contains(OTHER)").size());
+		assertEquals(0, nodeSelector.select("p:contains(others)").size());
+	}
+
+	@Test
 	void testChecked() {
 		NodeSelector nodeSelector = new NodeSelector(new LagartoDOMBuilder().parse(
 			"<input id='c1' type='checkbox' checked><input id='c2' type='checkbox'><input id='r1' type='RADIO' checked>" +
