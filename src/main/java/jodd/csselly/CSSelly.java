@@ -69,6 +69,8 @@ public class CSSelly {
 			final CssSelector last = lexer.selectors.get(lexer.selectors.size() - 1);
 			if (last.getCombinator() == Combinator.DESCENDANT) {
 				last.setCombinator(null);
+			} else if (last.getCombinator() != null) {
+				throw new CSSellyException("Selector ends with combinator <" + last.getCombinator().getSign() + ">");
 			}
 
 			// set previous css selector

@@ -552,6 +552,8 @@ final class CSSellyLexer {
 	// pseudo function expression, may contain nested parentheses and strings
 	final StringBuilder pseudoFnExpression = new StringBuilder();
 	int pseudoFnDepth;
+	// whether an attribute was parsed since the last '['
+	boolean attrParsed;
 
 	private void startPseudoFn(String name) {
 		pseudoFnName = name;
@@ -846,10 +848,17 @@ final class CSSellyLexer {
         zzAtEOF = true;
             zzDoEOF();
             switch (zzLexicalState) {
+            case ATTR: {
+              if (!attrParsed) {
+							throw new CSSellyException("Empty attribute selector.", yystate(), line(), column());
+						}
+						return 0;
+            }  // fall though
+            case 147: break;
             case PSEUDO_FN: {
               throw new CSSellyException("Unclosed pseudo function <" + pseudoFnName + ">.", yystate(), line(), column());
             }  // fall though
-            case 147: break;
+            case 148: break;
             default:
           { return 0; }
         }
@@ -897,17 +906,20 @@ final class CSSellyLexer {
             // fall through
           case 30: break;
           case 9:
-            { stateAttr();
+            { attrParsed = false; stateAttr();
             }
             // fall through
           case 31: break;
           case 10:
-            { cssSelector.addAttributeSelector(yytext());
+            { attrParsed = true; cssSelector.addAttributeSelector(yytext());
             }
             // fall through
           case 32: break;
           case 11:
-            { stateSelector();
+            { if (!attrParsed) {
+							throw new CSSellyException("Empty attribute selector.", yystate(), line(), column());
+						}
+						stateSelector();
             }
             // fall through
           case 33: break;

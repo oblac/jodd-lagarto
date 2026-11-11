@@ -344,6 +344,22 @@ class CSSellyTest {
 	}
 
 	@Test
+	void testIncompleteSelectors() {
+		for (final String query : new String[] {"p >", "p>", "p +", "p ~ ", "div > p +", "p[", "p[]", "p[ ]", "p[]:first-child", ":has(p >)"}) {
+			assertThrows(CSSellyException.class, () -> CSSelly.parse(query), query);
+		}
+
+		// like in browsers, the end of the selector closes an attribute selector
+		final NodeSelector nodeSelector = new NodeSelector(new LagartoDOMBuilder().parse("<p title='a'>a</p><p>b</p>"));
+		assertEquals(1, nodeSelector.select("p[title").size());
+		assertEquals(1, nodeSelector.select("p[title=a").size());
+		assertEquals(1, nodeSelector.select("p[title=\"a\"").size());
+		// trailing whitespace is not a combinator
+		assertEquals(2, nodeSelector.select("p ").size());
+		assertEquals(2, nodeSelector.select("p\n").size());
+	}
+
+	@Test
 	void testUppercaseClassNames() {
 		final CSSelly lexer = new CSSelly("div.fooBar");
 		final List<CssSelector> selectorList = lexer.parse();

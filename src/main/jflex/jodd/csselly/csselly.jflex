@@ -54,6 +54,8 @@ import java.nio.CharBuffer;
 	// pseudo function expression, may contain nested parentheses and strings
 	final StringBuilder pseudoFnExpression = new StringBuilder();
 	int pseudoFnDepth;
+	// whether an attribute was parsed since the last '['
+	boolean attrParsed;
 
 	private void startPseudoFn(String name) {
 		pseudoFnName = name;
@@ -106,7 +108,7 @@ dimension ={num}{ident}
 }
 
 <SELECTOR> {
-	"["				{ stateAttr(); }
+	"["				{ attrParsed = false; stateAttr(); }
 	"#"{name}		{ cssSelector.addIdSelector(yytext(1)); }
 	"."{ident}		{ cssSelector.addClassSelector(yytext(1)); }
 	":"(":")?{ident}"("		{ startPseudoFn(yytext(yycharat(1) == ':' ? 2 : 1,1)); }
@@ -122,8 +124,20 @@ dimension ={num}{ident}
 		{w}
 		({ident} {ww} [is] | {string} {w} [is] | {ident} | {string})
 		{w}
-	)?				{ cssSelector.addAttributeSelector(yytext()); }
-	"]"				{ stateSelector(); }
+	)?				{ attrParsed = true; cssSelector.addAttributeSelector(yytext()); }
+	"]"				{
+						if (!attrParsed) {
+							throw new CSSellyException("Empty attribute selector.", yystate(), line(), column());
+						}
+						stateSelector();
+					}
+	// like in browsers, the end of the selector closes an attribute selector, eg: p[title
+	<<EOF>>			{
+						if (!attrParsed) {
+							throw new CSSellyException("Empty attribute selector.", yystate(), line(), column());
+						}
+						return 0;
+					}
 }
 
 <COMBINATOR> {
