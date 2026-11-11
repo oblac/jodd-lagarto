@@ -27,6 +27,7 @@ package jodd.csselly.selector;
 import jodd.lagarto.dom.Node;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Pseudo functions.
@@ -65,7 +66,7 @@ public abstract class PseudoFunction<E> {
 	 * Returns pseudo-function name.
 	 */
 	public String getPseudoFunctionName() {
-		String name = getClass().getSimpleName().toLowerCase();
+		String name = getClass().getSimpleName().toLowerCase(Locale.ROOT);
 		name = name.replace('_', '-');
 		return name;
 	}

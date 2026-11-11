@@ -519,6 +519,24 @@ class NodeSelectorTest {
 		assertEquals("l3", ids(nodeSelector.select("li:eq(2)")));
 	}
 
+	@Test
+	void testTurkishLocale() {
+		final java.util.Locale defaultLocale = java.util.Locale.getDefault();
+		java.util.Locale.setDefault(new java.util.Locale("tr", "TR"));
+		try {
+			// 'I' is lower-cased to a dotless 'ı' in Turkish
+			assertEquals("first-child", new jodd.csselly.selector.PseudoClasses.FIRST_CHILD().getPseudoClassName());
+			assertEquals("nth-child", new jodd.csselly.selector.PseudoFunctions.NTH_CHILD().getPseudoFunctionName());
+
+			NodeSelector nodeSelector = new NodeSelector(new LagartoDOMBuilder().parse("<TITLE ID='t1'>t</TITLE><LI ID='l1'>i</LI>"));
+			assertEquals("title", nodeSelector.selectFirst("#t1").getNodeName());
+			assertEquals("t1", ids(nodeSelector.select("title[id=t1]")));
+			assertEquals("l1", ids(nodeSelector.select("LI[ID]:last-child, li:nth-child(2)")));
+		} finally {
+			java.util.Locale.setDefault(defaultLocale);
+		}
+	}
+
 	private static String ids(final List<Node> nodes) {
 		final List<String> ids = new ArrayList<>();
 		for (final Node node : nodes) {

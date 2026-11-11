@@ -40,6 +40,8 @@ import jodd.net.HtmlEncoder;
 
 import java.io.IOException;
 
+import java.util.Locale;
+
 /**
  * {@link jodd.lagarto.dom.NodeVisitor} that renders DOM tree to string.
  */
@@ -181,8 +183,8 @@ public class LagartoHtmlRendererNodeVisitor implements NodeVisitor {
 		switch (tagCase) {
 			case DEFAULT: return node.getNodeName();
 			case RAW: return node.getNodeRawName();
-			case LOWERCASE: return node.getNodeRawName().toLowerCase();
-			case UPPERCASE: return node.getNodeRawName().toUpperCase();
+			case LOWERCASE: return node.getNodeRawName().toLowerCase(Locale.ROOT);
+			case UPPERCASE: return node.getNodeRawName().toUpperCase(Locale.ROOT);
 		}
 		return null;
 	}
@@ -194,8 +196,8 @@ public class LagartoHtmlRendererNodeVisitor implements NodeVisitor {
 		switch (attributeCase) {
 			case DEFAULT: return attribute.getName();
 			case RAW: return attribute.getRawName();
-			case LOWERCASE: return attribute.getRawName().toLowerCase();
-			case UPPERCASE: return attribute.getRawName().toUpperCase();
+			case LOWERCASE: return attribute.getRawName().toLowerCase(Locale.ROOT);
+			case UPPERCASE: return attribute.getRawName().toUpperCase(Locale.ROOT);
 		}
 		return null;
 	}
