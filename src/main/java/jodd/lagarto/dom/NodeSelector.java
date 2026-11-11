@@ -340,21 +340,33 @@ public class NodeSelector {
 	/**
 	 * Matches nodes against a selector, from right to left, honoring the combinators.
 	 * The results of the intermediate matches are remembered, so the ancestors and siblings
-	 * shared by several nodes are matched only once.
+	 * shared by several nodes are matched only once, and each sibling list is walked once for a given selector.
 	 */
 	private static final class ChainMatcher {
+		// bits per selector index in the memo
+		private static final int MATCH_KNOWN = 0;
+		private static final int MATCH = 1;
+		private static final int PREVIOUS_KNOWN = 2;
+		private static final int PREVIOUS = 3;
+		private static final int BITS = 4;
+
 		private final List<CssSelector> selectors;
 		// the matched nodes and their ancestors must be descendants of this node
 		private final Node root;
 		// the node that a leading scope selector matches, or null
 		private final Node anchor;
-		// for each node: bit 2i is set if the selector at index i was matched, bit 2i+1 holds the result
 		private final Map<Node, BitSet> memo = new IdentityHashMap<>();
+		// the nodes walked through by matchAnyPreviousSibling, per selector index: nested calls are for lower indexes
+		private final List<List<Node>> walkedNodes;
 
 		ChainMatcher(final List<CssSelector> selectors, final Node root, final Node anchor) {
 			this.selectors = selectors;
 			this.root = root;
 			this.anchor = anchor;
+			this.walkedNodes = new ArrayList<>(selectors.size());
+			for (int i = 0; i < selectors.size(); i++) {
+				walkedNodes.add(new ArrayList<>());
+			}
 		}
 
 		boolean matches(final Node node) {
@@ -363,6 +375,19 @@ public class NodeSelector {
 			return selectors.get(last).accept(node) && (last == 0 || matchPrevious(node, last - 1));
 		}
 
+		private BitSet bits(final Node node) {
+			BitSet bits = memo.get(node);
+			if (bits == null) {
+				bits = new BitSet(BITS * selectors.size());
+				memo.put(node, bits);
+			}
+			return bits;
+		}
+
+		/**
+		 * Matches the node against the selector at given index, and its ancestors or previous siblings
+		 * against the previous selectors.
+		 */
 		private boolean match(final Node node, final int index) {
 			if (index == 0 && anchor != null) {
 				return node == anchor;
@@ -370,19 +395,13 @@ public class NodeSelector {
 			if (node == root || node.getNodeType() != Node.NodeType.ELEMENT) {
 				return false;
 			}
-			BitSet bits = memo.get(node);
-			if (bits != null && bits.get(2 * index)) {
-				return bits.get(2 * index + 1);
+			final BitSet bits = bits(node);
+			if (bits.get(BITS * index + MATCH_KNOWN)) {
+				return bits.get(BITS * index + MATCH);
 			}
 			final boolean result = selectors.get(index).accept(node) && (index == 0 || matchPrevious(node, index - 1));
-			if (bits == null) {
-				bits = new BitSet(2 * selectors.size());
-				memo.put(node, bits);
-			}
-			bits.set(2 * index);
-			if (result) {
-				bits.set(2 * index + 1);
-			}
+			bits.set(BITS * index + MATCH_KNOWN);
+			bits.set(BITS * index + MATCH, result);
 			return result;
 		}
 
@@ -396,7 +415,12 @@ public class NodeSelector {
 					final Node parent = node.getParentNode();
 					return parent != null && match(parent, prevIndex);
 				}
+				case ADJACENT_SIBLING: {
+					final Node sibling = node.getPreviousSiblingElement();
+					return sibling != null && match(sibling, prevIndex);
+				}
 				case DESCENDANT: {
+					// ancestor chains are short: walked for each node, the ancestors' matches being remembered
 					for (Node ancestor = node.getParentNode(); ancestor != null; ancestor = ancestor.getParentNode()) {
 						if (match(ancestor, prevIndex)) {
 							return true;
@@ -408,24 +432,54 @@ public class NodeSelector {
 					}
 					return false;
 				}
-				case ADJACENT_SIBLING: {
-					final Node sibling = node.getPreviousSiblingElement();
-					return sibling != null && match(sibling, prevIndex);
-				}
-				case GENERAL_SIBLING: {
-					for (Node sibling = node.getPreviousSiblingElement(); sibling != null; sibling = sibling.getPreviousSiblingElement()) {
-						if (match(sibling, prevIndex)) {
-							return true;
-						}
-						if (sibling == anchor) {
-							return false;
-						}
-					}
-					return false;
-				}
+				case GENERAL_SIBLING:
+					// sibling lists can be long: walked once
+					return matchAnyPreviousSibling(node, prevIndex);
 				default:
 					return false;
 			}
+		}
+
+		/**
+		 * Returns {@code true} if one of the previous siblings of the node matches the selector at given index.
+		 * The result is remembered for the node and for the siblings walked through, as they share the same
+		 * previous siblings: each sibling list is walked once.
+		 */
+		private boolean matchAnyPreviousSibling(final Node node, final int index) {
+			final List<Node> walked = walkedNodes.get(index);
+			Node current = node;
+			boolean result;
+			while (true) {
+				final BitSet bits = bits(current);
+				if (bits.get(BITS * index + PREVIOUS_KNOWN)) {
+					result = bits.get(BITS * index + PREVIOUS);
+					break;
+				}
+				walked.add(current);
+				final Node previous = current.getPreviousSiblingElement();
+				if (previous == null) {
+					result = false;
+					break;
+				}
+				if (match(previous, index)) {
+					result = true;
+					break;
+				}
+				if (previous == anchor) {
+					// no need to look further
+					result = false;
+					break;
+				}
+				current = previous;
+			}
+			// the siblings walked through have the same previous siblings, beyond the ones that didn't match
+			for (final Node walkedNode : walked) {
+				final BitSet bits = memo.get(walkedNode);
+				bits.set(BITS * index + PREVIOUS_KNOWN);
+				bits.set(BITS * index + PREVIOUS, result);
+			}
+			walked.clear();
+			return result;
 		}
 	}
 
