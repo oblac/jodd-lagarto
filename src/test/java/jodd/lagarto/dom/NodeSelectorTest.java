@@ -498,6 +498,27 @@ class NodeSelectorTest {
 		assertThrows(CSSellyException.class, () -> nodeSelector.select(":nth-of-type(2 of .a)"));
 	}
 
+	@Test
+	void testResultsInDocumentOrder() {
+		NodeSelector nodeSelector = new NodeSelector(new LagartoDOMBuilder().parse(
+			"<div id='d1'><p id='p1'></p><div id='d2'><p id='p2'></p></div><p id='p3'></p></div>" +
+			"<ul><li id='l1'></li><li id='l2' class='a'></li><li id='l3'></li><li id='l4' class='a'></li></ul>"));
+
+		// the nested div used to be walked after its parent div
+		assertEquals("p1,p2,p3", ids(nodeSelector.select("div > p")));
+		assertEquals("p1,p2,p3", ids(nodeSelector.select("div p")));
+		assertEquals("l2,l3,l4", ids(nodeSelector.select("li ~ li")));
+		assertEquals("l3,l4", ids(nodeSelector.select(".a ~ li")));
+		assertEquals("p1,p2,p3,l2,l4", ids(nodeSelector.select(".a, div > p")));
+		// relative selectors, as used by :has()
+		assertEquals("l2,l3,l4", ids(new NodeSelector(nodeSelector.selectFirst("#l1")).select("~ li")));
+		assertEquals("d2,p2,p3", ids(new NodeSelector(nodeSelector.selectFirst("#p1")).select("~ * , ~ div p")));
+		// jQuery positional pseudo-classes still apply to the current results
+		assertEquals("l1", ids(nodeSelector.select("li:first")));
+		assertEquals("l4", ids(nodeSelector.select("ul li:last")));
+		assertEquals("l3", ids(nodeSelector.select("li:eq(2)")));
+	}
+
 	private static String ids(final List<Node> nodes) {
 		final List<String> ids = new ArrayList<>();
 		for (final Node node : nodes) {

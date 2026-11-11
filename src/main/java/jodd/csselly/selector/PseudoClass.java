@@ -48,6 +48,18 @@ public abstract class PseudoClass {
 	}
 
 	/**
+	 * Returns {@code true} if the pseudo-class depends on the position of the node within current results,
+	 * i.e. if {@link #matchInRange(List, Node, int)} is overridden, eg: {@code :first}.
+	 */
+	public boolean isRangeDependent() {
+		try {
+			return getClass().getMethod("matchInRange", List.class, Node.class, int.class).getDeclaringClass() != PseudoClass.class;
+		} catch (final NoSuchMethodException ex) {
+			return true;
+		}
+	}
+
+	/**
 	 * Returns pseudo-class name from simple class name.
 	 */
 	public String getPseudoClassName() {

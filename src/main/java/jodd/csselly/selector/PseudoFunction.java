@@ -50,6 +50,18 @@ public abstract class PseudoFunction<E> {
 	}
 
 	/**
+	 * Returns {@code true} if the pseudo-function depends on the position of the node within current results,
+	 * i.e. if {@link #matchInRange(List, Node, int, Object)} is overridden, eg: {@code :eq()}.
+	 */
+	public boolean isRangeDependent() {
+		try {
+			return getClass().getMethod("matchInRange", List.class, Node.class, int.class, Object.class).getDeclaringClass() != PseudoFunction.class;
+		} catch (final NoSuchMethodException ex) {
+			return true;
+		}
+	}
+
+	/**
 	 * Returns pseudo-function name.
 	 */
 	public String getPseudoFunctionName() {

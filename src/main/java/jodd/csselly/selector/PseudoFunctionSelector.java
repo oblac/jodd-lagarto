@@ -103,6 +103,7 @@ public class PseudoFunctionSelector<E> extends Selector implements NodeFilter, N
 	protected final PseudoFunction<E> pseudoFunction;
 	protected final String expression;
 	protected final E parsedExpression;
+	private final boolean rangeDependent;
 
 	/**
 	 * Creates pseudo function selector for given function and expression.
@@ -113,6 +114,14 @@ public class PseudoFunctionSelector<E> extends Selector implements NodeFilter, N
 		this.pseudoFunction = (PseudoFunction<E>) lookupPseudoFunction(functionName.trim());
 		this.expression = expression;
 		this.parsedExpression = pseudoFunction.parseExpression(expression);
+		this.rangeDependent = pseudoFunction.isRangeDependent();
+	}
+
+	/**
+	 * Returns {@code true} if the selector depends on the position of the node within current results.
+	 */
+	public boolean isRangeDependent() {
+		return rangeDependent;
 	}
 
 	/**

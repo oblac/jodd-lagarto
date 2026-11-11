@@ -28,7 +28,9 @@ import jodd.csselly.CSSelly;
 import jodd.csselly.Combinator;
 import jodd.csselly.CssSelector;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.IdentityHashMap;
@@ -64,6 +66,24 @@ public class NodeSelector {
 	 * When there's more than one selector, results are returned in document order.
 	 */
 	public List<Node> select(final Collection<List<CssSelector>> selectorsCollection) {
+		if (selectorsCollection.size() > 1 && canSelectInOneWalk(selectorsCollection)) {
+			// one walk over the nodes, that are matched against each selector: results are in document order
+			final List<Node> results = new ArrayList<>();
+			final List<ChainMatcher> matchers = new ArrayList<>(selectorsCollection.size());
+			for (List<CssSelector> selectors : selectorsCollection) {
+				matchers.add(new ChainMatcher(selectors, rootNode, null));
+			}
+			walkDescendants(rootNode, node -> {
+				for (ChainMatcher matcher : matchers) {
+					if (matcher.matches(node)) {
+						results.add(node);
+						break;
+					}
+				}
+				return true;
+			});
+			return results;
+		}
 		List<Node> results = new UniqueNodeList();
 		for (List<CssSelector> selectors : selectorsCollection) {
 			processSelectors(results, selectors);
@@ -72,6 +92,45 @@ public class NodeSelector {
 			sortInDocumentOrder(results);
 		}
 		return new ArrayList<>(results);
+	}
+
+	/**
+	 * Returns {@code true} if at least one node is selected by the pre-parsed CSS selectors.
+	 * Faster than {@link #select(Collection)}, as the selection stops at the first matching node.
+	 */
+	public boolean hasMatch(final Collection<List<CssSelector>> selectorsCollection) {
+		for (List<CssSelector> selectors : selectorsCollection) {
+			if (isRangeDependent(selectors)) {
+				if (!select(rootNode, selectors).isEmpty()) {
+					return true;
+				}
+			} else if (!selectFromRight(rootNode, selectors, true).isEmpty()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static boolean canSelectInOneWalk(final Collection<List<CssSelector>> selectorsCollection) {
+		for (List<CssSelector> selectors : selectorsCollection) {
+			if (selectors.get(0).isScope() || isRangeDependent(selectors)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Returns {@code true} if one of the selectors depends on the position of the nodes within the current results,
+	 * eg: {@code :first}, and requires the selection to be performed from left to right.
+	 */
+	private static boolean isRangeDependent(final List<CssSelector> selectors) {
+		for (CssSelector selector : selectors) {
+			if (selector.isRangeDependent()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -188,6 +247,194 @@ public class NodeSelector {
 	}
 
 	protected List<Node> select(final Node rootNode, final List<CssSelector> selectors) {
+		if (isRangeDependent(selectors)) {
+			return selectFromLeft(rootNode, selectors);
+		}
+		return selectFromRight(rootNode, selectors, false);
+	}
+
+	/**
+	 * Selects the nodes like browsers do: the candidate nodes are walked once, in document order,
+	 * and each one is matched against the selectors, from right to left.
+	 */
+	private List<Node> selectFromRight(final Node rootNode, final List<CssSelector> selectors, final boolean firstOnly) {
+		final List<Node> results = new ArrayList<>();
+
+		// a leading scope selector, explicit (:scope) or implicit (relative selector, eg "> p"), is the scoping root:
+		// the root node itself, or the root element when selecting from a document, like :root
+		final CssSelector first = selectors.get(0);
+		if (first.isScope()) {
+			final Node scopeNode = rootNode.getNodeType() == Node.NodeType.DOCUMENT ? rootNode.getFirstChildElement() : rootNode;
+			if (scopeNode == null || (first.hasConditions() && !first.accept(scopeNode))) {
+				return results;
+			}
+			if (selectors.size() == 1) {
+				// only the descendants of the root node are selected
+				if (scopeNode != rootNode) {
+					results.add(scopeNode);
+				}
+				return results;
+			}
+			final ChainMatcher matcher = new ChainMatcher(selectors, rootNode, scopeNode);
+			final NodeVisitor visitor = node -> {
+				if (matcher.matches(node)) {
+					results.add(node);
+					return !firstOnly;
+				}
+				return true;
+			};
+			final Combinator combinator = first.getCombinator();
+			if (combinator == Combinator.ADJACENT_SIBLING || combinator == Combinator.GENERAL_SIBLING) {
+				// the following siblings of the scoping root, and their descendants
+				for (Node sibling = scopeNode.getNextSiblingElement(); sibling != null; sibling = sibling.getNextSiblingElement()) {
+					if (!visitor.visit(sibling) || !walkDescendants(sibling, visitor)) {
+						break;
+					}
+				}
+			} else {
+				walkDescendants(scopeNode, visitor);
+			}
+			return results;
+		}
+
+		final ChainMatcher matcher = new ChainMatcher(selectors, rootNode, null);
+		walkDescendants(rootNode, node -> {
+			if (matcher.matches(node)) {
+				results.add(node);
+				return !firstOnly;
+			}
+			return true;
+		});
+		return results;
+	}
+
+	@FunctionalInterface
+	private interface NodeVisitor {
+		/**
+		 * Visits an element, returns {@code false} to stop the walk.
+		 */
+		boolean visit(Node element);
+	}
+
+	/**
+	 * Visits the descendant elements of a node in document order, without recursion.
+	 * Returns {@code false} if the walk was stopped by the visitor.
+	 */
+	private static boolean walkDescendants(final Node root, final NodeVisitor visitor) {
+		final ArrayDeque<Node> stack = new ArrayDeque<>();
+		for (int i = root.getChildNodesCount() - 1; i >= 0; i--) {
+			stack.push(root.getChild(i));
+		}
+		while (!stack.isEmpty()) {
+			final Node node = stack.pop();
+			if (node.getNodeType() == Node.NodeType.ELEMENT && !visitor.visit(node)) {
+				return false;
+			}
+			for (int i = node.getChildNodesCount() - 1; i >= 0; i--) {
+				stack.push(node.getChild(i));
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Matches nodes against a selector, from right to left, honoring the combinators.
+	 * The results of the intermediate matches are remembered, so the ancestors and siblings
+	 * shared by several nodes are matched only once.
+	 */
+	private static final class ChainMatcher {
+		private final List<CssSelector> selectors;
+		// the matched nodes and their ancestors must be descendants of this node
+		private final Node root;
+		// the node that a leading scope selector matches, or null
+		private final Node anchor;
+		// for each node: bit 2i is set if the selector at index i was matched, bit 2i+1 holds the result
+		private final Map<Node, BitSet> memo = new IdentityHashMap<>();
+
+		ChainMatcher(final List<CssSelector> selectors, final Node root, final Node anchor) {
+			this.selectors = selectors;
+			this.root = root;
+			this.anchor = anchor;
+		}
+
+		boolean matches(final Node node) {
+			final int last = selectors.size() - 1;
+			// the node is visited once: no need to remember the result
+			return selectors.get(last).accept(node) && (last == 0 || matchPrevious(node, last - 1));
+		}
+
+		private boolean match(final Node node, final int index) {
+			if (index == 0 && anchor != null) {
+				return node == anchor;
+			}
+			if (node == root || node.getNodeType() != Node.NodeType.ELEMENT) {
+				return false;
+			}
+			BitSet bits = memo.get(node);
+			if (bits != null && bits.get(2 * index)) {
+				return bits.get(2 * index + 1);
+			}
+			final boolean result = selectors.get(index).accept(node) && (index == 0 || matchPrevious(node, index - 1));
+			if (bits == null) {
+				bits = new BitSet(2 * selectors.size());
+				memo.put(node, bits);
+			}
+			bits.set(2 * index);
+			if (result) {
+				bits.set(2 * index + 1);
+			}
+			return result;
+		}
+
+		/**
+		 * Matches the ancestors or previous siblings of the node against the selector at given index,
+		 * depending on its combinator.
+		 */
+		private boolean matchPrevious(final Node node, final int prevIndex) {
+			switch (selectors.get(prevIndex).getCombinator()) {
+				case CHILD: {
+					final Node parent = node.getParentNode();
+					return parent != null && match(parent, prevIndex);
+				}
+				case DESCENDANT: {
+					for (Node ancestor = node.getParentNode(); ancestor != null; ancestor = ancestor.getParentNode()) {
+						if (match(ancestor, prevIndex)) {
+							return true;
+						}
+						if (ancestor == root || ancestor == anchor) {
+							// no need to look further up
+							return false;
+						}
+					}
+					return false;
+				}
+				case ADJACENT_SIBLING: {
+					final Node sibling = node.getPreviousSiblingElement();
+					return sibling != null && match(sibling, prevIndex);
+				}
+				case GENERAL_SIBLING: {
+					for (Node sibling = node.getPreviousSiblingElement(); sibling != null; sibling = sibling.getPreviousSiblingElement()) {
+						if (match(sibling, prevIndex)) {
+							return true;
+						}
+						if (sibling == anchor) {
+							return false;
+						}
+					}
+					return false;
+				}
+				default:
+					return false;
+			}
+		}
+	}
+
+	/**
+	 * Selects the nodes from left to right: the nodes matching the first selector are selected,
+	 * then the nodes matching the second selector from them, and so on.
+	 * Required by the selectors that depend on the position of the nodes within current results, eg: {@code :first}.
+	 */
+	private List<Node> selectFromLeft(final Node rootNode, final List<CssSelector> selectors) {
 
 		// start with the root node
 		List<Node> nodes = new ArrayList<>();
