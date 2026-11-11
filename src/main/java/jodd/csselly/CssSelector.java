@@ -30,7 +30,6 @@ import jodd.csselly.selector.PseudoFunctionSelector;
 import jodd.lagarto.dom.Document;
 import jodd.lagarto.dom.Node;
 import jodd.lagarto.dom.NodeFilter;
-import jodd.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -177,8 +176,8 @@ public class CssSelector implements NodeFilter {
 		selectors.add(new AttributeSelector(CLASS, INCLUDES, clazz));
 	}
 
-	public void addAttributeSelector(String attribute) {
-		attribute = unescape(attribute);
+	public void addAttributeSelector(final String attribute) {
+		// the attribute name and value are unescaped once separated, as quotes may be escaped in the value
 		selectors.add(new AttributeSelector(attribute));
 	}
 
@@ -358,14 +357,11 @@ public class CssSelector implements NodeFilter {
 	// ---------------------------------------------------------------- util
 
 	/**
-	 * Unescapes CSS string by removing all backslash characters from it.
+	 * Resolves the CSS escapes of an identifier.
+	 * @see CSSelly#unescape(String)
 	 */
 	protected String unescape(final String value) {
-		if (value.indexOf('\\') == -1) {
-			return value;
-		}
-
-		return StringUtil.remove(value, '\\');
+		return CSSelly.unescape(value);
 	}
 
 }
