@@ -80,6 +80,13 @@ public class PseudoFunctionSelector<E> extends Selector implements NodeFilter, N
 	}
 
 	/**
+	 * Returns {@code true} if a pseudo function is registered with given name.
+	 */
+	public static boolean isPseudoFunction(final String pseudoFunctionName) {
+		return PSEUDO_FUNCTION_MAP.containsKey(pseudoFunctionName.toLowerCase(Locale.ROOT));
+	}
+
+	/**
 	 * Lookups pseudo function for given pseudo function name.
 	 */
 	public static PseudoFunction<?> lookupPseudoFunction(final String pseudoFunctionName) {
