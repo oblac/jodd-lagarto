@@ -175,7 +175,7 @@ public interface PseudoFunctions {
 	}
 
 	/**
-	 * Selects all elements that contain the specified text.
+	 * Selects all elements that contain the specified text, ignoring case like jsoup.
 	 */
 	class CONTAINS extends PseudoFunction<String> {
 
@@ -184,13 +184,12 @@ public interface PseudoFunctions {
 			if (StringUtil.startsWithChar(expression, '\'') || StringUtil.startsWithChar(expression, '"')) {
 				expression = expression.substring(1, expression.length() - 1);
 			}
-			return CSSelly.unescape(expression);
+			return ElementText.lowerCase(CSSelly.unescape(expression));
 		}
 
 		@Override
 		public boolean match(final Node node, final String expression) {
-			final String text = node.getTextContent();
-			return text.contains(expression);
+			return ElementText.lowerCase(node.getTextContent()).contains(expression);
 		}
 	}
 
