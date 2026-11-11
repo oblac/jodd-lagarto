@@ -29,12 +29,16 @@ import jodd.csselly.selector.PseudoClassSelector;
 import jodd.csselly.selector.PseudoClasses;
 import jodd.csselly.selector.PseudoFunctionExpression;
 import jodd.csselly.selector.PseudoFunctionSelector;
+import jodd.lagarto.dom.LagartoDOMBuilder;
+import jodd.lagarto.dom.NodeSelector;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 class CSSellyTest {
@@ -320,6 +324,23 @@ class CSSellyTest {
 		} catch (final CSSellyException ex) {
 		}
 
+	}
+
+	@Test
+	void testEmptySelectors() {
+		assertNull(new CSSelly("").parse());
+		assertNull(new CSSelly("  ").parse());
+
+		for (final String query : new String[] {"", " ", "p,", ",p", "p, ,a", ":not()", ":not( )", ":has()", "p:is(p,)"}) {
+			final CSSellyException ex = assertThrows(CSSellyException.class, () -> CSSelly.parse(query), query);
+			assertTrue(ex.getMessage().startsWith("Empty selector"), ex.getMessage());
+		}
+
+		// like in browsers, :is() and :where() accept an empty list, that matches nothing
+		final NodeSelector nodeSelector = new NodeSelector(new LagartoDOMBuilder().parse("<p>a</p>"));
+		assertEquals(0, nodeSelector.select(":is()").size());
+		assertEquals(0, nodeSelector.select("p:where( )").size());
+		assertEquals(1, nodeSelector.select("p:not(:is())").size());
 	}
 
 	@Test
