@@ -8,6 +8,7 @@ import jodd.lagarto.dom.NodeMatcher;
 import jodd.lagarto.dom.NodeSelector;
 import jodd.util.StringUtil;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -335,9 +336,14 @@ public interface PseudoFunctions {
 
 		@Override
 		public boolean match(final Node node, final List<List<CssSelector>> selectors) {
-			final List<Node> matchedNodes = new NodeSelector(node).select(selectors);
-
-			return !matchedNodes.isEmpty();
+			final NodeSelector nodeSelector = new NodeSelector(node);
+			// selectors one by one: stop at the first one that matches, and don't sort the results of the group
+			for (final List<CssSelector> selector : selectors) {
+				if (!nodeSelector.select(Collections.singletonList(selector)).isEmpty()) {
+					return true;
+				}
+			}
+			return false;
 		}
 	}
 
