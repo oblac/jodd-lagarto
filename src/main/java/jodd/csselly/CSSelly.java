@@ -104,7 +104,6 @@ public class CSSelly {
 	 */
 	static List<String> splitSelectorsGroup(final String query) {
 		final List<String> singleQueries = new ArrayList<>();
-		char quote = 0;
 		int depth = 0;
 		int start = 0;
 		final int length = query.length();
@@ -112,12 +111,12 @@ public class CSSelly {
 			final char c = query.charAt(i);
 			if (c == '\\') {
 				i++;
-			} else if (quote != 0) {
-				if (c == quote) {
-					quote = 0;
-				}
 			} else if (c == '"' || c == '\'') {
-				quote = c;
+				// like the lexer, an unclosed quote is a plain character, eg: :contains(don't)
+				final int end = stringEnd(query, i);
+				if (end != -1) {
+					i = end;
+				}
 			} else if (c == '(' || c == '[') {
 				depth++;
 			} else if ((c == ')' || c == ']') && depth > 0) {
@@ -129,6 +128,27 @@ public class CSSelly {
 		}
 		singleQueries.add(query.substring(start));
 		return singleQueries;
+	}
+
+	/**
+	 * Returns the index of the quote that closes the string starting at given index,
+	 * or {@code -1} if the string isn't closed before the end of the line.
+	 */
+	private static int stringEnd(final String query, final int startIndex) {
+		final char quote = query.charAt(startIndex);
+		final int length = query.length();
+		for (int i = startIndex + 1; i < length; i++) {
+			final char c = query.charAt(i);
+			if (c == quote) {
+				return i;
+			}
+			if (c == '\\') {
+				i++;
+			} else if (c == '\n' || c == '\r' || c == '\f') {
+				return -1;
+			}
+		}
+		return -1;
 	}
 
 	// ---------------------------------------------------------------- toString

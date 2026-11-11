@@ -86,6 +86,20 @@ class NodeSelectorComplexSelectorsTest {
 	}
 
 	@Test
+	void testNewlinesInPseudoFunctions() {
+		assertEquals("li1,li3", select("li:nth-child(2n\n+1)"));
+		assertEquals("li1,li4", select("li:not(.x,\n:nth-child(\n3\n))"));
+	}
+
+	@Test
+	void testUnclosedQuotesInPseudoFunctions() {
+		final Document doc = new LagartoDOMBuilder().parse("<p id='p1'>don't</p><p id='p2'>it's</p><p id='p3'>none</p>");
+		assertEquals("p1", select(doc, "p:contains(don't)"));
+		assertEquals("p1,p3", select(doc, "p:contains(don't), p:contains(none)"));
+		assertEquals("p2", select(doc, "p:not(:contains(don't), :contains(none))"));
+	}
+
+	@Test
 	void testCommasInsideSelectors() {
 		assertEquals("li3,li4", select("li:not(.x, :first-child)"));
 		assertEquals("main", select("[title='a,b']"));
