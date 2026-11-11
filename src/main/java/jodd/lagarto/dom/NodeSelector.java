@@ -30,10 +30,12 @@ import jodd.csselly.CssSelector;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Node selector selects DOM nodes using {@link CSSelly CSS3 selectors}.
@@ -62,14 +64,33 @@ public class NodeSelector {
 	 * When there's more than one selector, results are returned in document order.
 	 */
 	public List<Node> select(final Collection<List<CssSelector>> selectorsCollection) {
-		List<Node> results = new ArrayList<>();
+		List<Node> results = new UniqueNodeList();
 		for (List<CssSelector> selectors : selectorsCollection) {
 			processSelectors(results, selectors);
 		}
 		if (selectorsCollection.size() > 1) {
 			sortInDocumentOrder(results);
 		}
-		return results;
+		return new ArrayList<>(results);
+	}
+
+	/**
+	 * List of nodes that are checked for duplicates before being added,
+	 * {@link #contains(Object)} is fast as it doesn't scan the list.
+	 */
+	private static final class UniqueNodeList extends ArrayList<Node> {
+		private final Set<Node> nodes = Collections.newSetFromMap(new IdentityHashMap<>());
+
+		@Override
+		public boolean add(final Node node) {
+			nodes.add(node);
+			return super.add(node);
+		}
+
+		@Override
+		public boolean contains(final Object o) {
+			return nodes.contains(o);
+		}
 	}
 
 	/**
@@ -198,7 +219,7 @@ public class NodeSelector {
 			final CssSelector cssSelector = selectors.get(i);
 
 			// create new set of results for current css selector
-			List<Node> selectedNodes = new ArrayList<>();
+			List<Node> selectedNodes = new UniqueNodeList();
 			for (Node node : nodes) {
 				walk(node, cssSelector, selectedNodes);
 			}
