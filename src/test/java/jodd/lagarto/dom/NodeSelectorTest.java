@@ -448,6 +448,40 @@ class NodeSelectorTest {
 	}
 
 	@Test
+	void testFormAndLinkPseudoClasses() {
+		NodeSelector nodeSelector = new NodeSelector(new LagartoDOMBuilder().parse(
+			"<form>" +
+			"<input id='i1' required><input id='i2' disabled><input id='i3' readonly><input id='i4' type='hidden' required>" +
+			"<input id='i5' type='checkbox'><input id='i6' type='unknown'>" +
+			"<fieldset id='f1' disabled><legend><input id='i7'></legend><legend><input id='i8'></legend>" +
+			"<fieldset id='f2'><button id='b1'>b</button></fieldset></fieldset>" +
+			"<select id='s1' required><optgroup id='g1' disabled><option id='o1'>a</option></optgroup>" +
+			"<option id='o2' disabled>b</option><option id='o3'>c</option></select>" +
+			"<textarea id='t1'></textarea><textarea id='t2' readonly></textarea>" +
+			"</form>" +
+			"<div id='d1' contenteditable><p id='p1'>x</p><p id='p2' contenteditable='false'>y</p></div>" +
+			"<a id='a1' href='/'>a</a><a id='a2' name='n'>b</a><map><area id='r1' href='/'></map><link id='l1' href='/'>"));
+
+		// expected values are the ones of Chrome
+		assertEquals("i1,i3,i4,i5,i6,i7,s1,o3,t1,t2", ids(nodeSelector.select(":enabled")));
+		assertEquals("i2,f1,i8,f2,b1,g1,o1,o2", ids(nodeSelector.select(":disabled")));
+		assertEquals("i1,s1", ids(nodeSelector.select(":required")));
+		assertEquals("i2,i3,i4,i5,i6,i7,i8,b1,t1,t2", ids(nodeSelector.select(":optional")));
+		assertEquals("i1,i6,i7,t1,d1,p1", ids(nodeSelector.select(":read-write")));
+		assertEquals("i2,i3,i8", ids(nodeSelector.select("input:read-only:not([type])")));
+		assertEquals("a1,r1", ids(nodeSelector.select(":link")));
+		assertEquals("a1,r1", ids(nodeSelector.select(":any-link")));
+	}
+
+	private static String ids(final List<Node> nodes) {
+		final List<String> ids = new ArrayList<>();
+		for (final Node node : nodes) {
+			ids.add(node.getAttribute("id"));
+		}
+		return String.join(",", ids);
+	}
+
+	@Test
 	void testChecked() {
 		NodeSelector nodeSelector = new NodeSelector(new LagartoDOMBuilder().parse(
 			"<input id='c1' type='checkbox' checked><input id='c2' type='checkbox'><input id='r1' type='RADIO' checked>" +
