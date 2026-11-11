@@ -27,6 +27,8 @@ package jodd.csselly.selector;
 import jodd.csselly.CSSellyException;
 import jodd.util.StringUtil;
 
+import java.util.Locale;
+
 /**
  * {@link PseudoFunction Pseudo-function expression}, in form: {@code an + b}.
  */
@@ -37,7 +39,8 @@ public class PseudoFunctionExpression {
 	protected final int b;
 
 	public PseudoFunctionExpression(String expression) {
-		expression = StringUtil.removeChars(expression, "+ \t\n\r\n");
+		// keywords and n are case-insensitive
+		expression = StringUtil.removeChars(expression, "+ \t\n\r\n").toLowerCase(Locale.ROOT);
 		if (expression.equals("odd")) {
 			a = 2;
 			b = 1;

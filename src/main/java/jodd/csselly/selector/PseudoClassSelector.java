@@ -33,6 +33,7 @@ import jodd.util.ClassUtil;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -95,14 +96,15 @@ public class PseudoClassSelector extends Selector implements NodeFilter, NodeLis
 		} catch (final Exception ex) {
 			throw new CSSellyException(ex);
 		}
-		PSEUDO_CLASS_MAP.put(pseudoClass.getPseudoClassName(), pseudoClass);
+		// pseudo class names are case-insensitive
+		PSEUDO_CLASS_MAP.put(pseudoClass.getPseudoClassName().toLowerCase(Locale.ROOT), pseudoClass);
 	}
 
 	/**
 	 * Lookups pseudo class for given pseudo class name.
 	 */
 	public static PseudoClass lookupPseudoClass(final String pseudoClassName) {
-		final PseudoClass pseudoClass = PSEUDO_CLASS_MAP.get(pseudoClassName);
+		final PseudoClass pseudoClass = PSEUDO_CLASS_MAP.get(pseudoClassName.toLowerCase(Locale.ROOT));
 		if (pseudoClass == null) {
 			throw new CSSellyException("Unsupported pseudo class: " + pseudoClassName);
 		}
