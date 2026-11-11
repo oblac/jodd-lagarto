@@ -1,6 +1,7 @@
 package jodd.csselly.selector;
 
 import jodd.csselly.CSSelly;
+import jodd.csselly.CSSellyException;
 import jodd.csselly.CssSelector;
 import jodd.lagarto.dom.Node;
 import jodd.lagarto.dom.NodeMatcher;
@@ -202,7 +203,15 @@ public interface PseudoFunctions {
 			if (StringUtil.startsWithChar(expression, '\'') || StringUtil.startsWithChar(expression, '"')) {
 				expression = expression.substring(1, expression.length() - 1);
 			}
-			return CSSelly.parse(expression);
+			final List<List<CssSelector>> selectors = CSSelly.parse(expression);
+			for (final List<CssSelector> selector : selectors) {
+				// relative selectors are anchored at the tested element, but an explicit :scope still represents
+				// the scoping root of the whole selection, which is not available here
+				if (selector != null && selector.get(0).isScope() && !selector.get(0).isRelative()) {
+					throw new CSSellyException(":scope is not supported in :has()");
+				}
+			}
+			return selectors;
 		}
 
 		@Override
@@ -214,22 +223,58 @@ public interface PseudoFunctions {
 	}
 
 	/**
-	 * Selects all elements that do not match the given selector.
+	 * Base class for pseudo functions that match an element against a list of (non-relative) selectors.
 	 */
-	class NOT extends PseudoFunction<List<List<CssSelector>>> {
+	abstract class SelectorListPseudoFunction extends PseudoFunction<List<List<CssSelector>>> {
 
 		@Override
 		public List<List<CssSelector>> parseExpression(String expression) {
 			if (StringUtil.startsWithChar(expression, '\'') || StringUtil.startsWithChar(expression, '"')) {
 				expression = expression.substring(1, expression.length() - 1);
 			}
-			return CSSelly.parse(expression);
+			final List<List<CssSelector>> selectors = CSSelly.parse(expression);
+			for (final List<CssSelector> selector : selectors) {
+				if (selector == null) {
+					throw new CSSellyException("Empty selector in :" + getPseudoFunctionName() + "()");
+				}
+				if (selector.get(0).isScope()) {
+					throw new CSSellyException("Relative selectors are not supported in :" + getPseudoFunctionName() + "()");
+				}
+			}
+			return selectors;
 		}
+
+		protected boolean matchAny(final Node node, final List<List<CssSelector>> selectors) {
+			return new NodeMatcher(node).match(selectors);
+		}
+	}
+
+	/**
+	 * Selects all elements that do not match any of the given selectors.
+	 */
+	class NOT extends SelectorListPseudoFunction {
 
 		@Override
 		public boolean match(final Node node, final List<List<CssSelector>> selectors) {
-			return !new NodeMatcher(node).match(selectors);
+			return !matchAny(node, selectors);
 		}
+	}
+
+	/**
+	 * Selects all elements that match any of the given selectors.
+	 */
+	class IS extends SelectorListPseudoFunction {
+
+		@Override
+		public boolean match(final Node node, final List<List<CssSelector>> selectors) {
+			return matchAny(node, selectors);
+		}
+	}
+
+	/**
+	 * Same as {@link IS}, specificity doesn't apply here.
+	 */
+	class WHERE extends IS {
 	}
 
 }
