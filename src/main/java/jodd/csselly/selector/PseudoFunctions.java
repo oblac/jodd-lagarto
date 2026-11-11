@@ -65,6 +65,8 @@ public interface PseudoFunctions {
 			if (!new NodeMatcher(node).match(selectors)) {
 				return false;
 			}
+			// with a <= 0, eg: '2 of S' or '-n+3 of S', the index can't be greater than b: no need to count further
+			final int maxIndex = a > 0 ? Integer.MAX_VALUE : b;
 			final Node parent = node.getParentNode();
 			final int childCount = parent.getChildNodesCount();
 			int index = 1;
@@ -75,6 +77,9 @@ public interface PseudoFunctions {
 				}
 				if (sibling.getNodeType() == Node.NodeType.ELEMENT && new NodeMatcher(sibling).match(selectors)) {
 					index++;
+					if (index > maxIndex) {
+						return false;
+					}
 				}
 			}
 			return false;
